@@ -34,8 +34,6 @@ export default async function Experiences({ siteId }: ExperiencesProps) {
   //   >
   // >(sessionId && `/api/experience`, fetcher);
 
-  console.log("experiences", siteId);
-
   return (
     <div className="-mt-3.5 flex flex-col divide-y divide-gray-200">
       {experiences ? (

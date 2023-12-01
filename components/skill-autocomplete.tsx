@@ -14,6 +14,7 @@ import { FormFieldsType } from "@/lib/types";
 import { useField } from "formik";
 import { Search, XCircle } from "lucide-react";
 import LoadingSpinner from "./icons/loading-spinner";
+import { useDebounce } from "use-debounce";
 
 interface SkillAutocompleteProps extends FormFieldsType {
   skills?: Array<Skill>;
@@ -27,7 +28,7 @@ interface SkillAutocompleteProps extends FormFieldsType {
 const Skill = ({ skill, removeSkill }: { skill: Skill; removeSkill: any }) => {
   return (
     <>
-      <span className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2.5 py-1 text-xs font-normal text-gray-500">
+      <span className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2.5 py-1 text-xs font-normal text-gray-500 dark:border-none dark:bg-gray-300 dark:text-gray-600">
         {skill.name}
         <button
           type="button"
@@ -58,9 +59,10 @@ const SkillAutocomplete = ({
     skills || [],
   );
   const [query, setQuery] = React.useState("");
+  const [debouncedQuery] = useDebounce(query, 250);
 
   const { data: fetchedSkills, error } = useSWR<Array<Skill>>(
-    sessionId && `/api/skill?q=${query}`,
+    sessionId && `/api/builder/skill?q=${debouncedQuery}`,
     fetcher,
   );
   const isLoading = !error && !fetchedSkills;
@@ -97,14 +99,14 @@ const SkillAutocomplete = ({
         by={ascFilter}
         onChange={handleSelect}
         as="div"
-        className="max-w-x1 shadow-2x1 relative w-full rounded-lg bg-white dark:bg-stone-700 ring-1 ring-black/5 "
+        className="max-w-x1 shadow-2x1 relative w-full rounded-lg bg-white ring-1 ring-black/5 dark:bg-stone-700 "
       >
         <div className="flex w-full items-center rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus-within:border-blue-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
           <Search className="mr-2 h-5 w-5 text-gray-400" />
           <Combobox.Input
             onChange={(event) => setQuery(event.target.value)}
             autoComplete="off"
-            className="w-full border-none p-0 placeholder-gray-300 focus:ring-0 dark:bg-stone-700"
+            className="w-full border-none p-0 text-sm placeholder-gray-300 focus:ring-0 dark:bg-stone-700"
             placeholder="Search for a skill"
           />
           {isLoading && <LoadingSpinner />}
