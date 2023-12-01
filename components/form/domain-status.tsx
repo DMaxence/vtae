@@ -1,14 +1,14 @@
 "use client";
 
 import { AlertCircle, CheckCircle2, XCircle } from "lucide-react";
-import LoadingSpinner from "./loading-spinner";
+import IosLoadingSpinner from "./ios-loading-spinner";
 import { useDomainStatus } from "./use-domain-status";
 
 export default function DomainStatus({ domain }: { domain: string }) {
   const { status, loading } = useDomainStatus({ domain });
 
   return loading ? (
-    <LoadingSpinner />
+    <IosLoadingSpinner />
   ) : status === "Valid Configuration" ? (
     <CheckCircle2
       fill="#2563EB"

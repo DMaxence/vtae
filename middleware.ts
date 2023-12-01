@@ -17,7 +17,7 @@ export const config = {
 export default async function middleware(req: NextRequest) {
   const url = req.nextUrl;
 
-  // Get hostname of request (e.g. demo.vercel.pub, demo.localhost:3000)
+  // Get hostname of request (e.g. demo.vtae.xyz, demo.localhost:3000)
   let hostname = req.headers
     .get("host")!
     .replace(".localhost:3000", `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`);
@@ -48,13 +48,6 @@ export default async function middleware(req: NextRequest) {
     }
     return NextResponse.rewrite(
       new URL(`/app${path === "/" ? "" : path}`, req.url),
-    );
-  }
-
-  // special case for `vercel.pub` domain
-  if (hostname === "vercel.pub") {
-    return NextResponse.redirect(
-      "https://vercel.com/blog/platforms-starter-kit",
     );
   }
 

@@ -8,7 +8,9 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./lib/**/*.{js,ts,jsx,tsx}",
     "./node_modules/@tremor/**/*.{js,ts,jsx,tsx}", // Tremor module
+    "node_modules/flowbite-react/lib/esm/**/*.js", // Flowbite module
   ],
+  darkMode: ["class"],
   theme: {
     extend: {
       colors: {
@@ -181,5 +183,6 @@ module.exports = {
     require("@tailwindcss/typography"),
     require("@tailwindcss/forms"),
     require("tailwindcss-animate"),
+    require("flowbite/plugin"),
   ],
 };

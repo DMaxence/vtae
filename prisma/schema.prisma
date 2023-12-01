@@ -2,30 +2,38 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  provider = "mysql"
+  url      = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  // directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  relationMode = "prisma"
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String          @id @default(cuid())
   name          String?
-  // if you are using Github OAuth, you can get rid of the username attribute (that is for Twitter OAuth)
   username      String?
   gh_username   String?
-  email         String?   @unique
+  email         String?         @unique
   emailVerified DateTime?
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  password      String?
   accounts      Account[]
   sessions      Session[]
   sites         Site[]
   posts         Post[]
+  personalInfos PersonalInfos[]
+  experiences   Experience[]
+  skills        Skill[]
+  educations    Education[]
+  links         Link[]
+  languages     Language[]
 }
 
 model Account {
@@ -75,8 +83,8 @@ model Post {
   description   String?  @db.Text
   content       String?  @db.Text
   slug          String   @default(cuid())
-  image         String?  @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/hxfcV5V-eInX3jbVUhjAt1suB7zB88uGd1j20b.png") @db.Text
-  imageBlurhash String?  @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC") @db.Text
+  image         String?  @db.Text
+  imageBlurhash String?  @db.Text
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   published     Boolean  @default(false)
@@ -91,31 +99,148 @@ model Post {
 }
 
 model Site {
-  id            String   @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String?
-  description   String?  @db.Text
-  logo          String?  @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
-  font          String   @default("font-cal")
-  image         String?  @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/hxfcV5V-eInX3jbVUhjAt1suB7zB88uGd1j20b.png") @db.Text
-  imageBlurhash String?  @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC") @db.Text
-  subdomain     String?  @unique
-  customDomain  String?  @unique
-  message404    String?  @default("Blimey! You've found a page that doesn't exist.") @db.Text
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  description   String?        @db.Text
+  logo          String?        @db.Text
+  font          String         @default("font-cal")
+  image         String?        @db.Text
+  imageBlurhash String?        @db.Text
+  subdomain     String?        @unique
+  customDomain  String?        @unique
+  message404    String?        @db.Text
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  user          User?          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId        String?
   posts         Post[]
+  experiences   Experience[]
+  personalInfos PersonalInfos?
+  educations    Education[]
+  links         Link[]
+  languages     Language[]
+  theme         Theme?         @relation(fields: [themeId], references: [id])
+  themeId       String?
 
   @@index([userId])
+  @@index([themeId])
 }
 
-model Example {
-  id            Int     @id @default(autoincrement())
-  name          String?
-  description   String? @db.Text
-  domainCount   Int?
-  url           String?
-  image         String? @db.Text
-  imageBlurhash String? @db.Text
+model PersonalInfos {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  firstname     String?
+  lastname      String?
+  title         String?
+  alias         String?
+  about         String?  @db.Text
+  location      String?
+  currentWork   String?
+  image         String?  @db.Text
+  imageBlurhash String?  @db.LongText
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  site          Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId        String?  @unique
+}
+
+model Experience {
+  id          String    @id @default(cuid())
+  userId      String?
+  companyName String
+  companyUrl  String?
+  jobTitle    String
+  description String    @db.Text
+  location    String?
+  skills      Skill[]
+  startDate   DateTime  @db.Date
+  endDate     DateTime? @db.Date
+  type        String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  site        Site?     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId      String?
+
+  @@index([userId, siteId], name: "experience_site_constraint")
+}
+
+model Skill {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  primary     Boolean      @default(false)
+  type        String?
+  userId      String?
+  experiences Experience[]
+  user        User?        @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@fulltext([name])
+}
+
+model Education {
+  id          String    @id @default(cuid())
+  userId      String?
+  place       String
+  degree      String?
+  degreeField String?
+  country     String?
+  city        String?
+  description String?   @db.Text
+  startDate   DateTime  @db.Date
+  endDate     DateTime? @db.Date
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  site        Site?     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId      String?
+
+  @@index([userId, siteId], name: "education_site_constraint")
+}
+
+model Link {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  alt       String?
+  icon      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  siteId    String?
+  userId    String?
+  site      Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([siteId, userId], name: "link_site_constraint")
+}
+
+model Language {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  siteId    String?
+  userId    String?
+  site      Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([siteId, userId], name: "language_site_constraint")
+}
+
+model Theme {
+  id                String   @id @default(cuid())
+  name              String
+  slug              String   @unique
+  image             String?
+  bgColor           String?
+  textColor         String?
+  titleColor        String?
+  linkColor         String?
+  accentColor       String?
+  contrastColor     String?
+  contrastTextColor String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  sites             Site[]
 }

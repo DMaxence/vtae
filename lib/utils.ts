@@ -1,3 +1,4 @@
+import { Experience } from "@prisma/client";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -56,4 +57,90 @@ export const toDateString = (date: Date) => {
 
 export const random = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
+};
+
+export default function getScrollAnimation() {
+  return {
+    offscreen: {
+      y: 150,
+      opacity: 0,
+    },
+    onscreen: ({ duration = 2 } = {}) => ({
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        duration,
+      },
+    }),
+  };
+}
+
+export const getTextDate = (date: Date | string) =>
+  new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+  });
+
+export const getElapsedTime = (
+  startDate: Date | string,
+  endDate: Date | string,
+) => {
+  const start = typeof startDate === "string" ? new Date(startDate) : startDate;
+  const end = typeof endDate === "string" ? new Date(endDate) : endDate;
+  const years = end.getFullYear() - start.getFullYear();
+  const months =
+    end.getMonth() -
+    start.getMonth() +
+    12 * (end.getFullYear() - start.getFullYear()) +
+    1;
+
+  const yearText =
+    years === 0 || months < 12
+      ? ""
+      : years > 1
+        ? `${years} years`
+        : `${years} year`;
+
+  let monthText = "";
+  if (months <= 1) {
+    monthText = " 1 month";
+  } else if (months > 1 && months % 12 !== 0) {
+    monthText = ` ${months % 12} months`;
+  } else if (months % 12 === 0) {
+    monthText = "";
+  }
+
+  return `${yearText}${monthText}`;
+};
+
+export const getExperienceYears = (experiences: Experience[]) => {
+  const months = new Set();
+
+  // convert date into unique integer month value based on year 1900
+  function m1900(date: Date) {
+    const y = date.getFullYear();
+    const m = date.getMonth();
+    return (y - 1900) * 12 + m;
+  }
+
+  experiences?.forEach((job) => {
+    const m1 = m1900(new Date(job.startDate));
+    const m2 = m1900(job?.endDate ? new Date(job.endDate) : new Date());
+    for (let m = m1; m < m2; m++) months.add(m);
+  });
+  const experienceYears = Math.round((months.size / 12) * 2) / 2;
+  return experienceYears;
+};
+
+export const isValidEmail = (email: string) => {
+  return /\S+@\S+\.\S+/.test(email);
+};
+
+export const getClickableLink = (link: string) => {
+  if (isValidEmail(link)) return `mailto:${link}`;
+
+  return link.startsWith("http://") || link.startsWith("https://")
+    ? link
+    : `https://${link}`;
 };

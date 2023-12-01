@@ -1,3 +1,7 @@
+import type { Post, Site } from "@prisma/client";
+import type { PropsWithChildren } from "react";
+import React from "react";
+
 export type DomainVerificationStatusProps =
   | "Valid Configuration"
   | "Invalid Configuration"
@@ -55,4 +59,47 @@ export interface DomainVerificationResponse {
     value: string;
     reason: string;
   }[];
+}
+
+export type WithChildren<T = {}> = T & PropsWithChildren<{}>;
+
+export type WithShowModal<T = {}> = T & {
+  showModal: boolean;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export type WithSiteId<T = {}> = T & {
+  siteId: string;
+};
+
+export type WithClassName<T = {}> = T & {
+  className?: string;
+};
+
+export interface WithSitePost extends Post {
+  site: Site | null;
+}
+
+export interface FormFieldsType {
+  name: string;
+  placeholder: string;
+  type: string;
+  required?: boolean;
+  maxLength?: number;
+  selectOptions?: Array<{
+    value: string;
+    label: string;
+  }>;
+  containerClasses?: string;
+  readOnly?: boolean;
+  helperText?: string;
+}
+
+export enum EmploymentType {
+  FULL_TIME = "Full Time",
+  PART_TIME = "Part Time",
+  FREELANCE = "Freelance",
+  INTERNSHIP = "Internship / Apprenticeship",
+  PERSONAL_PROJECT = "Personal Project",
+  CONTRACT = "Contract",
 }

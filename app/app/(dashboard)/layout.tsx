@@ -10,7 +10,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <Profile />
         </Suspense>
       </Nav>
-      <div className="min-h-screen dark:bg-black sm:pl-60">{children}</div>
+      {/* TODO : remove bg-black maybe */}
+      <div className="min-h-screen transition-all dark:bg-black sm:pl-60">{children}</div>
     </div>
   );
 }

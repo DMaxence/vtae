@@ -37,6 +37,13 @@ export default function Modal({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [onKeyDown]);
 
+  useEffect(() => {
+    if (showModal) document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.removeProperty("overflow");
+    };
+  }, [showModal]);
+
   const { isMobile, isDesktop } = useWindowSize();
 
   return (
@@ -65,7 +72,7 @@ export default function Modal({
               </FocusTrap>
               <motion.div
                 key="desktop-backdrop"
-                className="fixed inset-0 z-30 bg-gray-100 bg-opacity-10 backdrop-blur"
+                className="fixed inset-0 z-30 overflow-hidden bg-gray-100 bg-opacity-10 backdrop-blur"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
