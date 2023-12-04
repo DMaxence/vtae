@@ -1,5 +1,6 @@
-import { Experience } from "@prisma/client";
+import { Experience, Site } from "@prisma/client";
 import { clsx, type ClassValue } from "clsx";
+import { revalidateTag } from "next/cache";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -9,7 +10,7 @@ export async function fetcher<JSON = any>(
   input: RequestInfo,
   init?: RequestInit,
 ): Promise<JSON> {
-  const response = await fetch(input, { ...init, cache: "no-store" });
+  const response = await fetch(input, { ...init, cache: "force-cache" });
 
   return response.json();
 }
@@ -143,4 +144,11 @@ export const getClickableLink = (link: string) => {
   return link.startsWith("http://") || link.startsWith("https://")
     ? link
     : `https://${link}`;
+};
+
+export const revalidateSite = async (site: Site) => {
+  await revalidateTag(
+    `${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
+  );
+  site.customDomain && (await revalidateTag(`${site.customDomain}-metadata`));
 };

@@ -11,33 +11,9 @@ interface SectionProps extends WithChildren {
   theme?: ThemeType;
   sectionName?: string;
   description?: string;
-  editModal?: React.FC<WithSiteId>;
-  addModal?: React.FC<WithSiteId>;
+  editModal?: React.FC<WithSiteId & WithShowModal>;
+  addModal?: React.FC<WithSiteId & WithShowModal>;
   site: Site;
-}
-
-function EditButton({ children }: { children: React.ReactNode }) {
-  const modal = useModal();
-  return (
-    <button
-      onClick={() => modal?.show(children)}
-      // className="rounded-lg border border-black bg-black px-4 py-1.5 text-sm font-medium text-white transition-all hover:bg-white hover:text-black active:bg-stone-100 dark:border-stone-700 dark:hover:border-stone-200 dark:hover:bg-black dark:hover:text-white dark:active:bg-stone-800"
-    >
-      <PenSquare className="h-5 w-5 text-gray-500 dark:text-gray-100" />
-    </button>
-  );
-}
-
-function AddButton({ children }: { children: React.ReactNode }) {
-  const modal = useModal();
-  return (
-    <button
-      onClick={() => modal?.show(children)}
-      // className="rounded-lg border border-black bg-black px-4 py-1.5 text-sm font-medium text-white transition-all hover:bg-white hover:text-black active:bg-stone-100 dark:border-stone-700 dark:hover:border-stone-200 dark:hover:bg-black dark:hover:text-white dark:active:bg-stone-800"
-    >
-      <Plus className="h-5 w-5 text-gray-500 dark:text-gray-100" />
-    </button>
-  );
 }
 
 export default function Section({
@@ -49,11 +25,11 @@ export default function Section({
   addModal: AddModal,
   site,
 }: SectionProps) {
-  // const [showModal, setShowModal] = React.useState<boolean>(false);
+  const [showModal, setShowModal] = React.useState<boolean>(false);
 
   return (
     <section
-      className="rounded-lg bg-white p-5 shadow-md dark:bg-black"
+      className="flex flex-col gap-3.5 rounded-lg bg-white p-5 shadow-md dark:bg-black"
       style={{ backgroundColor: theme?.bgColor }}
     >
       <div className="flex justify-between">
@@ -63,15 +39,14 @@ export default function Section({
         >
           {sectionName}
         </h2>
-        {EditModal && (
-          <EditButton>
-            <EditModal siteId={site.id} />
-          </EditButton>
-        )}
-        {AddModal && (
-          <AddButton>
-            <AddModal siteId={site.id} />
-          </AddButton>
+        {(EditModal || AddModal) && (
+          <button type="button" onClick={() => setShowModal(!showModal)}>
+            {EditModal ? (
+              <PenSquare className="h-5 w-5 text-gray-500 dark:text-gray-100" />
+            ) : (
+              <Plus className="h-5 w-5 text-gray-500 dark:text-gray-100" />
+            )}
+          </button>
         )}
       </div>
       {description && (
@@ -82,13 +57,21 @@ export default function Section({
           {description}
         </p>
       )}
-      <div className="mt-3.5">{children}</div>
-      {/* {EditModal && (
-        <EditModal showModal={showModal} setShowModal={setShowModal} />
+      <div className="">{children}</div>
+      {EditModal && (
+        <EditModal
+          siteId={site.id}
+          showModal={showModal}
+          setShowModal={setShowModal}
+        />
       )}
       {AddModal && (
-        <AddModal showModal={showModal} setShowModal={setShowModal} />
-      )} */}
+        <AddModal
+          siteId={site.id}
+          showModal={showModal}
+          setShowModal={setShowModal}
+        />
+      )}
     </section>
   );
 }

@@ -11,21 +11,26 @@ import { Form, Formik } from "formik";
 import CancelButton from "@/components/cancel-button";
 import ModalTitle from "@/components/modal-title";
 import SubmitButton from "@/components/submit-button";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
-import { useModal } from "@/components/modal/provider";
 import { fetcher } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 
 import { aboutFields } from "@/constants/fields";
 
+import Modal from "@/components/modal";
 import TextArea from "@/components/textarea";
-import { WithSiteId } from "@/lib/types";
+import { createOrUpdatePersonalInfos } from "@/lib/builder/personal-infos";
+import { WithShowModal, WithSiteId } from "@/lib/types";
+import { toast } from "sonner";
 
-interface AboutModalProps extends WithSiteId {}
+interface AboutModalProps extends WithSiteId, WithShowModal {}
 
-export default function AboutModal({ siteId }: AboutModalProps) {
-  const modal = useModal();
+export default function AboutModal({
+  showModal,
+  setShowModal,
+  siteId,
+}: AboutModalProps) {
   const [isPending, startTransition] = React.useTransition();
 
   const { data: session } = useSession();
@@ -43,26 +48,19 @@ export default function AboutModal({ siteId }: AboutModalProps) {
       .max(aboutFields[0].maxLength || 1000, "Text is too long"),
   });
 
-  async function onSubmit({ about }: PersonalInfos) {
-    startTransition(async () => {});
-    // const res = await fetch("/api/personal-infos", {
-    //   method: HttpMethod.POST,
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     about: about,
-    //   }),
-    // });
-    // if (res.ok) {
-    //   const data = await res.json();
-    //   // push data on redux store
-    //   mutate("/api/personal-infos");
-    //   toast.success("Bio updated");
-    //   setShowModal(false);
-    //   setUpdatingInfos(false);
-    // }
-  }
+  const close = () => setShowModal(false);
+
+  const onSubmit = async (data: PersonalInfos) =>
+    startTransition(async () => {
+      const res = await createOrUpdatePersonalInfos(data, siteId);
+      if (res.error) {
+        toast.error(res.error);
+      } else {
+        mutate(`/api/builder/${siteId}/personal-infos`);
+        close();
+        toast.success(`Successfully updated personal infos!`);
+      }
+    });
 
   return (
     <Formik
@@ -79,20 +77,22 @@ export default function AboutModal({ siteId }: AboutModalProps) {
       validationSchema={validationSchema}
       enableReinitialize
     >
-      <Form className="inline-block w-full max-w-md overflow-hidden rounded-lg border border-stone-200 bg-white pt-8 text-center align-middle shadow-md transition-all dark:border-stone-700 dark:bg-stone-900">
-        <ModalTitle title="Edit your bio" />
-        <div className="mx-auto grid w-5/6 gap-y-5">
-          {aboutFields.map((field) => (
-            <TextArea key={field.name} {...field} />
-          ))}
-        </div>
-        <div className="mb-5 mt-3 flex w-full flex-row-reverse items-center justify-between px-8">
-          <div className="flex gap-3.5 self-start">
-            <CancelButton onCancel={() => modal?.hide()} />
-            <SubmitButton loading={isPending} />
+      <Modal showModal={showModal} setShowModal={setShowModal}>
+        <Form className="inline-block w-full max-w-2xl overflow-hidden rounded-lg border border-stone-200 bg-white pt-8 text-center align-middle shadow-md transition-all dark:border-stone-700 dark:bg-stone-900">
+          <ModalTitle title="Edit your bio" />
+          <div className="mx-auto grid w-5/6 gap-y-5">
+            {aboutFields.map((field) => (
+              <TextArea key={field.name} {...field} />
+            ))}
           </div>
-        </div>
-      </Form>
+          <div className="mb-5 mt-3 flex w-full flex-row-reverse items-center justify-between px-8">
+            <div className="flex gap-3.5 self-start">
+              <CancelButton onCancel={close} />
+              <SubmitButton loading={isPending} />
+            </div>
+          </div>
+        </Form>
+      </Modal>
     </Formik>
   );
 }

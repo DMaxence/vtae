@@ -1,8 +1,9 @@
+"use server";
 import prisma from "@/lib/prisma";
 
-import type { NextApiRequest, NextApiResponse } from "next";
-import type { Site, Education } from ".prisma/client";
-import type { Session } from "next-auth";
+import type { Education, Site } from "@prisma/client";
+import { withSiteAuth } from "../auth";
+import { revalidateSite } from "../utils";
 
 /**
  * Get Education
@@ -99,57 +100,47 @@ export const getEducation = async (siteId: string, educationId?: string) => {
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-// export async function createEducation(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: Session
-// ): Promise<void | NextApiResponse<{
-//   educationId: string
-// }>> {
-//   const { startDate, endDate } = req.body
+export const createEducation = withSiteAuth(
+  async ({ startDate, endDate, ...data }: Education, site: Site) => {
+    try {
+      const response = await prisma.education.create({
+        data: {
+          ...data,
+          startDate: new Date(startDate),
+          ...(endDate ? { endDate: new Date(endDate) } : {}),
+          site: {
+            connectOrCreate: {
+              where: {
+                id: site.id,
+              },
+              create: {
+                id: site.id,
+              },
+            },
+          },
+        },
+        include: {
+          site: {
+            select: { subdomain: true, customDomain: true },
+          },
+        },
+      });
 
-//   if (!session.user.id)
-//     return res.status(500).end('Server failed to get session user ID')
-
-//   try {
-//     const response = await prisma.education.create({
-//       data: {
-//         ...req.body,
-//         startDate: new Date(startDate),
-//         endDate: new Date(endDate),
-//         user: {
-//           connect: {
-//             id: session.user.id,
-//           },
-//         },
-//         site: {
-//           connectOrCreate: {
-//             where: {
-//               userId: session.user.id,
-//             },
-//             create: {
-//               userId: session.user.id,
-//             },
-//           },
-//         },
-//       },
-//       include: {
-//         site: {
-//           select: { subdomain: true, customDomain: true },
-//         },
-//       },
-//     })
-
-//     await revalidateSite(response.site)
-
-//     return res.status(201).json({
-//       educationId: response.id,
-//     })
-//   } catch (error) {
-//     console.log(error)
-//     return res.status(500).end(error)
-//   }
-// }
+      await revalidateSite(response.site as Site);
+      return response;
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        return {
+          error: `This education is already in use`,
+        };
+      } else {
+        return {
+          error: error.message,
+        };
+      }
+    }
+  },
+);
 
 /**
  * Delete Education
@@ -161,41 +152,29 @@ export const getEducation = async (siteId: string, educationId?: string) => {
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-// export async function deleteEducation(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: Session
-// ): Promise<void | NextApiResponse> {
-//   const { educationId } = req.body
+export const deleteEducation = withSiteAuth(
+  async ({ educationId }: { educationId: string }, site: Site) => {
+    try {
+      const response = await prisma.education.delete({
+        where: {
+          id: educationId,
+        },
+        include: {
+          site: {
+            select: { subdomain: true, customDomain: true },
+          },
+        },
+      });
 
-//   if (Array.isArray(educationId))
-//     return res
-//       .status(400)
-//       .end(`Bad request. educationId parameter must be an array.`)
-
-//   if (!session.user.id)
-//     return res.status(500).end('Server failed to get session user ID')
-
-//   try {
-//     const response = await prisma.education.delete({
-//       where: {
-//         id: educationId,
-//       },
-//       include: {
-//         site: {
-//           select: { subdomain: true, customDomain: true },
-//         },
-//       },
-//     })
-
-//     await revalidateSite(response.site)
-
-//     return res.status(200).end()
-//   } catch (error) {
-//     console.error(error)
-//     return res.status(500).end(error)
-//   }
-// }
+      await revalidateSite(response.site as Site);
+      return response;
+    } catch (error: any) {
+      return {
+        error: error.message,
+      };
+    }
+  },
+);
 
 /**
  * Update Education
@@ -213,43 +192,37 @@ export const getEducation = async (siteId: string, educationId?: string) => {
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-// export async function updateEducation(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: Session
-// ): Promise<void | NextApiResponse<Site>> {
-//   const { id, startDate, endDate } = req.body
+export const updateEducation = withSiteAuth(
+  async ({ id, startDate, endDate, ...data }: Education) => {
+    try {
+      const response = await prisma.education.update({
+        where: {
+          id: id,
+        },
+        data: {
+          ...data,
+          startDate: new Date(startDate),
+          ...(endDate ? { endDate: new Date(endDate) } : {}),
+        },
+        include: {
+          site: {
+            select: { subdomain: true, customDomain: true },
+          },
+        },
+      });
 
-//   if (!session.user.id)
-//     return res.status(500).end('Server failed to get session user ID')
-
-//   try {
-//     const response = await prisma.education.update({
-//       where: {
-//         id: id,
-//       },
-//       data: {
-//         ...req.body,
-//         startDate: new Date(startDate),
-//         endDate: new Date(endDate),
-//         user: {
-//           connect: {
-//             id: session.user.id,
-//           },
-//         },
-//       },
-//       include: {
-//         site: {
-//           select: { subdomain: true, customDomain: true },
-//         },
-//       },
-//     })
-
-//     await revalidateSite(response.site)
-
-//     return res.status(200).json(response)
-//   } catch (error) {
-//     console.error(error)
-//     return res.status(500).end(error)
-//   }
-// }
+      await revalidateSite(response.site as Site);
+      return response;
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        return {
+          error: `This experience is already in use`,
+        };
+      } else {
+        return {
+          error: error.message,
+        };
+      }
+    }
+  },
+);

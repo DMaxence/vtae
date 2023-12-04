@@ -6,29 +6,39 @@ import * as yup from "yup";
 import CancelButton from "@/components/cancel-button";
 import ModalTitle from "@/components/modal-title";
 import SubmitButton from "@/components/submit-button";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
-import { useModal } from "@/components/modal/provider";
 import { fetcher } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 
 import DeleteButton from "@/components/delete-button";
 import Select from "@/components/select";
-import { WithSiteId } from "@/lib/types";
+import { WithShowModal, WithSiteId } from "@/lib/types";
 import { Form, Formik, FormikHelpers, FormikProps, FormikValues } from "formik";
 
 import type { Language } from "@prisma/client";
 
+import Modal from "@/components/modal";
 import { languageFields } from "@/constants/fields";
+import {
+  createLanguage,
+  deleteLanguage,
+  updateLanguage,
+} from "@/lib/builder/language";
+import { toast } from "sonner";
 
-interface LanguageModalProps extends WithSiteId {
+interface LanguageModalProps extends WithSiteId, WithShowModal {
   languageId?: string;
 }
 
-const LanguageModal = ({ siteId, languageId }: LanguageModalProps) => {
-  const modal = useModal();
-  const [updatingInfos, setUpdatingInfos] = React.useState<boolean>(false);
-  const [deleting, setDeleting] = React.useState<boolean>(false);
+const LanguageModal = ({
+  showModal,
+  setShowModal,
+  siteId,
+  languageId,
+}: LanguageModalProps) => {
+  const [isUpdating, startUpdateTransition] = React.useTransition();
+  const [isDeleting, startDeleteTransition] = React.useTransition();
 
   const { data: session } = useSession();
   const sessionId = session?.user?.id;
@@ -44,50 +54,38 @@ const LanguageModal = ({ siteId, languageId }: LanguageModalProps) => {
     name: yup.string().required("Required"),
   });
 
-  const sendData = async (
+  const onSubmit = async (
     values: Language,
     actions: FormikHelpers<FormikValues>,
   ) => {
-    // setUpdatingInfos(true)
-    // const res = await fetch('/api/language', {
-    //   method: languageId ? HttpMethod.PUT : HttpMethod.POST,
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     ...values,
-    //     ...(languageId && { id: languageId }),
-    //   }),
-    // })
-    // if (res.ok) {
-    //   const data = await res.json()
-    //   // push data on redux store
-    //   mutate('/api/language')
-    //   toast.success(`Language ${languageId ? 'updated' : 'created'}`)
-    //   actions.resetForm()
-    //   setShowModal(false)
-    // }
-    // if (res) setUpdatingInfos(false)
+    startUpdateTransition(async () => {
+      const res = await (languageId
+        ? updateLanguage({ ...values, id: languageId }, siteId)
+        : createLanguage(values, siteId));
+      if (res.error) {
+        toast.error(res.error);
+      } else {
+        mutate(`/api/builder/${siteId}/language`);
+        mutate("/api/skill");
+        setShowModal(false);
+        actions.resetForm();
+        toast.success(`Language ${languageId ? "updated" : "created"}`);
+      }
+    });
   };
 
   const onDelete = async () => {
-    // setDeleting(true)
-    // const res = await fetch('/api/language', {
-    //   method: HttpMethod.DELETE,
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     languageId: languageId,
-    //   }),
-    // })
-    // if (res.ok) {
-    //   // push data on redux store
-    //   mutate('/api/language')
-    //   toast.success('Language deleted')
-    //   setShowModal(false)
-    // }
-    // if (res) setDeleting(false)
+    startDeleteTransition(async () => {
+      const res = await deleteLanguage({ languageId }, siteId);
+      if (res.error) {
+        toast.error(res.error);
+      } else {
+        mutate(`/api/builder/${siteId}/language`);
+        mutate("/api/skill");
+        setShowModal(false);
+        toast.success("Language deleted");
+      }
+    });
   };
 
   return (
@@ -95,11 +93,14 @@ const LanguageModal = ({ siteId, languageId }: LanguageModalProps) => {
       validateOnBlur={false}
       validateOnChange={false}
       initialValues={languageFields.reduce((acc, field) => {
-        acc[field.name] = (languageId ? language?.[field.name] : null) ?? "";
+        acc[field.name] =
+          (languageId
+            ? language?.[field.name as keyof typeof language]
+            : null) ?? "";
         return acc;
       }, {})}
       onSubmit={(values, actions) => {
-        sendData(values as Language, actions);
+        onSubmit(values as Language, actions);
         actions.setSubmitting(false);
       }}
       validationSchema={validationSchema}
@@ -111,33 +112,35 @@ const LanguageModal = ({ siteId, languageId }: LanguageModalProps) => {
       }: FormikProps<(typeof languageFields)[keyof typeof languageFields]>) => {
         const onCancel = () => {
           resetForm();
-          modal?.hide();
+          setShowModal(false);
         };
 
         return (
-          <Form className="inline-block w-full max-w-3xl rounded-lg border border-stone-200 bg-white pt-8 text-center align-middle shadow-xl transition-all dark:border-stone-700 dark:bg-stone-900">
-            <ModalTitle title="Edit your language" />
-            <div className="flex flex-wrap justify-between gap-y-5 px-8">
-              {languageFields.map(({ ...field }) => (
-                <Select
-                  key={field.name}
-                  {...field}
-                  setFieldValue={setFieldValue}
-                />
-              ))}
-            </div>
-            <div className="mb-5 mt-3 flex w-full flex-row-reverse items-center justify-between px-8">
-              {languageId && (
-                <div className="order-1">
-                  <DeleteButton onDelete={onDelete} loading={deleting} />
-                </div>
-              )}
-              <div className="flex gap-3.5 self-start">
-                <CancelButton onCancel={onCancel} />
-                <SubmitButton loading={updatingInfos} />
+          <Modal showModal={showModal} setShowModal={setShowModal}>
+            <Form className="inline-block w-full max-w-3xl rounded-lg border border-stone-200 bg-white pt-8 text-center align-middle shadow-xl transition-all dark:border-stone-700 dark:bg-stone-900">
+              <ModalTitle title="Edit your language" />
+              <div className="flex flex-wrap justify-between gap-y-5 px-8">
+                {languageFields.map(({ ...field }) => (
+                  <Select
+                    key={field.name}
+                    {...field}
+                    setFieldValue={setFieldValue}
+                  />
+                ))}
               </div>
-            </div>
-          </Form>
+              <div className="mb-5 mt-3 flex w-full flex-row-reverse items-center justify-between px-8">
+                {languageId && (
+                  <div className="order-1">
+                    <DeleteButton onDelete={onDelete} loading={isDeleting} />
+                  </div>
+                )}
+                <div className="flex gap-3.5 self-start">
+                  <CancelButton onCancel={onCancel} />
+                  <SubmitButton loading={isUpdating} />
+                </div>
+              </div>
+            </Form>
+          </Modal>
         );
       }}
     </Formik>

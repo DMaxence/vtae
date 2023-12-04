@@ -146,6 +146,9 @@ ul[data-type="taskList"] li[data-checked="true"] > div > p {
     @apply dark:bg-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800;
     /* @apply bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800; */
   }
+  & .select-content__option--is-selected {
+    @apply dark:bg-neutral-900;
+  }
   /* & .select-content__option--is-focused {
     @apply bg-neutral-200 dark:bg-neutral-800;
   } */

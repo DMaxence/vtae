@@ -1,10 +1,11 @@
 "use client";
 import type { Link as LinkType, Theme } from "@prisma/client";
 
+import { WithSiteId } from "@/lib/types";
 import { getClickableLink } from "@/lib/utils";
 import { PenSquare } from "lucide-react";
-import { WithSiteId } from "@/lib/types";
-import { useModal } from "../modal/provider";
+
+import React from "react";
 import LinkModal from "../builder/Modals/link-modal";
 
 interface LinkProps extends WithSiteId {
@@ -14,9 +15,10 @@ interface LinkProps extends WithSiteId {
 }
 
 export default function Link({ siteId, link, readOnly, theme }: LinkProps) {
-  const modal = useModal();
+  const [showModal, setShowModal] = React.useState<boolean>(false);
+
   return (
-    <div className="mb-2.5 flex flex-col gap-3.5">
+    <div className="flex flex-col gap-3.5 py-2.5 first:pt-0 last:pb-0">
       <div className="flex items-center justify-between">
         <div className="flex gap-3.5">
           <div
@@ -37,17 +39,20 @@ export default function Link({ siteId, link, readOnly, theme }: LinkProps) {
         </div>
         {!readOnly && (
           <div>
-            <button
-              type="button"
-              onClick={() =>
-                modal?.show(<LinkModal siteId={siteId} linkId={link.id} />)
-              }
-            >
+            <button type="button" onClick={() => setShowModal(true)}>
               <PenSquare className="h-5 w-5 text-gray-500 dark:text-gray-100" />
             </button>
           </div>
         )}
       </div>
+      {!readOnly && (
+        <LinkModal
+          siteId={siteId}
+          linkId={link.id}
+          setShowModal={setShowModal}
+          showModal={showModal}
+        />
+      )}
     </div>
   );
 }

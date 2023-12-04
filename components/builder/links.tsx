@@ -15,21 +15,17 @@ export default async function Links({ siteId }: LinksProps) {
 
   const links = await prisma.link.findMany({
     where: {
-      user: {
-        sites: {
-          some: {
-            id: siteId,
-          },
-        },
-      },
+      siteId,
     },
   });
 
   return (
-    <div className="-mt-3.5 flex flex-col divide-y divide-gray-200">
+    <div className="flex flex-col divide-y divide-gray-200">
       {links &&
         (links.length > 0 ? (
-          links.map((link) => <Link key={link.id} siteId={siteId} link={link} />)
+          links.map((link) => (
+            <Link key={link.id} siteId={siteId} link={link} />
+          ))
         ) : (
           <>
             <div className="text-center">

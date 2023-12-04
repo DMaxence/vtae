@@ -7,7 +7,7 @@ import { countryCodeToDisplayNameMap } from "@/constants/countryCodeToDisplayNam
 import { CalendarDays, MapPin, PenSquare } from "lucide-react";
 // import EducationModal from "../builder/Modals/EducationModal";
 import { getTextDate } from "@/lib/utils";
-import { useModal } from "../modal/provider";
+
 import EducationModal from "../builder/Modals/education-modal";
 
 const Education = ({
@@ -21,10 +21,10 @@ const Education = ({
   theme?: Theme;
   siteId: string;
 }) => {
-  const modal = useModal();
+  const [showModal, setShowModal] = React.useState<boolean>(false);
 
   return (
-    <div className="flex flex-col gap-3.5 py-3.5">
+    <div className="flex flex-col gap-3.5 py-3.5 first:pt-0 last:pb-0">
       <div className="flex items-center justify-between">
         <div className="">
           <div className="text-lg font-semibold">{education.place}</div>
@@ -49,20 +49,21 @@ const Education = ({
         </div>
         {!readOnly && (
           <div>
-            <button
-              type="button"
-              onClick={() =>
-                modal?.show(
-                  <EducationModal siteId={siteId} educationId={education.id} />,
-                )
-              }
-            >
+            <button type="button" onClick={() => setShowModal(true)}>
               <PenSquare className="h-5 w-5 text-gray-500 dark:text-gray-100" />
             </button>
           </div>
         )}
       </div>
       <div className="whitespace-pre-line">{education.description}</div>
+      {!readOnly && (
+        <EducationModal
+          siteId={siteId}
+          educationId={education.id}
+          setShowModal={setShowModal}
+          showModal={showModal}
+        />
+      )}
     </div>
   );
 };

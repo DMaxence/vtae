@@ -10,20 +10,25 @@ import CancelButton from "@/components/cancel-button";
 import ModalTitle from "@/components/modal-title";
 import SubmitButton from "@/components/submit-button";
 import TextInput from "@/components/text-input";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
-import { WithSiteId } from "@/lib/types";
+import { WithShowModal, WithSiteId } from "@/lib/types";
 import { fetcher } from "@/lib/utils";
 import { Form, Formik } from "formik";
 import { useSession } from "next-auth/react";
 
-import { useModal } from "@/components/modal/provider";
+import Modal from "@/components/modal";
 import { currentInfosFields } from "@/constants/fields";
+import { createOrUpdatePersonalInfos } from "@/lib/builder/personal-infos";
+import { toast } from "sonner";
 
-interface CurrentInfosModalProps extends WithSiteId {}
+interface CurrentInfosModalProps extends WithSiteId, WithShowModal {}
 
-const CurrentInfosModal = ({ siteId }: CurrentInfosModalProps) => {
-  const modal = useModal();
+const CurrentInfosModal = ({
+  showModal,
+  setShowModal,
+  siteId,
+}: CurrentInfosModalProps) => {
   const [isPending, startTransition] = React.useTransition();
 
   const { data: session } = useSession();
@@ -39,26 +44,19 @@ const CurrentInfosModal = ({ siteId }: CurrentInfosModalProps) => {
     currentWork: yup.string().trim(),
   });
 
-  async function onSubmit({ location, currentWork }: PersonalInfos) {
-    // const res = await fetch("/api/personal-infos", {
-    //   method: HttpMethod.POST,
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     location: location,
-    //     currentWork: currentWork,
-    //   }),
-    // });
-    // if (res.ok) {
-    //   const data = await res.json();
-    //   // push data on redux store
-    //   mutate("/api/personal-infos");
-    //   toast.success("Current infos updated");
-    //   setShowModal(false);
-    //   setUpdatingInfos(false);
-    // }
-  }
+  const close = () => setShowModal(false);
+
+  const onSubmit = (data: PersonalInfos) =>
+    startTransition(async () => {
+      const res = await createOrUpdatePersonalInfos(data, siteId);
+      if (res.error) {
+        toast.error(res.error);
+      } else {
+        mutate(`/api/builder/${siteId}/personal-infos`);
+        close();
+        toast.success(`Successfully updated personal infos!`);
+      }
+    });
 
   return (
     <Formik
@@ -75,20 +73,22 @@ const CurrentInfosModal = ({ siteId }: CurrentInfosModalProps) => {
       validationSchema={validationSchema}
       enableReinitialize
     >
-      <Form className="inline-block w-full max-w-md overflow-hidden rounded-lg border border-stone-200 bg-white pt-8 text-center align-middle shadow-md transition-all dark:border-stone-700 dark:bg-stone-900">
-        <ModalTitle title="Edit your current informations" />
-        <div className="mx-auto grid w-5/6 gap-y-5">
-          {currentInfosFields.map((field) => (
-            <TextInput key={field.name} {...field} />
-          ))}
-        </div>
-        <div className="mb-5 mt-3 flex w-full flex-row-reverse items-center justify-between px-8">
-          <div className="flex gap-3.5 self-start">
-            <CancelButton onCancel={() => modal?.hide()} />
-            <SubmitButton loading={isPending} />
+      <Modal showModal={showModal} setShowModal={setShowModal}>
+        <Form className="inline-block w-full max-w-2xl overflow-hidden rounded-lg border border-stone-200 bg-white pt-8 text-center align-middle shadow-md transition-all dark:border-stone-700 dark:bg-stone-900">
+          <ModalTitle title="Edit your current informations" />
+          <div className="mx-auto grid w-5/6 gap-y-5">
+            {currentInfosFields.map((field) => (
+              <TextInput key={field.name} {...field} />
+            ))}
           </div>
-        </div>
-      </Form>
+          <div className="mb-5 mt-3 flex w-full flex-row-reverse items-center justify-between px-8">
+            <div className="flex gap-3.5 self-start">
+              <CancelButton onCancel={close} />
+              <SubmitButton loading={isPending} />
+            </div>
+          </div>
+        </Form>
+      </Modal>
     </Formik>
   );
 };

@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "mysql"
-  url      = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  provider     = "mysql"
+  url          = env("POSTGRES_PRISMA_URL") // uses connection pooling
   // directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
   relationMode = "prisma"
 }
@@ -14,26 +14,20 @@ generator client {
 }
 
 model User {
-  id            String          @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
   username      String?
   gh_username   String?
-  email         String?         @unique
+  email         String?   @unique
   emailVerified DateTime?
   image         String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   password      String?
   accounts      Account[]
   sessions      Session[]
   sites         Site[]
   posts         Post[]
-  personalInfos PersonalInfos[]
-  experiences   Experience[]
-  skills        Skill[]
-  educations    Education[]
-  links         Link[]
-  languages     Language[]
 }
 
 model Account {
@@ -119,6 +113,7 @@ model Site {
   educations    Education[]
   links         Link[]
   languages     Language[]
+  skills        Skill[]
   theme         Theme?         @relation(fields: [themeId], references: [id])
   themeId       String?
 
@@ -128,7 +123,6 @@ model Site {
 
 model PersonalInfos {
   id            String   @id @default(cuid())
-  userId        String   @unique
   firstname     String?
   lastname      String?
   title         String?
@@ -140,14 +134,12 @@ model PersonalInfos {
   imageBlurhash String?  @db.LongText
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   site          Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
   siteId        String?  @unique
 }
 
 model Experience {
   id          String    @id @default(cuid())
-  userId      String?
   companyName String
   companyUrl  String?
   jobTitle    String
@@ -159,11 +151,10 @@ model Experience {
   type        String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   site        Site?     @relation(fields: [siteId], references: [id], onDelete: Cascade)
   siteId      String?
 
-  @@index([userId, siteId], name: "experience_site_constraint")
+  @@index([siteId], name: "experience_site_constraint")
 }
 
 model Skill {
@@ -171,17 +162,17 @@ model Skill {
   name        String       @unique
   primary     Boolean      @default(false)
   type        String?
-  userId      String?
+  siteId      String?
   experiences Experience[]
-  user        User?        @relation(fields: [userId], references: [id])
+  site        Site?        @relation(fields: [siteId], references: [id])
 
-  @@index([userId])
+  @@index([siteId])
   @@fulltext([name])
 }
 
 model Education {
-  id          String    @id @default(cuid())
-  userId      String?
+  id String @id @default(cuid())
+
   place       String
   degree      String?
   degreeField String?
@@ -192,11 +183,10 @@ model Education {
   endDate     DateTime? @db.Date
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   site        Site?     @relation(fields: [siteId], references: [id], onDelete: Cascade)
   siteId      String?
 
-  @@index([userId, siteId], name: "education_site_constraint")
+  @@index([siteId], name: "education_site_constraint")
 }
 
 model Link {
@@ -208,11 +198,10 @@ model Link {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   siteId    String?
-  userId    String?
-  site      Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([siteId, userId], name: "link_site_constraint")
+  site Site? @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId], name: "link_site_constraint")
 }
 
 model Language {
@@ -221,11 +210,10 @@ model Language {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   siteId    String?
-  userId    String?
-  site      Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([siteId, userId], name: "language_site_constraint")
+  site Site? @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId], name: "language_site_constraint")
 }
 
 model Theme {

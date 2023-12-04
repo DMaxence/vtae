@@ -65,8 +65,6 @@ export default function DatePicker({
               )
             : ""
         }
-        // TODO : Fix this because I don't know why I need to specify it's type
-        type="text"
         required={false}
         autoComplete="off"
       />

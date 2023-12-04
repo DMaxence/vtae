@@ -77,9 +77,9 @@ export function getSession() {
 
 export function withSiteAuth(action: any) {
   return async (
-    formData: FormData | null,
+    data: object | FormData | null,
     siteId: string,
-    key: string | null,
+    key?: string | null,
   ) => {
     const session = await getSession();
     if (!session) {
@@ -98,7 +98,7 @@ export function withSiteAuth(action: any) {
       };
     }
 
-    return action(formData, site, key);
+    return action(data, site, key);
   };
 }
 

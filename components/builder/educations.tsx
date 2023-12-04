@@ -15,13 +15,7 @@ export default async function Educations({ siteId }: EducationsProps) {
 
   const educations = await prisma.education.findMany({
     where: {
-      user: {
-        sites: {
-          some: {
-            id: siteId,
-          },
-        },
-      },
+      siteId,
     },
     orderBy: {
       startDate: "desc",
@@ -37,7 +31,7 @@ export default async function Educations({ siteId }: EducationsProps) {
   // );
 
   return (
-    <div className="-mt-3.5 flex flex-col divide-y divide-gray-200">
+    <div className="flex flex-col divide-y divide-gray-200">
       {educations &&
         (educations.length > 0 ? (
           educations.map((education) => (

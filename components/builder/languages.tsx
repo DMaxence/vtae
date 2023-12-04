@@ -14,35 +14,23 @@ export default async function Languages({ siteId }: LanguageProps) {
   }
   const languages = await prisma.language.findMany({
     where: {
-      user: {
-        sites: {
-          some: {
-            id: siteId,
-          },
-        },
-      },
+      siteId,
     },
   });
-  // const { data: session } = useSession();
-
-  // const sessionId = session?.user?.id;
-
-  // const { data: languages } = useSWR<Array<LanguageType>>(
-  //   sessionId && `/api/language`,
-  //   fetcher,
-  // );
 
   return (
-    <div className="-mt-3.5 flex flex-col divide-y divide-gray-200">
+    <div className="flex flex-col divide-y divide-gray-200">
       {languages &&
         (languages.length > 0 ? (
           languages.map((language) => (
             <Language key={language.id} siteId={siteId} language={language} />
           ))
         ) : (
-          <p className="whitespace-pre-line text-sm text-gray-400">
-            No language yet. Add one !
-          </p>
+          <div className="text-center">
+            <p className="font-cal text-xl text-gray-600">
+              No language yet. Add one !
+            </p>
+          </div>
         ))}
     </div>
   );

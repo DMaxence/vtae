@@ -1,4 +1,8 @@
+"use server";
 import prisma from "@/lib/prisma";
+import { withSiteAuth } from "../auth";
+import { Language, Site } from "@prisma/client";
+import { revalidateSite } from "../utils";
 
 /**
  * Get Language
@@ -47,53 +51,40 @@ export const getLanguage = async (siteId: string, languageId?: string) => {
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-// export async function createLanguage(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: Session
-// ): Promise<void | NextApiResponse<{
-//   languageId: string
-// }>> {
-//   if (!session.user.id)
-//     return res.status(500).end('Server failed to get session user ID')
+export const createLanguage = withSiteAuth(
+  async (data: Language, site: Site) => {
+    try {
+      const response = await prisma.language.create({
+        data: {
+          ...data,
+          site: {
+            connect: {
+              id: site.id,
+            },
+          },
+        },
+        include: {
+          site: {
+            select: { subdomain: true, customDomain: true },
+          },
+        },
+      });
 
-//   try {
-//     const response = await prisma.language.create({
-//       data: {
-//         ...req.body,
-//         user: {
-//           connect: {
-//             id: session.user.id,
-//           },
-//         },
-//         site: {
-//           connectOrCreate: {
-//             where: {
-//               userId: session.user.id,
-//             },
-//             create: {
-//               userId: session.user.id,
-//             },
-//           },
-//         },
-//       },
-//       include: {
-//         site: {
-//           select: { subdomain: true, customDomain: true },
-//         },
-//       },
-//     })
-
-//     await revalidateSite(response.site)
-
-//     return res.status(201).json({
-//       languageId: response.id,
-//     })
-//   } catch (error) {
-//     console.log(error)
-//     return res.status(500).end(error)
-//   }
-// }
+      await revalidateSite(response.site as Site);
+      return response;
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        return {
+          error: `This language is already in use`,
+        };
+      } else {
+        return {
+          error: error.message,
+        };
+      }
+    }
+  },
+);
 
 /**
  * Delete Language
@@ -105,41 +96,29 @@ export const getLanguage = async (siteId: string, languageId?: string) => {
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-// export async function deleteLanguage(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: Session
-// ): Promise<void | NextApiResponse> {
-//   const { languageId } = req.body
+export const deleteLanguage = withSiteAuth(
+  async ({ languageId }: { languageId: string }, site: Site) => {
+    try {
+      const response = await prisma.language.delete({
+        where: {
+          id: languageId,
+        },
+        include: {
+          site: {
+            select: { subdomain: true, customDomain: true },
+          },
+        },
+      });
 
-//   if (Array.isArray(languageId))
-//     return res
-//       .status(400)
-//       .end(`Bad request. languageId parameter must be an array.`)
-
-//   if (!session.user.id)
-//     return res.status(500).end('Server failed to get session user ID')
-
-//   try {
-//     const response = await prisma.language.delete({
-//       where: {
-//         id: languageId,
-//       },
-//       include: {
-//         site: {
-//           select: { subdomain: true, customDomain: true },
-//         },
-//       },
-//     })
-
-//     await revalidateSite(response.site)
-
-//     return res.status(200).end()
-//   } catch (error) {
-//     console.error(error)
-//     return res.status(500).end(error)
-//   }
-// }
+      await revalidateSite(response.site as Site);
+      return response;
+    } catch (error: any) {
+      return {
+        error: error.message,
+      };
+    }
+  },
+);
 
 /**
  * Update Language
@@ -157,41 +136,35 @@ export const getLanguage = async (siteId: string, languageId?: string) => {
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-// export async function updateLanguage(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: Session
-// ): Promise<void | NextApiResponse<Site>> {
-//   const { id, startDate, endDate } = req.body
+export const updateLanguage = withSiteAuth(
+  async ({ id, ...data }: Language, site: Site) => {
+    try {
+      const response = await prisma.language.update({
+        where: {
+          id: id,
+        },
+        data: {
+          ...data,
+        },
+        include: {
+          site: {
+            select: { subdomain: true, customDomain: true },
+          },
+        },
+      });
 
-//   if (!session.user.id)
-//     return res.status(500).end('Server failed to get session user ID')
-
-//   try {
-//     const response = await prisma.language.update({
-//       where: {
-//         id: id,
-//       },
-//       data: {
-//         ...req.body,
-//         user: {
-//           connect: {
-//             id: session.user.id,
-//           },
-//         },
-//       },
-//       include: {
-//         site: {
-//           select: { subdomain: true, customDomain: true },
-//         },
-//       },
-//     })
-
-//     await revalidateSite(response.site)
-
-//     return res.status(200).json(response)
-//   } catch (error) {
-//     console.error(error)
-//     return res.status(500).end(error)
-//   }
-// }
+      await revalidateSite(response.site as Site);
+      return response;
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        return {
+          error: `This language is already in use`,
+        };
+      } else {
+        return {
+          error: error.message,
+        };
+      }
+    }
+  },
+);

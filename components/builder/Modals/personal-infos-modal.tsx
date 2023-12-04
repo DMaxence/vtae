@@ -11,34 +11,35 @@ import ModalTitle from "@/components/modal-title";
 import SubmitButton from "@/components/submit-button";
 import TextInput from "@/components/text-input";
 import { personalInfosFields } from "@/constants/fields";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
+import Modal from "@/components/modal";
 import { useModal } from "@/components/modal/provider";
-import { WithSiteId } from "@/lib/types";
+import { createOrUpdatePersonalInfos } from "@/lib/builder/personal-infos";
+import { WithShowModal, WithSiteId } from "@/lib/types";
 import { fetcher } from "@/lib/utils";
 import { Form, Formik } from "formik";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-interface PersonalInfosModalProps extends WithSiteId {}
+interface PersonalInfosModalProps extends WithSiteId, WithShowModal {}
 
 export default function PersonalInfosModal({
+  showModal,
+  setShowModal,
   siteId,
 }: PersonalInfosModalProps) {
-  const router = useRouter();
-  const modal = useModal();
   const [isPending, startTransition] = React.useTransition();
 
   const { data: session } = useSession();
-  console.log("session", session);
+
   const sessionId = session?.user?.id;
 
   const { data: personalInfos, isLoading } = useSWR<PersonalInfos>(
     sessionId && `/api/builder/${siteId}/personal-infos`,
     fetcher,
   );
-
-  console.log("personalInfos", personalInfos);
 
   const validationSchema = yup.object({
     firstname: yup.string().trim().required("First name is required"),
@@ -47,18 +48,18 @@ export default function PersonalInfosModal({
     alias: yup.string().trim().nullable(),
   });
 
+  const close = () => setShowModal(false);
+
   const onSubmit = (data: PersonalInfos) =>
     startTransition(async () => {
-      // const res = createSite(data);
-      // if (res.error) {
-      //   toast.error(res.error);
-      // } else {
-      //   const { id } = res;
-      //   router.refresh();
-      //   router.push(`/site/${id}`);
-      //   modal?.hide();
-      //   toast.success(`Successfully created site!`);
-      // }
+      const res = await createOrUpdatePersonalInfos(data, siteId);
+      if (res.error) {
+        toast.error(res.error);
+      } else {
+        mutate(`/api/builder/${siteId}/personal-infos`);
+        close();
+        toast.success(`Successfully updated personal infos!`);
+      }
     });
 
   // async function updatePersonalInfos({
@@ -104,20 +105,22 @@ export default function PersonalInfosModal({
       validationSchema={validationSchema}
       enableReinitialize
     >
-      <Form className="inline-block w-full max-w-md overflow-hidden rounded-lg border border-stone-200 bg-white pt-8 text-center align-middle shadow-md transition-all dark:border-stone-700 dark:bg-stone-900">
-        <ModalTitle title="Edit your personal infos" />
-        <div className="mx-auto grid w-5/6 gap-y-5">
-          {personalInfosFields.map((field) => (
-            <TextInput key={field.name} {...field} />
-          ))}
-        </div>
-        <div className="mb-5 mt-3 flex w-full flex-row-reverse items-center justify-between px-8">
-          <div className="flex gap-3.5 self-start">
-            <CancelButton onCancel={() => modal?.hide()} />
-            <SubmitButton loading={isPending} />
+      <Modal showModal={showModal} setShowModal={setShowModal}>
+        <Form className="inline-block w-full max-w-2xl overflow-hidden rounded-lg border border-stone-200 bg-white pt-8 text-center align-middle shadow-md transition-all dark:border-stone-700 dark:bg-stone-900">
+          <ModalTitle title="Edit your personal infos" />
+          <div className="mx-auto grid w-5/6 gap-y-5">
+            {personalInfosFields.map((field) => (
+              <TextInput key={field.name} {...field} />
+            ))}
           </div>
-        </div>
-      </Form>
+          <div className="mb-5 mt-3 flex w-full flex-row-reverse items-center justify-between px-8">
+            <div className="flex gap-3.5 self-start">
+              <CancelButton onCancel={close} />
+              <SubmitButton loading={isPending} />
+            </div>
+          </div>
+        </Form>
+      </Modal>
     </Formik>
 
     // <Formik

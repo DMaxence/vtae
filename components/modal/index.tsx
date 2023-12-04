@@ -1,87 +1,70 @@
-"use client";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment, PropsWithChildren } from "react";
 
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-} from "react";
-import FocusTrap from "focus-trap-react";
-import { AnimatePresence, motion } from "framer-motion";
-import Leaflet from "./leaflet";
-import useWindowSize from "@/lib/hooks/use-window-size";
+interface ModalProps extends PropsWithChildren {
+  showModal: boolean;
+  setShowModal: (state: boolean) => void;
+  onClose?: () => void;
+  onSubmit?: () => void;
+  onDelete?: () => Promise<void>;
+  loading?: boolean;
+  deleteLoading?: boolean;
+  title?: string;
+  fullScreen?: boolean;
+}
 
 export default function Modal({
   children,
   showModal,
   setShowModal,
-}: {
-  children: React.ReactNode;
-  showModal: boolean;
-  setShowModal: Dispatch<SetStateAction<boolean>>;
-}) {
-  const desktopModalRef = useRef(null);
-
-  const onKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setShowModal(false);
-      }
-    },
-    [setShowModal],
-  );
-
-  useEffect(() => {
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onKeyDown]);
-
-  useEffect(() => {
-    if (showModal) document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.removeProperty("overflow");
-    };
-  }, [showModal]);
-
-  const { isMobile, isDesktop } = useWindowSize();
+  onClose,
+  fullScreen = false,
+}: ModalProps) {
+  const close = () => {
+    setShowModal(false);
+    onClose?.();
+  };
 
   return (
-    <AnimatePresence>
-      {showModal && (
-        <>
-          {isMobile && <Leaflet setShow={setShowModal}>{children}</Leaflet>}
-          {isDesktop && (
-            <>
-              <FocusTrap focusTrapOptions={{ initialFocus: false }}>
-                <motion.div
-                  ref={desktopModalRef}
-                  key="desktop-modal"
-                  className="fixed inset-0 z-40 hidden min-h-screen items-center justify-center md:flex"
-                  initial={{ scale: 0.95 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0.95 }}
-                  onMouseDown={(e) => {
-                    if (desktopModalRef.current === e.target) {
-                      setShowModal(false);
-                    }
-                  }}
-                >
-                  {children}
-                </motion.div>
-              </FocusTrap>
-              <motion.div
-                key="desktop-backdrop"
-                className="fixed inset-0 z-30 overflow-hidden bg-gray-100 bg-opacity-10 backdrop-blur"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setShowModal(false)}
-              />
-            </>
-          )}
-        </>
-      )}
-    </AnimatePresence>
+    <Transition show={showModal} as={Fragment}>
+      <Dialog
+        as="div"
+        className="fixed inset-0 z-40 flex items-center justify-center overflow-y-auto"
+        onClose={close}
+      >
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <Dialog.Overlay className="fixed inset-0 bg-gray-100 bg-opacity-10 backdrop-blur" />
+          {/* <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75" /> */}
+        </Transition.Child>
+
+        {/* {!fullScreen && (
+            <span
+              className="inline-block h-screen align-middle"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
+          )} */}
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0 scale-95"
+          enterTo="opacity-100 scale-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100 scale-100"
+          leaveTo="opacity-0 scale-95"
+        >
+          {children}
+        </Transition.Child>
+      </Dialog>
+    </Transition>
   );
 }

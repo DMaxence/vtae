@@ -1,4 +1,8 @@
+"use server";
 import prisma from "@/lib/prisma";
+import { withSiteAuth } from "../auth";
+import { Link, Site } from "@prisma/client";
+import { revalidateSite } from "../utils";
 
 /**
  * Get Link
@@ -47,53 +51,38 @@ export const getLink = async (siteId: string, linkId?: string) => {
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-// export async function createLink(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: Session
-// ): Promise<void | NextApiResponse<{
-//   linkId: string
-// }>> {
-//   if (!session.user.id)
-//     return res.status(500).end('Server failed to get session user ID')
+export const createLink = withSiteAuth(async (data: Link, site: Site) => {
+  try {
+    const response = await prisma.link.create({
+      data: {
+        ...data,
+        site: {
+          connect: {
+            id: site.id,
+          },
+        },
+      },
+      include: {
+        site: {
+          select: { subdomain: true, customDomain: true },
+        },
+      },
+    });
 
-//   try {
-//     const response = await prisma.link.create({
-//       data: {
-//         ...req.body,
-//         user: {
-//           connect: {
-//             id: session.user.id,
-//           },
-//         },
-//         site: {
-//           connectOrCreate: {
-//             where: {
-//               userId: session.user.id,
-//             },
-//             create: {
-//               userId: session.user.id,
-//             },
-//           },
-//         },
-//       },
-//       include: {
-//         site: {
-//           select: { subdomain: true, customDomain: true },
-//         },
-//       },
-//     })
-
-//     await revalidateSite(response.site)
-
-//     return res.status(201).json({
-//       linkId: response.id,
-//     })
-//   } catch (error) {
-//     console.log(error)
-//     return res.status(500).end(error)
-//   }
-// }
+    await revalidateSite(response.site as Site);
+    return response;
+  } catch (error: any) {
+    if (error.code === "P2002") {
+      return {
+        error: `This link is already in use`,
+      };
+    } else {
+      return {
+        error: error.message,
+      };
+    }
+  }
+});
 
 /**
  * Delete Link
@@ -105,41 +94,29 @@ export const getLink = async (siteId: string, linkId?: string) => {
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-// export async function deleteLink(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: Session
-// ): Promise<void | NextApiResponse> {
-//   const { linkId } = req.body
+export const deleteLink = withSiteAuth(
+  async ({ linkId }: { linkId: string }, site: Site) => {
+    try {
+      const response = await prisma.link.delete({
+        where: {
+          id: linkId,
+        },
+        include: {
+          site: {
+            select: { subdomain: true, customDomain: true },
+          },
+        },
+      });
 
-//   if (Array.isArray(linkId))
-//     return res
-//       .status(400)
-//       .end(`Bad request. linkId parameter must be an array.`)
-
-//   if (!session.user.id)
-//     return res.status(500).end('Server failed to get session user ID')
-
-//   try {
-//     const response = await prisma.link.delete({
-//       where: {
-//         id: linkId,
-//       },
-//       include: {
-//         site: {
-//           select: { subdomain: true, customDomain: true },
-//         },
-//       },
-//     })
-
-//     await revalidateSite(response.site)
-
-//     return res.status(200).end()
-//   } catch (error) {
-//     console.error(error)
-//     return res.status(500).end(error)
-//   }
-// }
+      await revalidateSite(response.site as Site);
+      return response;
+    } catch (error: any) {
+      return {
+        error: error.message,
+      };
+    }
+  },
+);
 
 /**
  * Update Link
@@ -157,41 +134,35 @@ export const getLink = async (siteId: string, linkId?: string) => {
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-// export async function updateLink(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: Session
-// ): Promise<void | NextApiResponse<Site>> {
-//   const { id, startDate, endDate } = req.body
+export const updateLink = withSiteAuth(
+  async ({ id, ...data }: Link, site: Site) => {
+    try {
+      const response = await prisma.link.update({
+        where: {
+          id: id,
+        },
+        data: {
+          ...data,
+        },
+        include: {
+          site: {
+            select: { subdomain: true, customDomain: true },
+          },
+        },
+      });
 
-//   if (!session.user.id)
-//     return res.status(500).end('Server failed to get session user ID')
-
-//   try {
-//     const response = await prisma.link.update({
-//       where: {
-//         id: id,
-//       },
-//       data: {
-//         ...req.body,
-//         user: {
-//           connect: {
-//             id: session.user.id,
-//           },
-//         },
-//       },
-//       include: {
-//         site: {
-//           select: { subdomain: true, customDomain: true },
-//         },
-//       },
-//     })
-
-//     await revalidateSite(response.site)
-
-//     return res.status(200).json(response)
-//   } catch (error) {
-//     console.error(error)
-//     return res.status(500).end(error)
-//   }
-// }
+      await revalidateSite(response.site as Site);
+      return response;
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        return {
+          error: `This link is already in use`,
+        };
+      } else {
+        return {
+          error: error.message,
+        };
+      }
+    }
+  },
+);

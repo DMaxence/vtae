@@ -14,7 +14,7 @@ import Educations from "@/components/builder/educations";
 import Experiences from "@/components/builder/experiences";
 import Languages from "@/components/builder/languages";
 import Links from "@/components/builder/links";
-import PersonalInfos from "@/components/builder/personal-infos-section";
+import PersonalInfos from "@/components/builder/personal-infos";
 import Skills from "@/components/builder/skills";
 
 import AboutModal from "@/components/builder/Modals/about-modal";
@@ -75,7 +75,7 @@ export default async function ResumeBuilder({
     <>
       <div className="flex flex-col items-center space-y-2 sm:flex-row sm:space-x-4 sm:space-y-0">
         <h1 className="w-60 truncate font-cal text-xl font-bold dark:text-white sm:w-auto sm:text-3xl">
-          All Infos for {data.name}
+          Content for {data.name}
         </h1>
         <a
           href={

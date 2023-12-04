@@ -2,20 +2,18 @@ import { getSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
-import PersonalInfos from "../displayer/personal-infos";
+import PersonalInfosDisplay from "../displayer/personal-infos";
 
+import { WithSiteId } from "@/lib/types";
 import { getExperienceYears } from "@/lib/utils";
 import type {
   Experience,
   PersonalInfos as PersonalInfosType,
 } from "@prisma/client";
-import { WithSiteId } from "@/lib/types";
 
-interface PersonalInfosSectionProps extends WithSiteId {}
+interface PersonalInfosProps extends WithSiteId {}
 
-export default async function PersonalInfosSection({
-  siteId,
-}: PersonalInfosSectionProps) {
+export default async function PersonalInfos({ siteId }: PersonalInfosProps) {
   const session = await getSession();
   if (!session) {
     redirect("/login");
@@ -39,7 +37,7 @@ export default async function PersonalInfosSection({
   });
   const experienceYears = getExperienceYears(experiences as Experience[]);
   return (
-    <PersonalInfos
+    <PersonalInfosDisplay
       personalInfos={personalInfos as PersonalInfosType}
       image={session?.user?.image}
       experience={experienceYears}

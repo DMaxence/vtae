@@ -1,4 +1,9 @@
+"use server";
 import prisma from "@/lib/prisma";
+
+import { Experience, Site } from "@prisma/client";
+import { withSiteAuth } from "../auth";
+import { revalidateSite } from "../utils";
 
 /**
  * Get Experience
@@ -56,77 +61,82 @@ export const getExperience = async (siteId: string, experienceId?: string) => {
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-// export async function createExperience(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: Session
-// ): Promise<void | NextApiResponse<{
-//   experienceId: string
-// }>> {
-//   const {
-//     type,
-//     companyName,
-//     companyUrl,
-//     jobTitle,
-//     startDate,
-//     endDate,
-//     location,
-//     skills,
-//     description,
-//   } = req.body
+export const createExperience = withSiteAuth(
+  async (
+    {
+      type,
+      companyName,
+      companyUrl,
+      jobTitle,
+      startDate,
+      endDate,
+      location,
+      skills,
+      description,
+    }: Experience & { skills: string[] },
+    site: Site,
+  ) => {
+    console.log("createExperience", {
+      type,
+      companyName,
+      companyUrl,
+      jobTitle,
+      startDate,
+      endDate,
+      location,
+      skills,
+      description,
+      site,
+    });
+    try {
+      const response = await prisma.experience.create({
+        data: {
+          type,
+          companyName,
+          companyUrl,
+          jobTitle,
+          description,
+          location,
+          startDate: new Date(startDate),
+          ...(endDate ? { endDate: new Date(endDate) } : {}),
+          skills: {
+            connect: skills.map((skillId: string) => ({
+              id: skillId,
+            })),
+          },
+          site: {
+            connectOrCreate: {
+              where: {
+                id: site.id,
+              },
+              create: {
+                id: site.id,
+              },
+            },
+          },
+        },
+        include: {
+          site: {
+            select: { subdomain: true, customDomain: true },
+          },
+        },
+      });
 
-//   if (!session.user.id)
-//     return res.status(500).end('Server failed to get session user ID')
-
-//   try {
-//     const response = await prisma.experience.create({
-//       data: {
-//         type: type,
-//         companyName: companyName,
-//         companyUrl: companyUrl,
-//         jobTitle: jobTitle,
-//         startDate: new Date(startDate),
-//         endDate: new Date(endDate),
-//         location: location,
-//         skills: {
-//           connect: skills.map((skillId: string) => ({
-//             id: skillId,
-//           })),
-//         },
-//         description: description,
-//         user: {
-//           connect: {
-//             id: session.user.id,
-//           },
-//         },
-//         site: {
-//           connectOrCreate: {
-//             where: {
-//               userId: session.user.id,
-//             },
-//             create: {
-//               userId: session.user.id,
-//             },
-//           },
-//         },
-//       },
-//       include: {
-//         site: {
-//           select: { subdomain: true, customDomain: true },
-//         },
-//       },
-//     })
-
-//     await revalidateSite(response.site)
-
-//     return res.status(201).json({
-//       experienceId: response.id,
-//     })
-//   } catch (error) {
-//     console.log(error, skills)
-//     return res.status(500).end(error)
-//   }
-// }
+      await revalidateSite(response.site as Site);
+      return response;
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        return {
+          error: `This experience is already in use`,
+        };
+      } else {
+        return {
+          error: error.message,
+        };
+      }
+    }
+  },
+);
 
 /**
  * Delete Experience
@@ -138,41 +148,29 @@ export const getExperience = async (siteId: string, experienceId?: string) => {
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-// export async function deleteExperience(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: Session
-// ): Promise<void | NextApiResponse> {
-//   const { experienceId } = req.body
+export const deleteExperience = withSiteAuth(
+  async ({ experienceId }: { experienceId: string }, site: Site) => {
+    try {
+      const response = await prisma.experience.delete({
+        where: {
+          id: experienceId,
+        },
+        include: {
+          site: {
+            select: { subdomain: true, customDomain: true },
+          },
+        },
+      });
 
-//   if (Array.isArray(experienceId))
-//     return res
-//       .status(400)
-//       .end(`Bad request. experienceId parameter must be an array.`)
-
-//   if (!session.user.id)
-//     return res.status(500).end('Server failed to get session user ID')
-
-//   try {
-//     const response = await prisma.experience.delete({
-//       where: {
-//         id: experienceId,
-//       },
-//       include: {
-//         site: {
-//           select: { subdomain: true, customDomain: true },
-//         },
-//       },
-//     })
-
-//     await revalidateSite(response.site)
-
-//     return res.status(200).end()
-//   } catch (error) {
-//     console.error(error)
-//     return res.status(500).end(error)
-//   }
-// }
+      await revalidateSite(response.site as Site);
+      return response;
+    } catch (error: any) {
+      return {
+        error: error.message,
+      };
+    }
+  },
+);
 
 /**
  * Update Experience
@@ -190,69 +188,69 @@ export const getExperience = async (siteId: string, experienceId?: string) => {
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-// export async function updateExperience(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: Session
-// ): Promise<void | NextApiResponse<Site>> {
-//   const {
-//     id,
-//     type,
-//     companyName,
-//     companyUrl,
-//     jobTitle,
-//     startDate,
-//     endDate,
-//     location,
-//     skills,
-//     removeSkills,
-//     description,
-//   } = req.body
+export const updateExperience = withSiteAuth(
+  async (
+    {
+      id,
+      type,
+      companyName,
+      companyUrl,
+      jobTitle,
+      startDate,
+      endDate,
+      location,
+      skills,
+      removeSkills,
+      description,
+    }: Experience & {
+      skills: string[];
+      removeSkills: string[];
+    },
+    site: Site,
+  ) => {
+    try {
+      const response = await prisma.experience.update({
+        where: {
+          id: id,
+        },
+        data: {
+          type,
+          companyName,
+          companyUrl,
+          jobTitle,
+          description,
+          location,
+          startDate: new Date(startDate),
+          ...(endDate ? { endDate: new Date(endDate) } : {}),
+          // replace connect with set to remove all skills and replace with new ones
+          skills: {
+            connect: skills.map((skillId: string) => ({
+              id: skillId,
+            })),
+            disconnect: removeSkills.map((skillId: string) => ({
+              id: skillId,
+            })),
+          },
+        },
+        include: {
+          site: {
+            select: { subdomain: true, customDomain: true },
+          },
+        },
+      });
 
-//   if (!session.user.id)
-//     return res.status(500).end('Server failed to get session user ID')
-
-//   try {
-//     const response = await prisma.experience.update({
-//       where: {
-//         id: id,
-//       },
-//       data: {
-//         type: type,
-//         companyName: companyName,
-//         companyUrl: companyUrl,
-//         jobTitle: jobTitle,
-//         startDate: new Date(startDate),
-//         endDate: new Date(endDate),
-//         location: location,
-//         // replace connect with set to remove all skills and replace with new ones
-//         skills: {
-//           connect: skills.map((skillId: string) => ({
-//             id: skillId,
-//           })),
-//           disconnect: removeSkills.map((skillId: string) => ({
-//             id: skillId,
-//           })),
-//         },
-//         description: description,
-//         user: {
-//           connect: {
-//             id: session.user.id,
-//           },
-//         },
-//       },
-//       include: {
-//         site: {
-//           select: { subdomain: true, customDomain: true },
-//         },
-//       },
-//     })
-
-//     await revalidateSite(response.site)
-
-//     return res.status(200).json(response)
-//   } catch (error) {
-//     console.error(error)
-//     return res.status(500).end(error)
-//   }
-// }
+      await revalidateSite(response.site as Site);
+      return response;
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        return {
+          error: `This experience is already in use`,
+        };
+      } else {
+        return {
+          error: error.message,
+        };
+      }
+    }
+  },
+);

@@ -1,12 +1,11 @@
+"use server";
 import prisma from "@/lib/prisma";
 
-import type { NextApiRequest, NextApiResponse } from "next";
-import type { PersonalInfos } from "@prisma/client";
-import type { Session } from "next-auth";
+import type { Site } from "@prisma/client";
 // import { revalidateSite } from '../revalidate'
-import { revalidateTag } from "next/cache";
 
-import { getSession } from "@/lib/auth";
+import { withSiteAuth } from "@/lib/auth";
+import { revalidateSite } from "../utils";
 
 /**
  * Get PersonalInfos
@@ -45,59 +44,47 @@ export const getPersonalInfos = async (siteId: string) => {
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-// export async function createOrUpdatePersonalInfos(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: Session,
-// ): Promise<void | NextApiResponse<{
-//   personalInfosId: string;
-// }>> {
-//   if (!session.user.id)
-//     return res.status(500).end("Server failed to get session user ID");
-
-//   try {
-//     const response = await prisma.personalInfos.upsert({
-//       where: {
-//         userId: session.user.id,
-//       },
-//       update: {
-//         ...req.body,
-//       },
-//       create: {
-//         user: {
-//           connect: {
-//             id: session.user.id,
-//           },
-//         },
-//         site: {
-//           connectOrCreate: {
-//             where: {
-//               userId: session.user.id,
-//             },
-//             create: {
-//               userId: session.user.id,
-//             },
-//           },
-//         },
-//         ...req.body,
-//       },
-//       include: {
-//         site: {
-//           select: { subdomain: true, customDomain: true },
-//         },
-//       },
-//     });
-
-//     // await revalidateSite(response.site)
-//     // await revalidateTag(
-//     //   `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
-//     // );
-
-//     return res.status(201).json({
-//       personalInfosId: response.id,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).end(error);
-//   }
-// };
+export const createOrUpdatePersonalInfos = withSiteAuth(
+  async (data: object, site: Site) => {
+    try {
+      const response = await prisma.personalInfos.upsert({
+        where: {
+          siteId: site.id,
+        },
+        update: {
+          ...data,
+        },
+        create: {
+          ...data,
+          site: {
+            connectOrCreate: {
+              where: {
+                id: site.id,
+              },
+              create: {
+                id: site.id,
+              },
+            },
+          },
+        },
+        include: {
+          site: {
+            select: { subdomain: true, customDomain: true },
+          },
+        },
+      });
+      await revalidateSite(response.site as Site);
+      return response;
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        return {
+          error: `This personnal infos are already in use`,
+        };
+      } else {
+        return {
+          error: error.message,
+        };
+      }
+    }
+  },
+);

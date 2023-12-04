@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 
 import { Combobox } from "@headlessui/react";
@@ -14,7 +15,9 @@ import { FormFieldsType } from "@/lib/types";
 import { useField } from "formik";
 import { Search, XCircle } from "lucide-react";
 import LoadingSpinner from "./icons/loading-spinner";
-import { useDebounce } from "use-debounce";
+import { useDebounce, useDebouncedCallback } from "use-debounce";
+
+import AsyncCreatableSelect from "react-select/async-creatable";
 
 interface SkillAutocompleteProps extends FormFieldsType {
   skills?: Array<Skill>;
@@ -75,9 +78,9 @@ const SkillAutocomplete = ({
     setQuery("");
   };
 
-  const filteredSkills = fetchedSkills?.filter(
-    (skill) => !selectedSkills.some((s) => s.id === skill.id),
-  );
+  const filteredSkills = fetchedSkills
+    ?.filter((skill) => !selectedSkills.some((s) => s.id === skill.id))
+    .map((skill) => ({ ...skill, value: skill.id, label: skill.name }));
 
   const removeSkill = (skill: Skill) =>
     setSelectedSkills(selectedSkills.filter((s) => s.id !== skill.id));
@@ -93,8 +96,34 @@ const SkillAutocomplete = ({
     setFieldValue("skills", newSkillsValues);
   }, [setFieldValue, experienceId, experience, selectedSkills]);
 
+  const getSkills = useDebouncedCallback(async (inputValue: string) => {
+    const res = await fetch(`/api/builder/skill?q=${inputValue}`);
+    const data = await res.json();
+    return data.map((skill: Skill) => ({
+      ...skill,
+      value: skill.id,
+      label: skill.name,
+    }));
+  }, 200);
+
   return (
     <div className="flex w-full flex-col">
+      {/* <AsyncCreatableSelect
+        cacheOptions
+        defaultOptions
+        classNamePrefix="select-content"
+        className="select-component w-full"
+        loadOptions={getSkills}
+        components={{
+          Option: ({ data, ...props }) => (
+            <div className="flex items-center px-5 py-3" {...props}>
+              <span className="block truncate font-normal">
+                <Highlighted text={data.label} highlight={query} />
+              </span>
+            </div>
+          ),
+        }}
+      /> */}
       <Combobox
         by={ascFilter}
         onChange={handleSelect}

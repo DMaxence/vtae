@@ -10,7 +10,6 @@ import type {
 import { cn, getClickableLink, getElapsedTime, getTextDate } from "@/lib/utils";
 import { CalendarDays, Link, MapPin, PenSquare } from "lucide-react";
 import { EmploymentType } from "@/lib/types";
-import { useModal } from "../modal/provider";
 import ExperienceModal from "../builder/Modals/experience-modal";
 
 const Skill = ({ skill, theme }: { skill: Skill; theme?: Theme }) => {
@@ -45,10 +44,10 @@ const Experience = ({
   readOnly?: boolean;
   siteId: string;
 }) => {
-  const modal = useModal();
+  const [showModal, setShowModal] = React.useState<boolean>(false);
 
   return (
-    <div className="flex flex-col gap-3.5 py-3.5">
+    <div className="flex flex-col gap-3.5 py-3.5 first:pt-0 last:pb-0">
       <div className="flex items-center justify-between">
         <div className="">
           <div
@@ -101,17 +100,7 @@ const Experience = ({
         </div>
         {!readOnly && (
           <div>
-            <button
-              type="button"
-              onClick={() =>
-                modal?.show(
-                  <ExperienceModal
-                    siteId={siteId}
-                    experienceId={experience.id}
-                  />,
-                )
-              }
-            >
+            <button type="button" onClick={() => setShowModal(true)}>
               <PenSquare className="h-5 w-5 text-gray-500 dark:text-gray-100" />
             </button>
           </div>
@@ -125,6 +114,14 @@ const Experience = ({
         </div>
       )}
       <div className="whitespace-pre-line">{experience.description}</div>
+      {!readOnly && (
+        <ExperienceModal
+          siteId={siteId}
+          experienceId={experience.id}
+          setShowModal={setShowModal}
+          showModal={showModal}
+        />
+      )}
     </div>
   );
 };
