@@ -6,6 +6,7 @@ import { Theme as ThemeType, Site } from "@prisma/client";
 import { PenSquare, Plus } from "lucide-react";
 import { useModal } from "./modal/provider";
 import { WithSiteId } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 interface SectionProps extends WithChildren {
   theme?: ThemeType;
@@ -13,7 +14,7 @@ interface SectionProps extends WithChildren {
   description?: string;
   editModal?: React.FC<WithSiteId & WithShowModal>;
   addModal?: React.FC<WithSiteId & WithShowModal>;
-  site: Site;
+  site?: Site;
 }
 
 export default function Section({
@@ -29,7 +30,10 @@ export default function Section({
 
   return (
     <section
-      className="flex flex-col gap-3.5 rounded-lg bg-white p-5 shadow-md dark:bg-black"
+      className={cn(
+        "flex flex-col gap-3.5 bg-white p-5 dark:bg-black dark:first:rounded-t-lg dark:last:rounded-b-lg",
+        site ? "rounded-lg shadow-md" : "",
+      )}
       style={{ backgroundColor: theme?.bgColor }}
     >
       <div className="flex justify-between">
@@ -58,14 +62,14 @@ export default function Section({
         </p>
       )}
       <div className="">{children}</div>
-      {EditModal && (
+      {EditModal && site && (
         <EditModal
           siteId={site.id}
           showModal={showModal}
           setShowModal={setShowModal}
         />
       )}
-      {AddModal && (
+      {AddModal && site && (
         <AddModal
           siteId={site.id}
           showModal={showModal}

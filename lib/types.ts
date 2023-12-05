@@ -69,7 +69,7 @@ export type WithShowModal<T = {}> = T & {
 };
 
 export type WithSiteId<T = {}> = T & {
-  siteId: string;
+  siteId?: string;
 };
 
 export type WithClassName<T = {}> = T & {

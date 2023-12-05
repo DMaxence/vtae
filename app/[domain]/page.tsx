@@ -1,11 +1,15 @@
-import Link from "next/link";
+import CurrentInfosDisplay from "@/components/displayer/current-infos";
+import Education from "@/components/displayer/education";
+import Experience from "@/components/displayer/experience";
+import Language from "@/components/displayer/language";
+import Link from "@/components/displayer/link";
+import PersonalInfos from "@/components/displayer/personal-infos";
+import Skill from "@/components/displayer/skill";
+import Section from "@/components/section";
+import { getSiteData } from "@/lib/fetchers";
 import prisma from "@/lib/prisma";
+import { getExperienceYears } from "@/lib/utils";
 import { notFound } from "next/navigation";
-import BlurImage from "@/components/blur-image";
-import { placeholderBlurhash, toDateString } from "@/lib/utils";
-import BlogCard from "@/components/blog-card";
-import { getPostsForSite, getSiteData } from "@/lib/fetchers";
-import Image from "next/image";
 
 export async function generateStaticParams() {
   const allSites = await prisma.site.findMany({
@@ -39,101 +43,107 @@ export default async function SiteHomePage({
   params: { domain: string };
 }) {
   const domain = decodeURIComponent(params.domain);
-  const [data, posts] = await Promise.all([
-    getSiteData(domain),
-    getPostsForSite(domain),
-  ]);
+  const data = await getSiteData(domain);
+  // const [data, posts] = await Promise.all([
+  //   getSiteData(domain),
+  //   getPostsForSite(domain),
+  // ]);
 
   if (!data) {
     notFound();
   }
 
+  const skillsWithDuplicates = data.experiences.map((exp) => exp.skills).flat();
+
+  const skills = [
+    ...new Map(skillsWithDuplicates.map((item) => [item.id, item])).values(),
+  ];
+
+  const experienceYears = getExperienceYears(data.experiences);
+
   return (
-    <>
-      <div className="mb-20 w-full">
-        {posts.length > 0 ? (
-          <div className="mx-auto w-full max-w-screen-xl md:mb-28 lg:w-5/6">
-            <Link href={`/${posts[0].slug}`}>
-              <div className="group relative mx-auto h-80 w-full overflow-hidden sm:h-150 lg:rounded-xl">
-                <BlurImage
-                  alt={posts[0].title ?? ""}
-                  blurDataURL={posts[0].imageBlurhash ?? placeholderBlurhash}
-                  className="h-full w-full object-cover group-hover:scale-105 group-hover:duration-300"
-                  width={1300}
-                  height={630}
-                  placeholder="blur"
-                  src={posts[0].image ?? "/placeholder.png"}
+    <div className="mb-20 w-full">
+      <div className="mx-auto w-full max-w-screen-sm print:max-w-none print:p-5 lg:w-5/6">
+        {data?.personalInfos && (
+          <>
+            {data.personalInfos?.firstname && data.user && (
+              <Section>
+                <PersonalInfos
+                  personalInfos={data.personalInfos}
+                  image={data.user?.image}
+                  experience={experienceYears}
                 />
-              </div>
-              <div className="mx-auto mt-10 w-5/6 lg:w-full">
-                <h2 className="my-10 font-title text-4xl dark:text-white md:text-6xl">
-                  {posts[0].title}
-                </h2>
-                <p className="w-full text-base dark:text-white md:text-lg lg:w-2/3">
-                  {posts[0].description}
+              </Section>
+            )}
+            {data.personalInfos?.about && (
+              <Section sectionName="About">
+                <p className="whitespace-pre-line text-justify">
+                  {data.personalInfos.about}
                 </p>
-                <div className="flex w-full items-center justify-start space-x-4">
-                  <div className="relative h-8 w-8 flex-none overflow-hidden rounded-full">
-                    {data.user?.image ? (
-                      <BlurImage
-                        alt={data.user?.name ?? "User Avatar"}
-                        width={100}
-                        height={100}
-                        className="h-full w-full object-cover"
-                        src={data.user?.image}
-                      />
-                    ) : (
-                      <div className="absolute flex h-full w-full select-none items-center justify-center bg-stone-100 text-4xl text-stone-500">
-                        ?
-                      </div>
-                    )}
-                  </div>
-                  <p className="ml-3 inline-block whitespace-nowrap align-middle text-sm font-semibold dark:text-white md:text-base">
-                    {data.user?.name}
-                  </p>
-                  <div className="h-6 border-l border-stone-600 dark:border-stone-400" />
-                  <p className="m-auto my-5 w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">
-                    {toDateString(posts[0].createdAt)}
-                  </p>
-                </div>
-              </div>
-            </Link>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Image
-              alt="missing post"
-              src="https://illustrations.popsy.co/gray/success.svg"
-              width={400}
-              height={400}
-              className="dark:hidden"
-            />
-            <Image
-              alt="missing post"
-              src="https://illustrations.popsy.co/white/success.svg"
-              width={400}
-              height={400}
-              className="hidden dark:block"
-            />
-            <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-              No posts yet.
-            </p>
-          </div>
+              </Section>
+            )}
+            {(data.personalInfos?.location ||
+              data.personalInfos?.currentWork) && (
+              <Section sectionName="Current Infos">
+                <CurrentInfosDisplay personalInfos={data.personalInfos} />
+              </Section>
+            )}
+          </>
+        )}
+
+        {skills?.length > 0 && (
+          <Section sectionName="Skills">
+            <div className="flex flex-wrap gap-2">
+              {skills.map((skill) => (
+                <Skill key={skill.id} skill={skill} />
+              ))}
+            </div>
+          </Section>
+        )}
+
+        {data?.experiences?.length > 0 && (
+          <Section sectionName="Experiences">
+            <div className="-mt-3.5 flex flex-col divide-y divide-gray-200">
+              {data.experiences.map((experience) => (
+                <Experience
+                  key={experience.id}
+                  experience={experience}
+                  readOnly
+                />
+              ))}
+            </div>
+          </Section>
+        )}
+
+        {data?.educations?.length > 0 && (
+          <Section sectionName="Educations">
+            <div className="-mt-3.5 flex flex-col divide-y divide-gray-200">
+              {data.educations.map((education) => (
+                <Education key={education.id} education={education} readOnly />
+              ))}
+            </div>
+          </Section>
+        )}
+
+        {data?.languages?.length > 0 && (
+          <Section sectionName="Language">
+            <div className="-mt-3.5 flex flex-col">
+              {data.languages.map((language) => (
+                <Language key={language.id} language={language} readOnly />
+              ))}
+            </div>
+          </Section>
+        )}
+        {data?.links?.length > 0 && (
+          <Section sectionName="Links">
+            <div className="-mt-3.5 flex flex-col">
+              {data.links.map((link) => (
+                <Link key={link.id} link={link} readOnly />
+              ))}
+            </div>
+          </Section>
         )}
       </div>
-
-      {posts.length > 1 && (
-        <div className="mx-5 mb-20 max-w-screen-xl lg:mx-24 2xl:mx-auto">
-          <h2 className="mb-10 font-title text-4xl dark:text-white md:text-5xl">
-            More stories
-          </h2>
-          <div className="grid w-full grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
-            {posts.slice(1).map((metadata: any, index: number) => (
-              <BlogCard key={index} data={metadata} />
-            ))}
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 }

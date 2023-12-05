@@ -45,7 +45,7 @@ export default function Link({ siteId, link, readOnly, theme }: LinkProps) {
           </div>
         )}
       </div>
-      {!readOnly && (
+      {!readOnly && siteId && (
         <LinkModal
           siteId={siteId}
           linkId={link.id}

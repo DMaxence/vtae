@@ -7,6 +7,7 @@ import { notFound, redirect } from "next/navigation";
 import { getSiteData } from "@/lib/fetchers";
 import { fontMapper } from "@/styles/fonts";
 import { Metadata } from "next";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 
 export async function generateMetadata({
   params,
@@ -45,7 +46,7 @@ export async function generateMetadata({
       images: [image],
       creator: "@vercel",
     },
-    icons: [logo],
+    icons: [data.user?.image || logo],
     metadataBase: new URL(`https://${domain}`),
     // Optional: Set canonical URL to custom domain if it exists
     // ...(params.domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) &&
@@ -97,6 +98,7 @@ export default async function SiteLayout({
               {data.name}
             </span>
           </Link>
+          <ThemeSwitcher />
         </div>
       </div>
 
@@ -108,6 +110,26 @@ export default async function SiteLayout({
       ) : (
         <ReportAbuse />
       )}
+      <footer className="flex w-full items-center justify-center py-7 print:hidden">
+        <p className="text-center text-xs text-gray-500 dark:text-gray-400">
+          Powered by{" "}
+          <a
+            className="font-semibold text-black underline dark:text-gray-300"
+            href="https://vtae.xyz"
+            rel="noreferrer noopener"
+            target="_blank"
+            // onClick={() => {
+            //   splitbee.track("CTA", {
+            //     from: subdomain,
+            //     cible: "Vtae landing page",
+            //   });
+            // }}
+            // style={{ color: theme?.linkColor }}
+          >
+            vtae.xyz
+          </a>
+        </p>
+      </footer>
     </div>
   );
 }

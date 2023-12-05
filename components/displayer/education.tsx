@@ -9,18 +9,15 @@ import { CalendarDays, MapPin, PenSquare } from "lucide-react";
 import { getTextDate } from "@/lib/utils";
 
 import EducationModal from "../builder/Modals/education-modal";
+import { WithSiteId } from "@/lib/types";
 
-const Education = ({
-  education,
-  readOnly,
-  theme,
-  siteId,
-}: {
+interface EducationProps extends WithSiteId {
   education: EducationType;
   readOnly?: boolean;
   theme?: Theme;
-  siteId: string;
-}) => {
+}
+
+const Education = ({ education, readOnly, theme, siteId }: EducationProps) => {
   const [showModal, setShowModal] = React.useState<boolean>(false);
 
   return (
@@ -56,7 +53,7 @@ const Education = ({
         )}
       </div>
       <div className="whitespace-pre-line">{education.description}</div>
-      {!readOnly && (
+      {!readOnly && siteId && (
         <EducationModal
           siteId={siteId}
           educationId={education.id}

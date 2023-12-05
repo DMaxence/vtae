@@ -9,7 +9,7 @@ import type {
 
 import { cn, getClickableLink, getElapsedTime, getTextDate } from "@/lib/utils";
 import { CalendarDays, Link, MapPin, PenSquare } from "lucide-react";
-import { EmploymentType } from "@/lib/types";
+import { EmploymentType, WithSiteId } from "@/lib/types";
 import ExperienceModal from "../builder/Modals/experience-modal";
 
 const Skill = ({ skill, theme }: { skill: Skill; theme?: Theme }) => {
@@ -31,19 +31,20 @@ const Skill = ({ skill, theme }: { skill: Skill; theme?: Theme }) => {
   );
 };
 
-const Experience = ({
-  experience,
-  readOnly,
-  theme,
-  siteId,
-}: {
+interface ExperienceProps extends WithSiteId {
   experience: ExperienceType & {
     skills: Skill[];
   };
   theme?: Theme;
   readOnly?: boolean;
-  siteId: string;
-}) => {
+}
+
+const Experience = ({
+  experience,
+  readOnly,
+  theme,
+  siteId,
+}: ExperienceProps) => {
   const [showModal, setShowModal] = React.useState<boolean>(false);
 
   return (
@@ -114,7 +115,7 @@ const Experience = ({
         </div>
       )}
       <div className="whitespace-pre-line">{experience.description}</div>
-      {!readOnly && (
+      {!readOnly && siteId && (
         <ExperienceModal
           siteId={siteId}
           experienceId={experience.id}
