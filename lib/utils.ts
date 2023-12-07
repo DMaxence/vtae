@@ -10,7 +10,7 @@ export async function fetcher<JSON = any>(
   input: RequestInfo,
   init?: RequestInit,
 ): Promise<JSON> {
-  const response = await fetch(input, { ...init, cache: "force-cache" });
+  const response = await fetch(input, { ...init, cache: "no-cache" });
 
   return response.json();
 }

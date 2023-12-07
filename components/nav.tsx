@@ -14,6 +14,7 @@ import {
   Settings,
   FileCode,
   Github,
+  FlaskConical,
 } from "lucide-react";
 import {
   useParams,
@@ -155,6 +156,17 @@ export default function Nav({ children }: { children: ReactNode }) {
     ];
   }, [segments, id, siteId]);
 
+  const fixedTabs = useMemo(() => {
+    return [
+      {
+        name: "Feature Requests",
+        href: "/feedback",
+        isActive: segments[0] === "feedback",
+        icon: <FlaskConical width={18} />,
+      },
+    ];
+  }, [segments]);
+
   const [showSidebar, setShowSidebar] = useState(false);
 
   const pathname = usePathname();
@@ -213,6 +225,20 @@ export default function Nav({ children }: { children: ReactNode }) {
           </div>
         </div>
         <div>
+          <div className="grid gap-1">
+            {fixedTabs.map(({ name, href, isActive, icon }) => (
+              <Link
+                key={name}
+                href={href}
+                className={`flex items-center space-x-3 ${
+                  isActive ? "bg-stone-200 text-black dark:bg-stone-700" : ""
+                } rounded-lg px-2 py-1.5 transition-all duration-150 ease-in-out hover:bg-stone-200 active:bg-stone-300 dark:text-white dark:hover:bg-stone-700 dark:active:bg-stone-800`}
+              >
+                {icon}
+                <span className="text-sm font-medium">{name}</span>
+              </Link>
+            ))}
+          </div>
           <div className="grid gap-1">
             {externalLinks.map(({ name, href, icon }) => (
               <a
