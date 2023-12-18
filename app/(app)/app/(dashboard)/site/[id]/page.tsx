@@ -24,6 +24,7 @@ import ExperienceModal from "@/components/builder/Modals/experience-modal";
 import LanguageModal from "@/components/builder/Modals/language-modal";
 import LinkModal from "@/components/builder/Modals/link-modal";
 import PersonalInfosModal from "@/components/builder/Modals/personal-infos-modal";
+import { getClient } from "@umami/api-client";
 
 const FIELD_SET_MAP = {
   [SECTIONS_MAP.PERSONAL_INFOS.name]: PersonalInfos,
@@ -68,6 +69,14 @@ export default async function ResumeBuilder({
   if (!data || data.userId !== session.user.id) {
     notFound();
   }
+
+  // const client = getClient({
+  //   userId: process.env.UMAMI_API_CLIENT_USER_ID,
+  //   // secret: process.env.UMAMI_API_CLIENT_SECRET,
+  //   // apiEndpoint: process.env.UMAMI_API_CLIENT_ENDPOINT,
+  // });
+  // const website = await client.getWebsites();
+  // console.log("client", client, website);
 
   const url = `${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`;
 

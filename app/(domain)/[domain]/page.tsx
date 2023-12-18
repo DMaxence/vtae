@@ -70,7 +70,7 @@ export default async function SiteHomePage({
               <Section>
                 <PersonalInfos
                   personalInfos={data.personalInfos}
-                  image={data.user?.image}
+                  user={data.user}
                   experience={experienceYears}
                 />
               </Section>

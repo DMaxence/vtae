@@ -19,7 +19,7 @@ export default function Form({
   handleSubmit,
 }: {
   title: string;
-  description: string;
+  description?: string;
   helpText: string;
   inputAttrs: {
     name: string;
@@ -64,14 +64,30 @@ export default function Form({
     >
       <div className="relative flex flex-col space-y-4 p-5 sm:p-10">
         <h2 className="font-cal text-xl dark:text-white">{title}</h2>
-        <p className="text-sm text-stone-500 dark:text-stone-400">
-          {description}
-        </p>
-        {inputAttrs.name === "image" || inputAttrs.name === "logo" ? (
+        {description && (
+          <p className="text-sm text-stone-500 dark:text-stone-400">
+            {description}
+          </p>
+        )}
+        {inputAttrs.name === "image" ||
+        inputAttrs.name === "logo" ||
+        inputAttrs.name === "avatar" ? (
           <Uploader
             defaultValue={inputAttrs.defaultValue}
             name={inputAttrs.name}
+            type={inputAttrs.type as "avatar" | "file"}
           />
+        ) : inputAttrs.name === "themeType" ? (
+          <div className="flex max-w-sm items-center overflow-hidden rounded-lg border border-stone-600">
+            <select
+              name="themeType"
+              defaultValue={inputAttrs.defaultValue}
+              className="w-full rounded-none border-none bg-white px-4 py-2 text-sm font-medium text-stone-700 focus:outline-none focus:ring-black dark:bg-black dark:text-stone-200 dark:focus:ring-white"
+            >
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
         ) : inputAttrs.name === "font" ? (
           <div className="flex max-w-sm items-center overflow-hidden rounded-lg border border-stone-600">
             <select

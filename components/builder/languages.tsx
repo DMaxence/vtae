@@ -26,11 +26,9 @@ export default async function Languages({ siteId }: LanguageProps) {
             <Language key={language.id} siteId={siteId} language={language} />
           ))
         ) : (
-          <div className="text-center">
-            <p className="font-cal text-xl text-gray-600">
-              No language yet. Add one !
-            </p>
-          </div>
+          <p className="whitespace-pre-line text-sm text-gray-400">
+            No language yet. Add one !
+          </p>
         ))}
     </div>
   );

@@ -19,7 +19,7 @@ export default function Uploader() {
       const file = event.currentTarget.files && event.currentTarget.files[0];
       if (file) {
         if (file.size / 1024 / 1024 > 50) {
-          toast.error("File size too big (max 50MB)");
+          toast.error("File size too big (max 10MB)");
         } else {
           setFile(file);
           const reader = new FileReader();
@@ -114,7 +114,7 @@ export default function Uploader() {
               const file = e.dataTransfer.files && e.dataTransfer.files[0];
               if (file) {
                 if (file.size / 1024 / 1024 > 50) {
-                  toast.error("File size too big (max 50MB)");
+                  toast.error("File size too big (max 10MB)");
                 } else {
                   setFile(file);
                   const reader = new FileReader();
@@ -160,7 +160,7 @@ export default function Uploader() {
               Drag and drop or click to upload.
             </p>
             <p className="mt-2 text-center text-sm text-gray-500">
-              Max file size: 50MB
+              Max file size: 10MB
             </p>
             <span className="sr-only">Photo upload</span>
           </div>

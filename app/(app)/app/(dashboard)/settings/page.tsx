@@ -9,6 +9,7 @@ export default async function SettingsPage() {
   if (!session) {
     redirect("/login");
   }
+  console.log(session);
   return (
     <div className="flex max-w-screen-xl flex-col space-y-12 p-8">
       <div className="flex flex-col space-y-6">
@@ -16,14 +17,35 @@ export default async function SettingsPage() {
           Settings
         </h1>
         <Form
-          title="Name"
-          description="Your name on this app."
+          title="Profile Picture"
+          helpText="Max file size 10MB. Recommended size 400x400."
+          inputAttrs={{
+            name: "image",
+            type: "avatar",
+            defaultValue: session.user?.image!,
+          }}
+          handleSubmit={editUser}
+        />
+        <Form
+          title="First Name"
           helpText="Please use 32 characters maximum."
           inputAttrs={{
-            name: "name",
+            name: "firstname",
             type: "text",
-            defaultValue: session.user.name!,
-            placeholder: "Brendon Urie",
+            defaultValue: session.user.firstname!,
+            placeholder: "John",
+            maxLength: 32,
+          }}
+          handleSubmit={editUser}
+        />
+        <Form
+          title="First Name"
+          helpText="Please use 32 characters maximum."
+          inputAttrs={{
+            name: "lastname",
+            type: "text",
+            defaultValue: session.user.lastname!,
+            placeholder: "Doe",
             maxLength: 32,
           }}
           handleSubmit={editUser}

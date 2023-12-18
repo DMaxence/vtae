@@ -152,3 +152,22 @@ export const revalidateSite = async (site: Site) => {
   );
   site.customDomain && (await revalidateTag(`${site.customDomain}-metadata`));
 };
+
+export const websiteScreenshotImage = (site: Site) => {
+  return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/vtae/website-screenshots/${site.subdomain}.png`;
+};
+
+export const takeWebsiteScreenshot = async (subdomain: string) => {
+  const url = process.env.NEXT_PUBLIC_VERCEL_ENV
+    ? `https://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+    : `http://${subdomain}.localhost:${process.env.PORT || 3000}`;
+  fetch("/api/images", {
+    method: "POST",
+    body: JSON.stringify({
+      url,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};

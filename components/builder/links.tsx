@@ -27,13 +27,9 @@ export default async function Links({ siteId }: LinksProps) {
             <Link key={link.id} siteId={siteId} link={link} />
           ))
         ) : (
-          <>
-            <div className="text-center">
-              <p className="font-cal text-xl text-gray-600">
-                No link yet. Add one !
-              </p>
-            </div>
-          </>
+          <p className="whitespace-pre-line text-sm text-gray-400">
+            No link yet. Add one !
+          </p>
         ))}
     </div>
   );

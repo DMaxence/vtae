@@ -42,11 +42,9 @@ export default async function Educations({ siteId }: EducationsProps) {
             />
           ))
         ) : (
-          <div className="text-center">
-            <p className="font-cal text-xl text-gray-600">
-              No education yet. Add one !
-            </p>
-          </div>
+          <p className="whitespace-pre-line text-sm text-gray-400">
+            No education yet. Add one !
+          </p>
         ))}
     </div>
   );

@@ -2,6 +2,7 @@
 
 import LoadingDots from "@/components/icons/loading-dots";
 import { createSite } from "@/lib/actions";
+import { takeWebsiteScreenshot } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import va from "@vercel/analytics";
 import { useRouter } from "next/navigation";
@@ -38,11 +39,12 @@ export default function CreateSiteModal() {
             toast.error(res.error);
           } else {
             va.track("Created Resume");
-            const { id } = res;
+            const { id, subdomain } = res;
             router.refresh();
             router.push(`/site/${id}`);
             modal?.hide();
             toast.success(`Successfully created hosted resume!`);
+            takeWebsiteScreenshot(subdomain);
           }
         })
       }

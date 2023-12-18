@@ -44,7 +44,7 @@ export default async function PostSettings({
         <Form
           title="Thumbnail image"
           description="The thumbnail image for your post. Accepted formats: .png, .jpg, .jpeg"
-          helpText="Max file size 50MB. Recommended size 1200x630."
+          helpText="Max file size 10MB. Recommended size 1200x630."
           inputAttrs={{
             name: "image",
             type: "file",

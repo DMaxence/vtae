@@ -19,5 +19,11 @@ export default async function CurrentInfos({ siteId }: CurrentInfosProps) {
       siteId,
     },
   });
-  return <CurrentInfosDisplay personalInfos={personalInfos as PersonalInfos} />;
+  return personalInfos?.location || personalInfos?.currentWork ? (
+    <CurrentInfosDisplay personalInfos={personalInfos as PersonalInfos} />
+  ) : (
+    <p className="whitespace-pre-line text-sm text-gray-400">
+      Tell people where you live and your job title
+    </p>
+  );
 }

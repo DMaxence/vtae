@@ -14,6 +14,8 @@ export const authOptions: NextAuthOptions = {
         return {
           id: profile.id.toString(),
           name: profile.name || profile.login,
+          firstname: profile.firstname || profile.name || profile.login,
+          lastname: profile.lastname || "",
           gh_username: profile.login,
           email: profile.email,
           image: profile.avatar_url,
@@ -56,6 +58,10 @@ export const authOptions: NextAuthOptions = {
         // @ts-expect-error
         id: token.sub,
         // @ts-expect-error
+        firstname: token?.user?.firstname,
+        // @ts-expect-error
+        lastname: token?.user?.lastname,
+        // @ts-expect-error
         username: token?.user?.username || token?.user?.gh_username,
       };
       return session;
@@ -68,6 +74,8 @@ export function getSession() {
     user: {
       id: string;
       name: string;
+      firstname: string;
+      lastname: string;
       username: string;
       email: string;
       image: string;

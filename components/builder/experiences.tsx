@@ -46,11 +46,9 @@ export default async function Experiences({ siteId }: ExperiencesProps) {
             />
           ))
         ) : (
-          <div className="text-center">
-            <p className="font-cal text-xl text-gray-600">
+          <p className="whitespace-pre-line text-sm text-gray-400">
               No experiences yet. Add one !
             </p>
-          </div>
         )
       ) : (
         <ExperienceSkeleton />

@@ -9,6 +9,7 @@ import { getExperienceYears } from "@/lib/utils";
 import type {
   Experience,
   PersonalInfos as PersonalInfosType,
+  User,
 } from "@prisma/client";
 
 interface PersonalInfosProps extends WithSiteId {}
@@ -39,7 +40,7 @@ export default async function PersonalInfos({ siteId }: PersonalInfosProps) {
   return (
     <PersonalInfosDisplay
       personalInfos={personalInfos as PersonalInfosType}
-      image={session?.user?.image}
+      user={session?.user as User}
       experience={experienceYears}
     />
   );

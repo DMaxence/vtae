@@ -5,6 +5,7 @@ import { Post, Site } from "@prisma/client";
 import { revalidateTag } from "next/cache";
 import { withPostAuth, withSiteAuth } from "./auth";
 import { getSession } from "@/lib/auth";
+// import { getClient } from "@umami/api-client";
 import {
   addDomainToVercel,
   // getApexDomain,
@@ -15,6 +16,9 @@ import {
 import { put } from "@vercel/blob";
 import { customAlphabet } from "nanoid";
 import { getBlurDataURL } from "@/lib/utils";
+import puppeteer from "puppeteer";
+import { handleCloudinaryUpload } from "./cloudinary";
+import { promises as fs } from "fs";
 
 const nanoid = customAlphabet(
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -32,6 +36,19 @@ export const createSite = async (formData: FormData) => {
   const description = formData.get("description") as string;
   const subdomain = formData.get("subdomain") as string;
 
+  // const client = getClient();
+
+  // console.log("Creating Umami website: ", {
+  //   name,
+  //   domain: `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
+  // });
+
+  // const website = await client.createWebsite({
+  //   name,
+  //   domain: `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
+  // });
+  // console.log("Umami API response: ", website);
+
   try {
     const response = await prisma.site.create({
       data: {
@@ -43,11 +60,34 @@ export const createSite = async (formData: FormData) => {
             id: session.user.id,
           },
         },
+        // umamiId: data?.id,
       },
     });
+    try {
+      await prisma.personalInfos.create({
+        data: {
+          firstname: session.user.firstname,
+          lastname: session.user.lastname,
+          image: session.user.image,
+          site: {
+            connect: {
+              id: response.id,
+            },
+          },
+        },
+      });
+    } catch (e) {
+      console.log(e);
+    }
+
     await revalidateTag(
       `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
     );
+    // takeWebsiteScreenshot({
+    //   url: process.env.NEXT_PUBLIC_VERCEL_ENV
+    //     ? `https://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+    //     : `http://${subdomain}.localhost:${process.env.PORT || 3000}`,
+    // });
     return response;
   } catch (error: any) {
     if (error.code === "P2002") {
@@ -407,8 +447,43 @@ export const editUser = async (
       error: "Not authenticated",
     };
   }
-  const value = formData.get(key) as string;
+  if (key === "image") {
+    const file = formData.get(key) as File;
 
+    if (file.size > 0) {
+      const filename = `${nanoid()}.${file.type.split("/")[1]}`;
+      const base64 = await file.arrayBuffer();
+      const base64String = Buffer.from(base64).toString("base64");
+
+      const uploadResponse = await handleCloudinaryUpload({
+        path: `data:image/png;base64,${base64String}`,
+        name: filename,
+        folder: "avatar",
+      });
+
+      const response = await prisma.user.update({
+        where: {
+          id: session.user.id,
+        },
+        data: {
+          [key]: uploadResponse.secure_url,
+        },
+      });
+      return response;
+    } else {
+      const response = await prisma.user.update({
+        where: {
+          id: session.user.id,
+        },
+        data: {
+          [key]: null,
+        },
+      });
+      return response;
+    }
+  }
+
+  const value = formData.get(key) as string;
   try {
     const response = await prisma.user.update({
       where: {
@@ -430,4 +505,42 @@ export const editUser = async (
       };
     }
   }
+};
+
+export const takeWebsiteScreenshot = async (options: { url: string }) => {
+  // Get the url and fullPage from the options
+  const { url } = options;
+
+  // Launch a new browser using puppeteer
+  const browser = await puppeteer.launch();
+
+  // Create a new page in the browser
+  const page = await browser.newPage();
+
+  const urlObject = new URL(url);
+
+  // Define a path where the screenshot will be saved
+  const path = `public/screenshots/${urlObject.hostname.split(".")[0]}.png`;
+
+  // Navigate to the url
+  await page.goto(url);
+
+  // Take a screenshot of the page
+  await page.screenshot({
+    path,
+  });
+
+  // Close the browser once done
+  await browser.close();
+
+  // Upload the screenshot to cloudinary
+  const uploadResponse = await handleCloudinaryUpload({
+    path,
+    folder: "website-screenshots",
+  });
+
+  // Delete the screenshot from the server
+  await fs.unlink(path);
+
+  return uploadResponse;
 };

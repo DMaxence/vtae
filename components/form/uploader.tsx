@@ -7,11 +7,14 @@ import { toast } from "sonner";
 export default function Uploader({
   defaultValue,
   name,
+  type,
 }: {
   defaultValue: string | null;
-  name: "image" | "logo";
+  name: "image" | "logo" | "avatar";
+  type: "avatar" | "file";
 }) {
-  const aspectRatio = name === "image" ? "aspect-video" : "aspect-square";
+  const aspectRatio =
+    name === "image" && type === "file" ? "aspect-video" : "aspect-square";
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [data, setData] = useState({
@@ -22,8 +25,8 @@ export default function Uploader({
 
   const handleUpload = (file: File | null) => {
     if (file) {
-      if (file.size / 1024 / 1024 > 50) {
-        toast.error("File size too big (max 50MB)");
+      if (file.size / 1024 / 1024 > 10) {
+        toast.error("File size too big (max 10MB)");
       } else if (
         !file.type.includes("png") &&
         !file.type.includes("jpg") &&
@@ -40,21 +43,30 @@ export default function Uploader({
     }
   };
 
+  const clearUpload = () => {
+    setData((prev) => ({ ...prev, [name]: null }));
+  };
+
   return (
     <div>
       <label
         htmlFor={`${name}-upload`}
         className={cn(
-          "group relative mt-2 flex cursor-pointer flex-col items-center justify-center rounded-md border border-gray-300 bg-white shadow-sm transition-all hover:bg-gray-50",
+          "group relative mt-2 flex cursor-pointer flex-col items-center justify-center border border-gray-300 bg-white shadow-sm transition-all hover:bg-gray-50",
           aspectRatio,
+          type === "avatar" ? "rounded-full" : "rounded-md",
           {
             "max-w-screen-md": aspectRatio === "aspect-video",
             "max-w-xs": aspectRatio === "aspect-square",
+            "max-w-[200px]": type === "avatar",
           },
         )}
       >
         <div
-          className="absolute z-[5] h-full w-full rounded-md"
+          className={cn(
+            "absolute z-[5] h-full w-full",
+            type === "avatar" ? "rounded-full" : "rounded-md",
+          )}
           onDragOver={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -81,13 +93,16 @@ export default function Uploader({
           }}
         />
         <div
-          className={`${
-            dragActive ? "border-2 border-black" : ""
-          } absolute z-[3] flex h-full w-full flex-col items-center justify-center rounded-md px-10 transition-all ${
-            data[name]
-              ? "bg-white/80 opacity-0 hover:opacity-100 hover:backdrop-blur-md"
-              : "bg-white opacity-100 hover:bg-gray-50"
-          }`}
+          className={cn(
+            `${
+              dragActive ? "border-2 border-black" : ""
+            } absolute z-[3] flex h-full w-full flex-col items-center justify-center px-10 transition-all ${
+              data[name]
+                ? "bg-white/80 opacity-0 hover:opacity-100 hover:backdrop-blur-md"
+                : "bg-white opacity-100 hover:bg-gray-50"
+            }`,
+            type === "avatar" ? "rounded-full" : "rounded-md",
+          )}
         >
           <svg
             className={`${
@@ -111,7 +126,7 @@ export default function Uploader({
             Drag and drop or click to upload.
           </p>
           <p className="mt-2 text-center text-sm text-gray-500">
-            Max file size: 50MB
+            Max file size: 10MB
           </p>
           <span className="sr-only">Photo upload</span>
         </div>
@@ -120,11 +135,19 @@ export default function Uploader({
           <img
             src={data[name] as string}
             alt="Preview"
-            className="h-full w-full rounded-md object-cover"
+            className={cn(
+              "h-full w-full object-cover",
+              type === "avatar" ? "rounded-full" : "rounded-md",
+            )}
           />
         )}
       </label>
-      <div className="mt-1 flex rounded-md shadow-sm">
+      <div
+        className={cn(
+          "mt-1 flex shadow-sm",
+          type === "avatar" ? "rounded-full" : "rounded-md",
+        )}
+      >
         <input
           id={`${name}-upload`}
           ref={inputRef}
@@ -137,6 +160,24 @@ export default function Uploader({
             handleUpload(file);
           }}
         />
+      </div>
+      <div
+        className={cn("mt-1 flex justify-center", {
+          "max-w-screen-md": aspectRatio === "aspect-video",
+          "max-w-xs": aspectRatio === "aspect-square",
+          "max-w-[200px]": type === "avatar",
+        })}
+      >
+        <button
+          type="button"
+          onClick={clearUpload}
+          className={cn(
+            "flex items-center justify-center space-x-2 rounded-md border px-5 py-1 text-sm transition-all focus:outline-none",
+            "border-red-500 bg-red-100/75 text-red-600 hover:bg-red-200/75 hover:text-red-700 dark:border-stone-700 dark:hover:border-stone-200 dark:hover:bg-black dark:hover:text-white dark:active:bg-stone-800",
+          )}
+        >
+          <p>Delete</p>
+        </button>
       </div>
     </div>
   );

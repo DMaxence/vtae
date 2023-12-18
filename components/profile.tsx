@@ -23,11 +23,11 @@ export default async function Profile() {
           }
           width={40}
           height={40}
-          alt={session.user.name ?? "User avatar"}
+          alt={session.user.firstname ?? "User avatar"}
           className="h-6 w-6 rounded-full"
         />
         <span className="truncate text-sm font-medium">
-          {session.user.name}
+          {session.user.firstname}
         </span>
       </Link>
       <LogoutButton />

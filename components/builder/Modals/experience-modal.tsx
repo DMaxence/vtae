@@ -9,7 +9,7 @@ import SubmitButton from "@/components/submit-button";
 import TextInput from "@/components/text-input";
 import useSWR, { mutate } from "swr";
 
-import { fetcher } from "@/lib/utils";
+import { fetcher, takeWebsiteScreenshot } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 
 import type { Experience, Skill } from "@prisma/client";
@@ -87,6 +87,7 @@ const ExperienceModal = ({
         setShowModal(false);
         actions.resetForm();
         toast.success(`Experience ${experienceId ? "updated" : "created"}`);
+        takeWebsiteScreenshot(res.site.subdomain);
       }
     });
   };
