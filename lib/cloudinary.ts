@@ -51,7 +51,7 @@ export const handleCloudinaryUpload = (resource: {
   return cloudinary.uploader.upload(resource.path, {
     use_filename: true,
     overwrite: true,
-    unique_filename: false,
+    // unique_filename: false,
     invalidate: true,
     filename_override: resource.name,
     // Folder to store image in

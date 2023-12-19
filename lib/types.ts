@@ -103,3 +103,9 @@ export enum EmploymentType {
   PERSONAL_PROJECT = "Personal Project",
   CONTRACT = "Contract",
 }
+
+
+export enum Providers {
+  github = "Github",
+  linkedIn = "Linkedin",
+}

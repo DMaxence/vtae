@@ -1,7 +1,7 @@
 "use client";
 
 import LoadingDots from "@/components/icons/loading-dots";
-import { cn } from "@/lib/utils";
+import { cn, takeWebsiteScreenshot } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
@@ -56,6 +56,7 @@ export default function Form({
               await update();
               router.refresh();
             }
+            takeWebsiteScreenshot(res);
             toast.success(`Successfully updated ${inputAttrs.name}!`);
           }
         });

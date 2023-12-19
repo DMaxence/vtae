@@ -87,7 +87,7 @@ const ExperienceModal = ({
         setShowModal(false);
         actions.resetForm();
         toast.success(`Experience ${experienceId ? "updated" : "created"}`);
-        takeWebsiteScreenshot(res.site.subdomain);
+        takeWebsiteScreenshot(res.site);
       }
     });
   };

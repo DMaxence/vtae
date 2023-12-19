@@ -157,14 +157,15 @@ export const websiteScreenshotImage = (site: Site) => {
   return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/vtae/website-screenshots/${site.subdomain}.png`;
 };
 
-export const takeWebsiteScreenshot = async (subdomain: string) => {
+export const takeWebsiteScreenshot = async (site: Site) => {
   const url = process.env.NEXT_PUBLIC_VERCEL_ENV
-    ? `https://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-    : `http://${subdomain}.localhost:${process.env.PORT || 3000}`;
+    ? `https://${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+    : `http://${site.subdomain}.localhost:${process.env.PORT || 3000}`;
   fetch("/api/images", {
     method: "POST",
     body: JSON.stringify({
       url,
+      siteId: site.id,
     }),
     headers: {
       "Content-Type": "application/json",

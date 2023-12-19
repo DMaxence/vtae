@@ -1,9 +1,16 @@
 import { getServerSession, type NextAuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
+import LinkedInProvider from "next-auth/providers/linkedin";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
+import { LogSnag } from "@logsnag/next/server";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
+
+const logsnag = new LogSnag({
+  token: process.env.LOGSNAG_TOKEN as string,
+  project: process.env.LOGSNAG_PROJECT as string,
+});
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -19,6 +26,28 @@ export const authOptions: NextAuthOptions = {
           gh_username: profile.login,
           email: profile.email,
           image: profile.avatar_url,
+        };
+      },
+    }),
+    LinkedInProvider({
+      clientId: process.env.AUTH_LINKEDIN_ID as string,
+      clientSecret: process.env.AUTH_LINKEDIN_SECRET as string,
+      issuer: "https://www.linkedin.com",
+      jwks_endpoint: "https://www.linkedin.com/oauth/openid/jwks",
+      authorization: {
+        params: {
+          scope: "profile email openid",
+        },
+      },
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          firstname: profile.given_name,
+          lastname: profile.family_name,
+          email: profile.email,
+          image: profile.picture || profile.image || profile.profilePicture,
+          locale: profile.locale,
         };
       },
     }),
@@ -65,6 +94,73 @@ export const authOptions: NextAuthOptions = {
         username: token?.user?.username || token?.user?.gh_username,
       };
       return session;
+    },
+    // signIn: async ({ user, account, profile, email, credentials }) => {
+    //   console.log(
+    //     "Signin callback",
+    //     user,
+    //     account,
+    //     profile,
+    //     email,
+    //     credentials,
+    //   );
+    //   return true;
+    // },
+  },
+  events: {
+    // createUser: async ({ user }) => {
+    //   await logsnag.track({
+    //     channel: "users",
+    //     event: "User Registered",
+    //     user_id: user.id,
+    //     icon: "👨",
+    //     notify: true,
+    //     tags: {
+    //       name: user.name?.toString() || "",
+    //       email: user.email?.toString() || "",
+    //     },
+    //   });
+    // },
+    signIn: async ({ user, account, isNewUser }) => {
+      const emailSplited = (user.email || "").split("@");
+      let email = "";
+      if (emailSplited.length !== 2) email = "error@error.com";
+      const domain = emailSplited[1];
+      const domainSplited = domain.split(".");
+      email =
+        domainSplited.length > 2
+          ? `${emailSplited[0]}@${domainSplited.slice(-2).join(".")}`
+          : user.email || "";
+      if (isNewUser) {
+        await logsnag.track({
+          channel: "users",
+          event: "User Registered",
+          user_id: user.id,
+          icon: "👨",
+          notify: true,
+          tags: {
+            name: user.name || "",
+            email: email,
+            provider: account?.provider || "password",
+            // @ts-expect-error
+            locale: user?.locale || "",
+          },
+        });
+      }
+      await logsnag.identify({
+        user_id: user.id,
+        properties: {
+          name: user.name || "",
+          // @ts-expect-error
+          firstname: user?.firstname || "",
+          // @ts-expect-error
+          lastname: user?.lastname || "",
+          email: email,
+          provider: account?.provider || "password",
+          // @ts-expect-error
+          locale: user?.locale || "",
+        },
+      });
     },
   },
 };

@@ -39,12 +39,12 @@ export default function CreateSiteModal() {
             toast.error(res.error);
           } else {
             va.track("Created Resume");
-            const { id, subdomain } = res;
+            const { id } = res;
             router.refresh();
             router.push(`/site/${id}`);
             modal?.hide();
             toast.success(`Successfully created hosted resume!`);
-            takeWebsiteScreenshot(subdomain);
+            takeWebsiteScreenshot(res);
           }
         })
       }
