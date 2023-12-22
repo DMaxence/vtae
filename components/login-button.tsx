@@ -9,7 +9,6 @@ import { toast } from "sonner";
 
 import GithubSVG from "@/public/icons/github.svg";
 import LinkedinSVG from "@/public/icons/linkedin.svg";
-import GoogleSVG from "@/public/icons/google.svg";
 
 type LoginButtonProps = {
   provider: Providers;
@@ -18,11 +17,7 @@ type LoginButtonProps = {
 export default function LoginButton({ provider }: LoginButtonProps) {
   const [loading, setLoading] = useState(false);
   const providerName =
-    provider === Providers.github
-      ? "github"
-      : provider === Providers.linkedIn
-        ? "linkedin"
-        : "google";
+    Object.keys(Providers)[Object.values(Providers).indexOf(provider)];
 
   // Get error message added by next/auth in URL.
   const searchParams = useSearchParams();
@@ -58,9 +53,8 @@ export default function LoginButton({ provider }: LoginButtonProps) {
             <GithubSVG className="h-4 w-4 text-black dark:text-white" />
           )}
           {provider === Providers.linkedIn && (
-            <LinkedinSVG className="h-4 w-4" />
+            <LinkedinSVG className="h-4 w-4 text-black dark:text-white" />
           )}
-          {provider === Providers.google && <GoogleSVG className="h-4 w-4" />}
 
           <p className="text-sm font-medium text-stone-600 dark:text-stone-400">
             Login with {provider}

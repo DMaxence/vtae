@@ -1,8 +1,15 @@
+import { compare, hash } from "bcryptjs";
+
 import { getServerSession, type NextAuthOptions } from "next-auth";
+
+import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 import LinkedInProvider from "next-auth/providers/linkedin";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
+
 import prisma from "@/lib/prisma";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+
 import { LogSnag } from "@logsnag/next/server";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
@@ -49,6 +56,176 @@ export const authOptions: NextAuthOptions = {
           image: profile.picture || profile.image || profile.profilePicture,
           locale: profile.locale,
         };
+      },
+    }),
+    GoogleProvider({
+      clientId: process.env.AUTH_GOOGLE_ID as string,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET as string,
+      profile(profile) {
+        console.log("Google profile", profile);
+        return {
+          id: profile.id,
+          name: profile.name,
+          firstname: profile.given_name,
+          lastname: profile.family_name,
+          email: profile.email,
+          image: profile.picture || profile.image || profile.profilePicture,
+          locale: profile.locale,
+        };
+      },
+    }),
+    CredentialsProvider({
+      id: "app-login",
+      name: "App Login",
+      credentials: {
+        email: {
+          label: "Email Address",
+          type: "email",
+          placeholder: "Email Address",
+        },
+        password: {
+          label: "Password",
+          type: "password",
+          placeholder: "Password",
+        },
+      },
+      authorize: async (credentials) => {
+        try {
+          let user = await prisma.user.findFirst({
+            where: {
+              email: credentials?.email,
+            },
+            select: {
+              id: true,
+              email: true,
+              password: true,
+              name: true,
+              firstname: true,
+              lastname: true,
+              image: true,
+            },
+          });
+
+          if (!user) {
+            if (!credentials?.password || !credentials?.email) {
+              throw new Error("Invalid Credentials");
+            }
+
+            throw new Error("The combo email/password is not correct");
+          } else {
+            if (!credentials?.password || !user.password) {
+              throw new Error("Invalid Credentials");
+            }
+            const isValid = await verifyPassword(
+              credentials?.password,
+              user.password,
+            );
+
+            if (!isValid) {
+              throw new Error("Invalid Credentials");
+            }
+          }
+          return {
+            id: user.id,
+            name: user.name,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            image: user.image,
+          };
+        } catch (error) {
+          console.log(error);
+          throw error;
+        }
+      },
+    }),
+    CredentialsProvider({
+      id: "app-register",
+      name: "App Register",
+      credentials: {
+        email: {
+          label: "Email Address",
+          type: "email",
+          placeholder: "Email Address",
+        },
+        password: {
+          label: "Password",
+          type: "password",
+          placeholder: "Password",
+        },
+        firstname: {
+          label: "First name",
+          type: "text",
+          placeholder: "First name",
+        },
+        lastname: {
+          label: "Last name",
+          type: "text",
+          placeholder: "Last name",
+        },
+        locale: {
+          type: "hidden",
+        },
+      },
+      authorize: async (credentials) => {
+        try {
+          let maybeUser = await prisma.user.findFirst({
+            where: {
+              email: credentials?.email,
+            },
+            select: {
+              id: true,
+              email: true,
+              password: true,
+              name: true,
+              firstname: true,
+              lastname: true,
+              image: true,
+            },
+          });
+
+          if (!maybeUser) {
+            if (!credentials?.password || !credentials?.email) {
+              throw new Error("Invalid Credentials");
+            }
+
+            maybeUser = await prisma.user.create({
+              data: {
+                email: credentials?.email,
+                password: await hashPassword(credentials?.password),
+                name: `${credentials?.firstname} ${credentials?.lastname}`,
+                firstname: credentials?.firstname,
+                lastname: credentials?.lastname,
+                locale: credentials?.locale,
+              },
+              select: {
+                id: true,
+                email: true,
+                password: true,
+                name: true,
+                firstname: true,
+                lastname: true,
+                image: true,
+              },
+            });
+          } else {
+            if (!credentials?.password || !maybeUser.password) {
+              throw new Error("This email is already taken");
+            }
+          }
+
+          return {
+            id: maybeUser.id,
+            name: maybeUser.name,
+            firstname: maybeUser.firstname,
+            lastname: maybeUser.lastname,
+            email: maybeUser.email,
+            image: maybeUser.image,
+          };
+        } catch (error) {
+          console.log(error);
+          throw error;
+        }
       },
     }),
   ],
@@ -234,4 +411,14 @@ export function withPostAuth(action: any) {
 
     return action(formData, post, key);
   };
+}
+
+export async function hashPassword(password: string) {
+  const hashedPassword = await hash(password, 12);
+  return hashedPassword;
+}
+
+export async function verifyPassword(password: string, hashedPassword: string) {
+  const isValid = await compare(password, hashedPassword);
+  return isValid;
 }

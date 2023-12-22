@@ -104,8 +104,8 @@ export enum EmploymentType {
   CONTRACT = "Contract",
 }
 
-
 export enum Providers {
   github = "Github",
   linkedIn = "Linkedin",
+  google = "Google",
 }

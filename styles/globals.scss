@@ -162,3 +162,29 @@ ul[data-type="taskList"] li[data-checked="true"] > div > p {
     @apply dark:text-white;
   }
 }
+
+.subtitle {
+  text-align: center;
+  overflow: hidden;
+  @apply mx-5
+}
+.subtitle:before,
+.subtitle:after {
+  content: "";
+  display: inline-block;
+  height: 1px;
+  position: relative;
+  vertical-align: middle;
+  width: 50%;
+  @apply bg-stone-200 dark:bg-stone-700;
+}
+
+.subtitle:before {
+  right: 18px;
+  margin-left: -50%;
+}
+
+.subtitle:after {
+  left: 18px;
+  margin-right: -50%;
+}

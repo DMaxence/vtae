@@ -172,3 +172,10 @@ export const takeWebsiteScreenshot = async (site: Site) => {
     },
   });
 };
+
+export const getLang = () =>
+  navigator.languages && navigator.languages.length
+    ? navigator.languages.find((lang) => lang.includes("-")) ||
+      navigator.languages.find((lang) => lang.includes("_")) ||
+      navigator.languages[0]
+    : navigator.language;
