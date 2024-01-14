@@ -62,8 +62,8 @@ export default async function SiteHomePage({
   const experienceYears = getExperienceYears(data.experiences);
 
   return (
-    <div className="mb-20 w-full">
-      <div className="mx-auto w-full max-w-screen-sm print:max-w-none print:p-5 lg:w-5/6">
+    <div className="mb-20 w-full print:mb-0">
+      <div className="mx-auto w-full max-w-screen-sm print:mx-0 print:!w-full print:max-w-none print:divide-y print:divide-gray-200 print:p-0 lg:w-5/6">
         {data?.personalInfos && (
           <>
             {data.personalInfos?.firstname && data.user && (
@@ -84,7 +84,7 @@ export default async function SiteHomePage({
             )}
             {(data.personalInfos?.location ||
               data.personalInfos?.currentWork) && (
-              <Section sectionName="Current Infos">
+              <Section sectionName="Current Infos" hidePrint>
                 <CurrentInfosDisplay personalInfos={data.personalInfos} />
               </Section>
             )}

@@ -7,6 +7,7 @@ import type {
 import BlurImage from "@/components/blur-image";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { MapPin } from "lucide-react";
 
 interface PersonalInfosSectionProps {
   personalInfos?: PersonalInfosType;
@@ -22,8 +23,8 @@ const PersonalInfos = ({
   theme,
 }: PersonalInfosSectionProps) => {
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative inline-block h-20 w-20 overflow-hidden rounded-full align-middle">
+    <div className="flex flex-col items-center print:items-start">
+      <div className="relative inline-block h-20 w-20 overflow-hidden rounded-full align-middle print:hidden">
         <Image
           alt={personalInfos?.firstname ?? "User Avatar"}
           height={80}
@@ -41,7 +42,7 @@ const PersonalInfos = ({
       </div>
       <h1
         className={cn(
-          "text-xl font-bold",
+          "text-xl font-bold print:text-2xl",
           personalInfos?.firstname ? "" : "text-gray-500",
         )}
       >
@@ -49,8 +50,18 @@ const PersonalInfos = ({
           ? `${personalInfos?.firstname} ${personalInfos?.lastname ?? ""}`
           : "Name"}
       </h1>
-      {personalInfos?.alias && <i>(Aka {personalInfos.alias})</i>}
-      <div className="text-center text-xl">{personalInfos?.title}</div>
+      {personalInfos?.alias && (
+        <i className="print:hidden">(Aka {personalInfos.alias})</i>
+      )}
+      <div className="text-center text-xl print:text-lg">
+        {personalInfos?.title}
+      </div>
+      <div className="hidden items-center gap-1 print:flex">
+        <MapPin className="inline-block h-4 w-4 text-gray-500 dark:text-gray-100" />
+        <span className="text-gray-500 dark:text-gray-100">
+          {personalInfos?.location}
+        </span>
+      </div>
       {experience ? (
         <div className="text-center">
           <span className="font-bold">

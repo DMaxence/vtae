@@ -48,7 +48,7 @@ const Experience = ({
   const [showModal, setShowModal] = React.useState<boolean>(false);
 
   return (
-    <div className="flex flex-col gap-3.5 py-3.5 first:pt-0 last:pb-0">
+    <div className="flex break-inside-avoid-page flex-col gap-3.5 py-3.5 first:pt-0 last:pb-0">
       <div className="flex items-center justify-between">
         <div className="">
           <div

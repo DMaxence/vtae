@@ -13,7 +13,7 @@ const Skill = ({ skill, theme }: SkillProps) => {
         "inline-flex items-center rounded-full px-3 py-1 text-sm font-normal",
         skill.primary
           ? "bg-gray-100 text-gray-800 dark:bg-white dark:text-gray-100"
-          : "border border-gray-200 bg-white text-gray-500 dark:border-none dark:bg-gray-300 dark:text-gray-600",
+          : "border border-gray-200 bg-gray-100 text-gray-600 dark:border-none dark:bg-gray-300 dark:text-gray-600",
       )}
       style={{
         color: theme?.contrastTextColor,

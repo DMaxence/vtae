@@ -1,4 +1,5 @@
 import { getSiteData } from "@/lib/fetchers";
+import { cn } from "@/lib/utils";
 import { fontMapper } from "@/styles/fonts";
 import "@/styles/globals.scss";
 import { Metadata } from "next";
@@ -84,19 +85,16 @@ export default async function SiteLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={theme}
+      className={cn(theme, "print:light")}
       style={{ colorScheme: theme }}
     >
-      <body className={fontMapper[data.font]}>
+      <body className={cn(fontMapper[data.font], 'text-sm')}>
         <Script
           async
           src="https://an.vtae.xyz/script.js"
           data-website-id={data?.umamiId}
         ></Script>
-        {/* <Script
-          async
-          src="/api/send"
-        ></Script> */}
+        {/* <Script async src="/api/send"></Script> */}
         <div>
           {/* <div className="ease left-0 right-0 top-0 z-30 flex h-16 bg-white transition-all duration-150 dark:bg-black dark:text-white">
             <div className="mx-auto flex h-full max-w-screen-xl items-center justify-center space-x-5 px-10 sm:px-20">
@@ -119,7 +117,7 @@ export default async function SiteLayout({
             </div>
           </div> */}
 
-          <div className="mt-20">{children}</div>
+          <div className="mt-20 print:mt-0">{children}</div>
 
           {/* {domain == `demo.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}` ||
       domain == `platformize.co` ? (

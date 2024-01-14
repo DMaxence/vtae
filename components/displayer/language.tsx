@@ -7,6 +7,7 @@ import { PenSquare } from "lucide-react";
 import LanguageModal from "../builder/Modals/language-modal";
 
 import { WithSiteId } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 interface LanguageProps extends WithSiteId {
   language: LanguageType;
@@ -23,13 +24,16 @@ export default function Language({
   const [showModal, setShowModal] = React.useState<boolean>(false);
 
   return (
-    <div className="flex flex-col gap-3.5 py-2.5 first:pt-0 last:pb-0">
+    <div className={cn({ "py-1.5 first:pt-0 last:pb-0": !readOnly })}>
       <div className="flex items-center justify-between">
         <div className="flex gap-3.5">
           <div
-            className="w-[150px] text-gray-700 dark:text-gray-200"
+            className={cn("w-[150px]", {
+              "text-gray-700 dark:text-gray-200": !readOnly,
+            })}
             style={{ color: theme?.textColor, opacity: 0.8 }}
           >
+            {readOnly ? "- " : ""}
             {countryCodeToDisplayLanguageMap[language.name]}
           </div>
         </div>
