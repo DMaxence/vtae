@@ -1,6 +1,6 @@
 import "@/styles/globals.scss";
 import "flowbite";
-import { cal, inter } from "@/styles/fonts";
+import { cal, inter, satoshi } from "@/styles/fonts";
 import { Analytics } from "@vercel/analytics/react";
 import { Providers } from "./providers";
 import { Metadata } from "next";
@@ -37,7 +37,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(cal.variable, inter.variable)}>
+      <body className={cn(cal.variable, inter.variable, satoshi.variable)}>
         <Providers>
           {children}
           <Analytics />

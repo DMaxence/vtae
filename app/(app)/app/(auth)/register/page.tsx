@@ -1,17 +1,17 @@
 "use client";
 
-import React, { Suspense } from "react";
-
 import LoadingDots from "@/components/icons/loading-dots";
 import TextInput from "@/components/text-input";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Providers } from "@/lib/types";
+import { getLang } from "@/lib/utils";
 import { APP_DOMAIN } from "@/utils/constants";
 import { Form, Formik } from "formik";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import React, { Suspense } from "react";
 import * as yup from "yup";
 import LoginButton from "@/components/login-button";
 
@@ -31,14 +31,29 @@ const passwordInput = {
   autoComplete: "current-password",
   placeholder: "Password",
 };
+const firstnameInput = {
+  id: "firstname",
+  name: "firstname",
+  type: "text",
+  autoComplete: "given-name",
+  placeholder: "First name",
+};
+const lastnameInput = {
+  id: "lastname",
+  name: "lastname",
+  type: "text",
+  autoComplete: "family-name",
+  placeholder: "Last name",
+};
 
 export default function LoginPage({ searchParams }: any) {
   const router = useRouter();
-
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
 
   const validationSchema = yup.object({
+    firstname: yup.string().max(32, "First name must be 32 characters or less"),
+    lastname: yup.string().max(32, "Last name must be 32 characters or less"),
     email: yup.string().email().required("Email is required"),
     password: yup
       .string()
@@ -77,10 +92,7 @@ export default function LoginPage({ searchParams }: any) {
           Build and host your resume with custom domains.
         </p>
       </div>
-      <div className="mt-8 border border-stone-200 bg-white/50 py-10 dark:border-stone-700 dark:bg-black/50 sm:mx-auto sm:w-full sm:max-w-md sm:rounded-2xl sm:shadow-xl">
-        {/* <h2 className="text-center">
-          Sign in with an existing account, or create new account.
-        </h2> */}
+      <div className="mx-5 mt-8 border border-stone-200 bg-white/50 py-10 dark:border-stone-700 dark:bg-black/50 sm:mx-auto sm:w-full sm:max-w-md sm:rounded-lg sm:shadow-md">
         <Suspense
           fallback={
             <div className="my-2 h-10 w-full rounded-md border border-stone-200 bg-stone-100 dark:border-stone-700 dark:bg-stone-800" />
@@ -99,10 +111,13 @@ export default function LoginPage({ searchParams }: any) {
               console.log("values", values);
               setLoading(true);
               try {
-                const res = await signIn("app-login", {
+                const res = await signIn("app-register", {
                   callbackUrl: "/",
                   email: values.email,
                   password: values.password,
+                  firstname: values.firstname,
+                  lastname: values.lastname,
+                  locale: getLang(),
                   redirect: false,
                 });
                 if (res) setLoading(false);
@@ -126,19 +141,21 @@ export default function LoginPage({ searchParams }: any) {
           >
             {({ handleSubmit }) => (
               <Form className="mx-auto mt-4 w-11/12 max-w-xs pb-5 sm:w-full">
-                {[emailInput, passwordInput].map((input) => (
-                  <div key={input.id} className="">
-                    <label
-                      htmlFor={input.id}
-                      className="block text-sm font-medium text-neutral-400"
-                    >
-                      {input.placeholder}
-                    </label>
-                    <div className="mt-1">
-                      <TextInput {...input} />
+                {[firstnameInput, lastnameInput, emailInput, passwordInput].map(
+                  (input) => (
+                    <div key={input.id} className="">
+                      <label
+                        htmlFor={input.id}
+                        className="block text-sm font-medium text-neutral-400"
+                      >
+                        {input.placeholder}
+                      </label>
+                      <div className="mt-1">
+                        <TextInput {...input} />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ),
+                )}
                 {error && (
                   <div className="mt-1 text-sm text-red-400">{error}</div>
                 )}
@@ -155,20 +172,20 @@ export default function LoginPage({ searchParams }: any) {
                         <LoadingDots />
                       </div>
                     ) : (
-                      <p>Login</p>
+                      <p>Register</p>
                     )}
                   </button>
                 </div>
                 <div className="mt-6 flex justify-center space-y-2">
                   <div className="flex items-center justify-center space-x-2">
                     <p className="text-sm font-medium text-neutral-400">
-                      Don&apos;t have an account?
+                      Already have an account?
                     </p>
                     <Link
-                      href={`${APP_DOMAIN}/register`}
+                      href={`${APP_DOMAIN}/login`}
                       className="text-sm font-medium text-black hover:text-stone-500 dark:text-white"
                     >
-                      Register
+                      Login
                     </Link>
                   </div>
                 </div>

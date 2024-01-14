@@ -21,7 +21,6 @@ const PersonalInfos = ({
   experience,
   theme,
 }: PersonalInfosSectionProps) => {
-  console.log("ppppppppppp", personalInfos, user);
   return (
     <div className="flex flex-col items-center">
       <div className="relative inline-block h-20 w-20 overflow-hidden rounded-full align-middle">

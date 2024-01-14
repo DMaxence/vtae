@@ -1,16 +1,10 @@
-import "@/styles/globals.scss";
-import Image from "next/image";
-import Link from "next/link";
-import { ReactNode } from "react";
-import CTA from "@/components/cta";
-import ReportAbuse from "@/components/report-abuse";
-import { notFound, redirect } from "next/navigation";
 import { getSiteData } from "@/lib/fetchers";
 import { fontMapper } from "@/styles/fonts";
+import "@/styles/globals.scss";
 import { Metadata } from "next";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { cn } from "@/lib/utils";
+import { notFound, redirect } from "next/navigation";
 import Script from "next/script";
+import { ReactNode } from "react";
 
 export async function generateMetadata({
   params,
@@ -99,6 +93,10 @@ export default async function SiteLayout({
           src="https://an.vtae.xyz/script.js"
           data-website-id={data?.umamiId}
         ></Script>
+        {/* <Script
+          async
+          src="/api/send"
+        ></Script> */}
         <div>
           {/* <div className="ease left-0 right-0 top-0 z-30 flex h-16 bg-white transition-all duration-150 dark:bg-black dark:text-white">
             <div className="mx-auto flex h-full max-w-screen-xl items-center justify-center space-x-5 px-10 sm:px-20">

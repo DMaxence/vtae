@@ -67,11 +67,11 @@ const countries = [
 ];
 
 const categories = [
-  {
-    title: "Top Pages",
-    subtitle: "Page",
-    data: pages,
-  },
+  // {
+  //   title: "Top Pages",
+  //   subtitle: "Page",
+  //   data: pages,
+  // },
   {
     title: "Top Referrers",
     subtitle: "Source",
@@ -100,9 +100,9 @@ export default function AnalyticsMockup() {
           }
         />
       </Card>
-      <Grid numItemsSm={2} numItemsLg={3} className="gap-6">
+      <Grid numItemsSm={2} numItemsLg={2} className="gap-6">
         {categories.map(({ title, subtitle, data }) => (
-          <Card key={title} className="max-w-lg">
+          <Card key={title}>
             <Title>{title}</Title>
             <Flex className="mt-4">
               <Text>

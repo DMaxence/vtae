@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import Form from "@/components/form";
 import { updateSite } from "@/lib/actions";
+import { Site } from "@prisma/client";
 
 export default async function SiteSettingsAppearance({
   params,
@@ -34,8 +35,10 @@ export default async function SiteSettingsAppearance({
           name: "image",
           type: "file",
           defaultValue: data?.image!,
+          button: true,
         }}
         handleSubmit={updateSite}
+        site={data as Site}
       />
       <Form
         title="Logo"

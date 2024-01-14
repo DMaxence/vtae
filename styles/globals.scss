@@ -166,7 +166,7 @@ ul[data-type="taskList"] li[data-checked="true"] > div > p {
 .subtitle {
   text-align: center;
   overflow: hidden;
-  @apply mx-5
+  @apply mx-5;
 }
 .subtitle:before,
 .subtitle:after {

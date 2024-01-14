@@ -258,7 +258,7 @@ export default function Nav({ children }: { children: ReactNode }) {
           </div>
           <div className="flex justify-between">
             <LangSwitcher />
-            <ThemeSwitcher />
+            <ThemeSwitcher tooltip />
           </div>
           <div className="my-2 border-t border-stone-200 dark:border-stone-700" />
           {children}

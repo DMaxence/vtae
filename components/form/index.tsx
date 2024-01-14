@@ -10,6 +10,7 @@ import DomainStatus from "./domain-status";
 import DomainConfiguration from "./domain-configuration";
 import Uploader from "./uploader";
 import va from "@vercel/analytics";
+import { Site } from "@prisma/client";
 
 export default function Form({
   title,
@@ -17,6 +18,7 @@ export default function Form({
   helpText,
   inputAttrs,
   handleSubmit,
+  site,
 }: {
   title: string;
   description?: string;
@@ -28,12 +30,21 @@ export default function Form({
     placeholder?: string;
     maxLength?: number;
     pattern?: string;
+    button?: boolean;
   };
   handleSubmit: any;
+  site?: Site;
 }) {
   const { id } = useParams() as { id?: string };
   const router = useRouter();
   const { update } = useSession();
+  const retakeScreenshot = async () => {
+    if (!site) return;
+    await takeWebsiteScreenshot(site);
+    await update();
+    router.refresh();
+    toast.success(`Successfully updated screenshot!`);
+  };
   return (
     <form
       action={async (data: FormData) => {
@@ -70,6 +81,17 @@ export default function Form({
             {description}
           </p>
         )}
+        {inputAttrs.button && (
+          <div>
+            <button
+              type="button"
+              className="flex items-center justify-center space-x-2 rounded-md border border-stone-200 bg-stone-100 px-3 text-sm text-stone-500 transition-all hover:border-stone-300 hover:bg-stone-200 hover:text-stone-500 focus:outline-none dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300 dark:hover:border-stone-200 dark:hover:bg-stone-700 dark:hover:text-stone-400 sm:h-10"
+              onClick={retakeScreenshot}
+            >
+              <p>Retake screenshot</p>
+            </button>
+          </div>
+        )}
         {inputAttrs.name === "image" ||
         inputAttrs.name === "logo" ||
         inputAttrs.name === "avatar" ? (
@@ -99,6 +121,7 @@ export default function Form({
               <option value="font-cal">Cal Sans</option>
               <option value="font-lora">Lora</option>
               <option value="font-work">Work Sans</option>
+              <option value="font-satoshi">Satoshi</option>
             </select>
           </div>
         ) : inputAttrs.name === "subdomain" ? (

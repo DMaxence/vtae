@@ -111,6 +111,7 @@ module.exports = {
       },
       fontFamily: {
         default: ["var(--font-inter)", ...fontFamily.sans],
+        display: ["var(--font-satoshi)", "system-ui", "sans-serif"],
         cal: ["var(--font-cal)", ...fontFamily.sans],
         title: ["var(--font-title)", ...fontFamily.sans],
         mono: ["Consolas", ...fontFamily.mono],
@@ -144,9 +145,21 @@ module.exports = {
           "60%": { transform: "translateX(3px) rotate(2.4deg)" },
           "75%": { transform: "translateX(-2px) rotate(-1.2deg)" },
         },
+        // Accordion
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
       },
       animation: {
         wiggle: "wiggle 0.8s both",
+        // Accordion
+        "accordion-down": "accordion-down 300ms cubic-bezier(0.87, 0, 0.13, 1)",
+        "accordion-up": "accordion-up 300ms cubic-bezier(0.87, 0, 0.13, 1)",
       },
     },
   },
@@ -184,5 +197,6 @@ module.exports = {
     require("@tailwindcss/forms"),
     require("tailwindcss-animate"),
     require("flowbite/plugin"),
+    require("tailwindcss-radix")(),
   ],
 };
