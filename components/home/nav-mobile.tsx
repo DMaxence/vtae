@@ -1,7 +1,7 @@
 "use client";
 
 import { cn, fetcher } from "@/lib/utils";
-import { APP_DOMAIN } from "@/utils/constants";
+import { APP_DOMAIN } from "@/utils";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";

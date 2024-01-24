@@ -4,7 +4,6 @@ import { fontMapper } from "@/styles/fonts";
 import "@/styles/globals.scss";
 import { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import Script from "next/script";
 import { ReactNode } from "react";
 
 export async function generateMetadata({
@@ -88,13 +87,7 @@ export default async function SiteLayout({
       className={cn(theme, "print:light")}
       style={{ colorScheme: theme }}
     >
-      <body className={cn(fontMapper[data.font], 'text-sm')}>
-        <Script
-          async
-          src="https://an.vtae.xyz/script.js"
-          data-website-id={data?.umamiId}
-        ></Script>
-        {/* <Script async src="/api/send"></Script> */}
+      <body className={cn(fontMapper[data.font], "text-sm")}>
         <div>
           {/* <div className="ease left-0 right-0 top-0 z-30 flex h-16 bg-white transition-all duration-150 dark:bg-black dark:text-white">
             <div className="mx-auto flex h-full max-w-screen-xl items-center justify-center space-x-5 px-10 sm:px-20">

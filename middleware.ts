@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { parse } from "@/lib/middleware/utils";
 import { getToken } from "next-auth/jwt";
+import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
+import { recordVisit } from "./lib/tinybird";
 
 export const config = {
   matcher: [
@@ -14,7 +16,7 @@ export const config = {
   ],
 };
 
-export default async function middleware(req: NextRequest) {
+export default async function middleware(req: NextRequest, ev: NextFetchEvent) {
   const url = req.nextUrl;
 
   // Get hostname of request (e.g. demo.vtae.xyz, demo.localhost:3000)
@@ -66,6 +68,13 @@ export default async function middleware(req: NextRequest) {
     );
   }
 
+  const { domain } = parse(req);
+
+  if (!domain) {
+    return null;
+  }
+
+  ev.waitUntil(recordVisit({ req, domain }));
   // rewrite everything else to `/[domain]/[slug] dynamic route
   return NextResponse.rewrite(new URL(`/${hostname}${path}`, req.url));
 }

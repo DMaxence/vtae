@@ -1,7 +1,10 @@
+import Stats from "@/components/stats";
+import { TooltipProvider } from "@/components/tooltip";
 import { getSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { SUB_DOMAIN } from "@/utils";
 import { notFound, redirect } from "next/navigation";
-import AnalyticsMockup from "@/components/analytics";
+import { Suspense } from "react";
 
 export default async function SiteAnalytics({
   params,
@@ -40,7 +43,11 @@ export default async function SiteAnalytics({
           </a>
         </div>
       </div>
-      <AnalyticsMockup />
+      <Suspense fallback={<div className="h-screen w-full bg-gray-50" />}>
+        <Stats
+          staticDomain={data.customDomain || SUB_DOMAIN(data.subdomain || "")}
+        />
+      </Suspense>
     </>
   );
 }

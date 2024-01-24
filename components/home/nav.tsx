@@ -2,7 +2,7 @@
 
 import { cn, fetcher } from "@/lib/utils";
 import useScroll from "@/lib/hooks/use-scroll";
-import { APP_DOMAIN } from "@/utils/constants";
+import { APP_DOMAIN } from "@/utils";
 import va from "@vercel/analytics";
 import Image from "next/image";
 import Link from "next/link";

@@ -5,7 +5,7 @@ import TextInput from "@/components/text-input";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Providers } from "@/lib/types";
 import { getLang } from "@/lib/utils";
-import { APP_DOMAIN } from "@/utils/constants";
+import { APP_DOMAIN } from "@/utils";
 import { Form, Formik } from "formik";
 import { signIn } from "next-auth/react";
 import Image from "next/image";

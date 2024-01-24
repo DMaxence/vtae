@@ -1,5 +1,5 @@
 import FeaturesAcordion from "@/components/home/features-acordion";
-import { APP_DOMAIN } from "@/utils/constants";
+import { APP_DOMAIN } from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
 

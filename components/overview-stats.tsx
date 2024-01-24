@@ -1,26 +1,69 @@
 "use client";
-
-import { random } from "@/lib/utils";
-import { Card, Metric, Text, AreaChart, BadgeDelta, Flex } from "@tremor/react";
-import { useMemo } from "react";
+import useSites from "@/lib/swr/use-sites";
+import { cn, fetcher } from "@/lib/utils";
+import { SUB_DOMAIN } from "@/utils";
+import { AreaChart, BadgeDelta, Card, Flex, Metric, Text } from "@tremor/react";
+import useSWR from "swr";
 
 export default function OverviewStats() {
-  const data = useMemo(() => {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-    return [
-      ...months.map((month) => ({
-        Month: `${month} 23`,
-        "Total Visitors": random(20000, 170418),
-      })),
-      {
-        Month: "Jul 23",
-        "Total Visitors": 170418,
-      },
+  const { sites } = useSites();
+
+  const domains = sites?.map((site) => {
+    const names = [
+      ...(site.customDomain ? [site.customDomain] : []),
+      SUB_DOMAIN(site.subdomain as string),
     ];
-  }, []);
+    return names;
+  });
+
+  const { data } = useSWR<Array<Array<{ start: string; clicks: number }>>>(
+    `/api/edge/stats/timeseries?domains=${domains
+      ?.flat()
+      .join(",")}&interval=365d`,
+    fetcher,
+  );
+
+  const flatDomains =
+    data?.reduce((acc, curr, idx) => {
+      acc = curr.map((d, i) => {
+        return {
+          start: d.start,
+          clicks: d.clicks + (acc[i]?.clicks || 0),
+        };
+      });
+      return acc;
+    }, []) || [];
+
+  const lastSixMonths = flatDomains.slice(-7);
+  const previousSixMonths = flatDomains.slice(0, 6);
+
+  const totalVisitorsPrevious = previousSixMonths?.reduce((acc, curr) => {
+    return acc + curr.clicks;
+  }, 0);
+
+  const totalVisitorsLastSixMonths = lastSixMonths?.reduce((acc, curr) => {
+    return acc + curr.clicks;
+  }, 0);
+
+  const totalVisitorsDifferencePercentage =
+    ((totalVisitorsLastSixMonths - totalVisitorsPrevious) /
+      (totalVisitorsPrevious || 1)) *
+    100;
+
+  const increase = totalVisitorsDifferencePercentage > 0;
+  const decrease = totalVisitorsDifferencePercentage < 0;
+  const unchanged = totalVisitorsDifferencePercentage === 0;
+
+  const visitors = lastSixMonths?.map((d) => ({
+    Month: new Date(d.start).toLocaleDateString("en-us", {
+      month: "short",
+      year: "numeric",
+    }),
+    "Total Visitors": d.clicks,
+  }));
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2">
+    <div className="grid gap-6">
       <Card className="dark:!bg-stone-900">
         <Text>Total Visitors</Text>
         <Flex
@@ -28,17 +71,29 @@ export default function OverviewStats() {
           justifyContent="start"
           alignItems="baseline"
         >
-          <Metric className="font-cal">170,418</Metric>
+          <Metric className="font-cal">{totalVisitorsLastSixMonths}</Metric>
           <BadgeDelta
-            deltaType="moderateIncrease"
-            className="dark:bg-green-900 dark:bg-opacity-50 dark:text-green-400"
+            deltaType={
+              increase
+                ? "moderateIncrease"
+                : decrease
+                  ? "moderateDecrease"
+                  : "unchanged"
+            }
+            className={cn({
+              "dark:bg-green-900 dark:bg-opacity-50 dark:text-green-400":
+                increase,
+              "dark:bg-red-900 dark:bg-opacity-50 dark:text-red-400": decrease,
+              "dark:bg-gray-900 dark:bg-opacity-50 dark:text-gray-400":
+                unchanged,
+            })}
           >
-            34.3%
+            {(totalVisitorsDifferencePercentage / 10).toFixed(0)}%
           </BadgeDelta>
         </Flex>
         <AreaChart
           className="mt-6 h-28"
-          data={data}
+          data={visitors}
           index="Month"
           valueFormatter={(number: number) =>
             `${Intl.NumberFormat("us").format(number).toString()}`

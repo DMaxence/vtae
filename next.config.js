@@ -19,6 +19,8 @@ module.exports = {
       { hostname: "flag.vercel.app" },
       { hostname: "illustrations.popsy.co" },
       { hostname: "media.licdn.com" },
+      { hostname: "faisalman.github.io" },
+      { hostname: "vtae.xyz" },
     ],
   },
   // webpack(config) {

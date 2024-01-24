@@ -2,7 +2,7 @@
 import React from "react";
 
 import { cn } from "@/lib/utils";
-import { APP_DOMAIN } from "@/utils/constants";
+import { APP_DOMAIN } from "@/utils";
 import * as Accordion from "@radix-ui/react-accordion";
 import { ChevronDownIcon } from "lucide-react";
 import { useTheme } from "next-themes";

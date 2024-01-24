@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { FEATURES_LIST } from "./content";
 import { MaxWidthWrapper } from "./max-width-wrapper";
+import { Linkedin } from "lucide-react";
 
 const navigation = {
   features: FEATURES_LIST.map(({ shortTitle, slug }) => ({
@@ -64,8 +65,8 @@ export function Footer() {
             <p className="max-w-xs text-sm text-gray-500 dark:text-gray-400">
               Giving freelancers superpowers with portfolios that stand out.
             </p>
-            {/* <div className="flex items-center space-x-2">
-              <a
+            <div className="flex items-center space-x-2">
+              {/* <a
                 href="https://twitter.com/dubdotco"
                 target="_blank"
                 rel="noreferrer"
@@ -84,17 +85,17 @@ export function Footer() {
                 <span className="sr-only">Github</span>
                 <Github className="h-5 w-5 text-gray-600" />
               </a>
-              <div className="h-8 border-l border-gray-200" />
+              <div className="h-8 border-l border-gray-200" /> */}
               <a
-                href="https://www.linkedin.com/company/dubhq/"
+                href="https://www.linkedin.com/company/vtae/"
                 target="_blank"
                 rel="noreferrer"
                 className="rounded-md p-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
               >
                 <span className="sr-only">LinkedIn</span>
-                <LinkedIn className="h-5 w-5" fill="#52525B" />
+                <Linkedin className="h-5 w-5" fill="#52525B" />
               </a>
-            </div> */}
+            </div>
           </div>
           {/* <div className="mt-16 grid grid-cols-2 gap-4 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2">

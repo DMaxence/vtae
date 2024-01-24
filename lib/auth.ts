@@ -19,6 +19,18 @@ const logsnag = new LogSnag({
   project: process.env.LOGSNAG_PROJECT as string,
 });
 
+export interface Session {
+  user: {
+    id: string;
+    name: string;
+    firstname: string;
+    lastname: string;
+    username: string;
+    email: string;
+    image: string;
+  };
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GitHubProvider({
@@ -343,17 +355,7 @@ export const authOptions: NextAuthOptions = {
 };
 
 export function getSession() {
-  return getServerSession(authOptions) as Promise<{
-    user: {
-      id: string;
-      name: string;
-      firstname: string;
-      lastname: string;
-      username: string;
-      email: string;
-      image: string;
-    };
-  } | null>;
+  return getServerSession(authOptions) as Promise<Session | null>;
 }
 
 export function withSiteAuth(action: any) {
@@ -410,6 +412,26 @@ export function withPostAuth(action: any) {
     }
 
     return action(formData, post, key);
+  };
+}
+
+export function withAuth(handler: any) {
+  return async (
+    req: Request,
+    { params }: { params: Record<string, string> | undefined },
+  ) => {
+    const session = await getSession();
+    if (!session) {
+      return {
+        error: "Not authenticated",
+      };
+    }
+
+    return handler({
+      req,
+      params: params || {},
+      session,
+    });
   };
 }
 
