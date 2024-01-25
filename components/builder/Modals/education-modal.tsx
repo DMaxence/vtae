@@ -18,7 +18,7 @@ import TextArea from "@/components/textarea";
 import DatePicker from "@/components/date-picker";
 import DeleteButton from "@/components/delete-button";
 import Select from "@/components/select";
-import { WithShowModal, WithSiteId } from "@/lib/types";
+import { InitialValuesType, WithShowModal, WithSiteId } from "@/lib/types";
 import { Form, Formik, FormikHelpers, FormikProps, FormikValues } from "formik";
 
 import type { Education } from "@prisma/client";
@@ -46,11 +46,10 @@ const EducationModal = ({
   const [isUpdating, startUpdateTransition] = React.useTransition();
   const [isDeleting, startDeleteTransition] = React.useTransition();
 
-  const { data: session } = useSession();
-  const sessionId = session?.user?.id;
+  const { status } = useSession();
 
   const { data: education } = useSWR<Education>(
-    sessionId &&
+    status === "authenticated" &&
       educationId &&
       `/api/builder/${siteId}/education?educationId=${educationId}`,
     fetcher,
@@ -105,7 +104,7 @@ const EducationModal = ({
     <Formik
       validateOnBlur={false}
       validateOnChange={false}
-      initialValues={educationFields.reduce((acc, field) => {
+      initialValues={educationFields.reduce((acc: InitialValuesType, field) => {
         acc[field.name] =
           education?.[field.name as keyof typeof education] ?? "";
         return acc;
@@ -117,12 +116,7 @@ const EducationModal = ({
       validationSchema={validationSchema}
       enableReinitialize={!!educationId}
     >
-      {({
-        setFieldValue,
-        resetForm,
-      }: FormikProps<
-        (typeof educationFields)[keyof typeof educationFields]
-      >) => {
+      {({ setFieldValue, resetForm }: FormikProps<InitialValuesType>) => {
         const onCancel = () => {
           resetForm();
           setShowModal(false);

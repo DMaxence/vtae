@@ -57,11 +57,12 @@ export const createLanguage = withSiteAuth(
       const response = await prisma.language.create({
         data: {
           ...data,
-          site: {
-            connect: {
-              id: site.id,
-            },
-          },
+          // site: {
+          //   connect: {
+          //     id: site.id,
+          //   },
+          // },
+          siteId: site.id,
         },
         include: {
           site: {

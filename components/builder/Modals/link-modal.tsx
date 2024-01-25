@@ -12,7 +12,7 @@ import { fetcher } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 
 import DeleteButton from "@/components/delete-button";
-import { WithShowModal, WithSiteId } from "@/lib/types";
+import { InitialValuesType, WithShowModal, WithSiteId } from "@/lib/types";
 import { Form, Formik, FormikHelpers, FormikProps, FormikValues } from "formik";
 
 import type { Link } from "@prisma/client";
@@ -37,11 +37,12 @@ const LinkModal = ({
   const [isUpdating, startUpdateTransition] = React.useTransition();
   const [isDeleting, startDeleteTransition] = React.useTransition();
 
-  const { data: session } = useSession();
-  const sessionId = session?.user?.id;
+  const { status } = useSession();
 
   const { data: link } = useSWR<Link>(
-    sessionId && linkId && `/api/builder/${siteId}/link?linkId=${linkId}`,
+    status === "authenticated" &&
+      linkId &&
+      `/api/builder/${siteId}/link?linkId=${linkId}`,
     fetcher,
   );
 
@@ -89,8 +90,8 @@ const LinkModal = ({
     <Formik
       validateOnBlur={false}
       validateOnChange={false}
-      initialValues={linkFields.reduce((acc, field) => {
-        acc[field.name] =
+      initialValues={linkFields.reduce((acc: InitialValuesType, field) => {
+        acc[field.name as string] =
           (linkId ? link?.[field.name as keyof typeof link] : null) ?? "";
         return acc;
       }, {})}
@@ -103,7 +104,9 @@ const LinkModal = ({
     >
       {({
         resetForm,
-      }: FormikProps<(typeof linkFields)[keyof typeof linkFields]>) => {
+      }: FormikProps<{
+        [key: string]: any;
+      }>) => {
         const onCancel = () => {
           resetForm();
           setShowModal(false);

@@ -78,17 +78,17 @@ export default function LinkPreviewTooltip({
     );
   }
 
-  const { url, rewrite, createdAt, archived, user } = data;
+  const { url, createdAt, user } = data;
   const apexDomain = getApexDomain(url);
 
   return (
     <div className="relative flex w-[28rem] items-center justify-between px-4 py-2">
       <div className="relative flex shrink items-center">
-        {archived ? (
+        {/* {archived ? (
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-300 px-0 sm:h-10 sm:w-10">
             <Archive className="h-4 w-4 text-gray-500 sm:h-5 sm:w-5" />
-          </div>
-        ) : url ? (
+          </div> */}
+        {url ? (
           <BlurImage
             src={`${GOOGLE_FAVICON_URL}${apexDomain}`}
             alt={apexDomain}
@@ -110,9 +110,9 @@ export default function LinkPreviewTooltip({
             <a
               className={cn(
                 "w-full max-w-[140px] truncate text-sm font-semibold text-blue-800 sm:max-w-[300px] sm:text-base md:max-w-[360px] xl:max-w-[500px]",
-                {
-                  "text-gray-500": archived,
-                },
+                // {
+                //   "text-gray-500": archived,
+                // },
               )}
               href={linkConstructor({ domain, key })}
               target="_blank"
@@ -145,9 +145,9 @@ export default function LinkPreviewTooltip({
                 <p>•</p>
               </>
             )}
-            {rewrite && (
+            {/* {rewrite && (
               <EyeOff className="xs:block hidden h-4 w-4 text-gray-500" />
-            )}
+            )} */}
             {url ? (
               <a
                 href={url}

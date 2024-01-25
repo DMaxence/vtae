@@ -150,7 +150,7 @@ export const getStats = async ({
   if (interval) {
     url.searchParams.append(
       "start",
-      intervalData[interval].startDate
+      intervalData[interval as keyof typeof intervalData].startDate
         .toISOString()
         .replace("T", " ")
         .replace("Z", ""),
@@ -160,7 +160,10 @@ export const getStats = async ({
       new Date(Date.now()).toISOString().replace("T", " ").replace("Z", ""),
     );
 
-    url.searchParams.append("granularity", intervalData[interval].granularity);
+    url.searchParams.append(
+      "granularity",
+      intervalData[interval as keyof typeof intervalData].granularity,
+    );
   }
 
   VALID_STATS_FILTERS.forEach((filter) => {
@@ -178,7 +181,6 @@ export const getStats = async ({
   })
     .then((res) => res.json())
     .then(({ data }) => {
-      console.log("data stats", data);
       if (endpoint === "clicks") {
         try {
           const clicks = data[0]["count()"];

@@ -28,7 +28,7 @@ import {
   deleteExperience,
   updateExperience,
 } from "@/lib/builder/experience";
-import { FormFieldsType, WithShowModal, WithSiteId } from "@/lib/types";
+import { InitialValuesType, WithShowModal, WithSiteId } from "@/lib/types";
 import { Form, Formik, FormikHelpers, FormikProps, FormikValues } from "formik";
 import { toast } from "sonner";
 
@@ -45,15 +45,14 @@ const ExperienceModal = ({
   const [isUpdating, startUpdateTransition] = React.useTransition();
   const [isDeleting, startDeleteTransition] = React.useTransition();
 
-  const { data: session } = useSession();
-  const sessionId = session?.user?.id;
+  const { status } = useSession();
 
   const { data: experience } = useSWR<
     Experience & {
       skills: Skill[];
     }
   >(
-    sessionId &&
+    status === "authenticated" &&
       experienceId &&
       `/api/builder/${siteId}/experience?experienceId=${experienceId}`,
     fetcher,
@@ -110,13 +109,16 @@ const ExperienceModal = ({
     <Formik
       validateOnBlur={false}
       validateOnChange={false}
-      initialValues={experienceFields.reduce((acc, field) => {
-        acc[field.name] =
-          (experienceId
-            ? experience?.[field.name as keyof typeof experience]
-            : null) ?? "";
-        return acc;
-      }, {})}
+      initialValues={experienceFields.reduce(
+        (acc: InitialValuesType, field) => {
+          acc[field.name] =
+            (experienceId
+              ? experience?.[field.name as keyof typeof experience]
+              : null) ?? "";
+          return acc;
+        },
+        {},
+      )}
       onSubmit={(values, actions) => {
         onSubmit(values as Experience, actions);
         actions.setSubmitting(false);
@@ -124,10 +126,7 @@ const ExperienceModal = ({
       validationSchema={validationSchema}
       enableReinitialize={!!experienceId}
     >
-      {({
-        setFieldValue,
-        resetForm,
-      }: FormikProps<Array<FormFieldsType>[keyof FormFieldsType[]]>) => {
+      {({ setFieldValue, resetForm }: FormikProps<InitialValuesType>) => {
         const onCancel = () => {
           resetForm();
           setShowModal(false);

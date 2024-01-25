@@ -1,14 +1,14 @@
 "use client";
 import type { Link as LinkType, Theme } from "@prisma/client";
 
-import { WithSiteId } from "@/lib/types";
+import { WithOptionalSiteId } from "@/lib/types";
 import { getClickableLink } from "@/lib/utils";
 import { PenSquare } from "lucide-react";
 
 import React from "react";
 import LinkModal from "../builder/Modals/link-modal";
 
-interface LinkProps extends WithSiteId {
+interface LinkProps extends WithOptionalSiteId {
   link: LinkType;
   readOnly?: boolean;
   theme?: Theme;
@@ -23,7 +23,7 @@ export default function Link({ siteId, link, readOnly, theme }: LinkProps) {
         <div className="flex gap-3.5">
           <div
             className="w-[150px] text-gray-700 dark:text-gray-200"
-            style={{ color: theme?.textColor, opacity: 0.8 }}
+            // style={{ color: theme?.textColor, opacity: 0.8 }}
           >
             {link.name}
           </div>
@@ -32,7 +32,7 @@ export default function Link({ siteId, link, readOnly, theme }: LinkProps) {
             href={getClickableLink(link.url)}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: theme?.linkColor }}
+            // style={{ color: theme?.linkColor }}
           >
             {link?.alt ? link.alt : link.url}
           </a>

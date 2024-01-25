@@ -21,7 +21,7 @@ import { aboutFields } from "@/constants/fields";
 import Modal from "@/components/modal";
 import TextArea from "@/components/textarea";
 import { createOrUpdatePersonalInfos } from "@/lib/builder/personal-infos";
-import { WithShowModal, WithSiteId } from "@/lib/types";
+import { InitialValuesType, WithShowModal, WithSiteId } from "@/lib/types";
 import { toast } from "sonner";
 
 interface AboutModalProps extends WithSiteId, WithShowModal {}
@@ -33,11 +33,10 @@ export default function AboutModal({
 }: AboutModalProps) {
   const [isPending, startTransition] = React.useTransition();
 
-  const { data: session } = useSession();
-  const sessionId = session?.user?.id;
+  const { status } = useSession();
 
   const { data: personalInfos } = useSWR<PersonalInfos>(
-    sessionId && `/api/builder/${siteId}/personal-infos`,
+    status === "authenticated" && `/api/builder/${siteId}/personal-infos`,
     fetcher,
   );
 
@@ -66,8 +65,9 @@ export default function AboutModal({
     <Formik
       validateOnBlur={false}
       validateOnChange={false}
-      initialValues={aboutFields.reduce((acc, field) => {
-        acc[field.name] = personalInfos?.[field.name] ?? "";
+      initialValues={aboutFields.reduce((acc: InitialValuesType, field) => {
+        acc[field.name] =
+          personalInfos?.[field.name as keyof typeof personalInfos] ?? "";
         return acc;
       }, {})}
       onSubmit={(values, actions) => {

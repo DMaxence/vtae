@@ -146,7 +146,13 @@ export const educationFields: FormFieldsType[] = [
       Object.keys(countryCodeToDisplayNameMap) as Array<string>
     ).map((key) => ({
       value: key,
-      label: `${countryCodeToFlagMap[key]} ${countryCodeToDisplayNameMap[key]}`,
+      label: `${
+        countryCodeToFlagMap[key as keyof typeof countryCodeToFlagMap]
+      } ${
+        countryCodeToDisplayNameMap[
+          key as keyof typeof countryCodeToDisplayNameMap
+        ]
+      }`,
     })),
     required: true,
     containerClasses: "pr-1.5 w-1/2",
@@ -215,7 +221,10 @@ export const languageFields: FormFieldsType[] = [
       Object.keys(countryCodeToDisplayLanguageMap) as Array<string>
     ).map((key) => ({
       value: key,
-      label: countryCodeToDisplayLanguageMap[key],
+      label:
+        countryCodeToDisplayLanguageMap[
+          key as keyof typeof countryCodeToDisplayLanguageMap
+        ],
     })),
     required: true,
     containerClasses: "w-full",

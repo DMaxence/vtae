@@ -1,5 +1,5 @@
 import { getDomainWithoutWWW } from "@/utils";
-import { get } from "@vercel/edge-config";
+import { EdgeConfigValue, get } from "@vercel/edge-config";
 
 export const isBlacklistedDomain = async (domain: string) => {
   let blacklistedDomains, blacklistedTerms;
@@ -14,7 +14,9 @@ export const isBlacklistedDomain = async (domain: string) => {
   }
   const domainToTest = getDomainWithoutWWW(domain) || domain;
   return (
+    // @ts-expect-error
     blacklistedDomains.includes(domainToTest) ||
+    // @ts-expect-error
     new RegExp(blacklistedTerms.join("|")).test(domainToTest)
   );
 };
@@ -27,6 +29,7 @@ export const isBlacklistedReferrer = async (referrer: string | null) => {
   } catch (e) {
     referrers = [];
   }
+  // @ts-expect-error
   return !referrers.includes(hostname);
 };
 
@@ -37,6 +40,7 @@ export const isBlacklistedKey = async (key: string) => {
   } catch (e) {
     blacklistedKeys = [];
   }
+  // @ts-expect-error
   return new RegExp(blacklistedKeys.join("|"), "i").test(key);
 };
 
@@ -47,6 +51,7 @@ export const isWhitelistedEmail = async (email: string) => {
   } catch (e) {
     whitelistedEmails = [];
   }
+  // @ts-expect-error
   return whitelistedEmails.includes(email);
 };
 
@@ -60,6 +65,7 @@ export const isBlacklistedEmail = async (email: string) => {
   } catch (e) {
     blacklistedEmails = [];
   }
+  // @ts-expect-error
   return new RegExp(blacklistedEmails.join("|"), "i").test(email);
 };
 
@@ -73,6 +79,7 @@ export const isReservedKey = async (key: string) => {
   } catch (e) {
     reservedKeys = [];
   }
+  // @ts-expect-error
   return reservedKeys.includes(key);
 };
 
@@ -86,5 +93,6 @@ export const isReservedUsername = async (key: string) => {
   } catch (e) {
     reservedUsernames = [];
   }
+  // @ts-expect-error
   return reservedUsernames.includes(key);
 };

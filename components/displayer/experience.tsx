@@ -9,7 +9,7 @@ import type {
 
 import { cn, getClickableLink, getElapsedTime, getTextDate } from "@/lib/utils";
 import { CalendarDays, Link, MapPin, PenSquare } from "lucide-react";
-import { EmploymentType, WithSiteId } from "@/lib/types";
+import { EmploymentType, WithOptionalSiteId } from "@/lib/types";
 import ExperienceModal from "../builder/Modals/experience-modal";
 
 const Skill = ({ skill, theme }: { skill: Skill; theme?: Theme }) => {
@@ -21,17 +21,17 @@ const Skill = ({ skill, theme }: { skill: Skill; theme?: Theme }) => {
           ? "bg-gray-100 text-gray-800"
           : "border border-gray-200 bg-white text-gray-500",
       )}
-      style={{
-        color: theme?.contrastTextColor,
-        backgroundColor: theme?.contrastColor,
-      }}
+      // style={{
+      //   color: theme?.contrastTextColor,
+      //   backgroundColor: theme?.contrastColor,
+      // }}
     >
       {skill.name}
     </span>
   );
 };
 
-interface ExperienceProps extends WithSiteId {
+interface ExperienceProps extends WithOptionalSiteId {
   experience: ExperienceType & {
     skills: Skill[];
   };
@@ -53,9 +53,9 @@ const Experience = ({
         <div className="">
           <div
             className="text-sm uppercase text-gray-500 dark:text-gray-400"
-            style={{ color: theme?.accentColor }}
+            // style={{ color: theme?.accentColor }}
           >
-            {EmploymentType[experience.type]}
+            {EmploymentType[experience.type as keyof typeof EmploymentType]}
           </div>
           {experience.companyUrl ? (
             <div className="flex gap-1 text-xl font-semibold">
@@ -79,7 +79,7 @@ const Experience = ({
           )}
           <div
             className="flex items-center gap-1.5 text-sm font-light text-gray-500 dark:text-gray-400"
-            style={{ color: theme?.accentColor }}
+            // style={{ color: theme?.accentColor }}
           >
             <CalendarDays className="h-3.5 w-3.5" />
             {getTextDate(experience.startDate)} -{" "}
@@ -92,7 +92,7 @@ const Experience = ({
           {experience.location && (
             <div
               className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-300"
-              style={{ color: theme?.accentColor }}
+              // style={{ color: theme?.accentColor }}
             >
               <MapPin className="h-3.5 w-3.5" />
               {experience.location}

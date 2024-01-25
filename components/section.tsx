@@ -37,14 +37,14 @@ export default function Section({
         site ? "rounded-lg shadow-md" : "",
         { "print:hidden": hidePrint },
       )}
-      style={{ backgroundColor: theme?.bgColor }}
+      // style={{ backgroundColor: theme?.bgColor }}
     >
       {(sectionName || EditModal || AddModal) && (
         <div className="flex justify-between">
           {sectionName && (
             <h2
               className="text-lg font-bold text-gray-600 dark:text-gray-100 print:mb-3.5 print:text-base print:font-semibold print:uppercase print:tracking-[2px] print:text-gray-400"
-              style={{ color: theme?.titleColor }}
+              // style={{ color: theme?.titleColor }}
             >
               {sectionName}
             </h2>
@@ -63,7 +63,7 @@ export default function Section({
       {description && (
         <p
           className="text-sm text-gray-600 dark:text-gray-100"
-          style={{ color: theme?.titleColor }}
+          // style={{ color: theme?.titleColor }}
         >
           {description}
         </p>

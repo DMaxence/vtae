@@ -51,7 +51,7 @@ export default function LoginButton({ provider }: LoginButtonProps) {
       } group my-2 flex h-10 w-full items-center justify-center space-x-2 rounded-md border border-stone-200 transition-colors duration-75 focus:outline-none dark:border-stone-700`}
     >
       {loading ? (
-        <LoadingDots color="#A8A29E" />
+        <LoadingDots type="light-gray" />
       ) : (
         <>
           {provider === Providers.github && (

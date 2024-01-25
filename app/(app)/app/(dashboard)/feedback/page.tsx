@@ -15,26 +15,33 @@ export default function Feedback() {
         if (!d.getElementById(i)) {
           var f = d.getElementsByTagName(s)[0],
             e = d.createElement(s);
-          (e.type = "text/javascript"),
-            (e.async = !0),
-            (e.src = "https://canny.io/sdk.js"),
-            f.parentNode.insertBefore(e, f);
+          ((e as HTMLScriptElement).type = "text/javascript"),
+            ((e as HTMLScriptElement).async = !0),
+            ((e as HTMLScriptElement).src = "https://canny.io/sdk.js"),
+            f?.parentNode?.insertBefore(e, f);
         }
       }
+      // @ts-expect-error
       if ("function" != typeof w.Canny) {
         var c = function () {
+          // @ts-expect-error
           c.q.push(arguments);
         };
+        // @ts-expect-error
         (c.q = []),
+          // @ts-expect-error
           (w.Canny = c),
           "complete" === d.readyState
             ? l()
-            : w.attachEvent
-              ? w.attachEvent("onload", l)
+            : // @ts-expect-error
+              w.attachEvent
+              ? // @ts-expect-error
+                w.attachEvent("onload", l)
               : w.addEventListener("load", l, !1);
       }
     })(window, document, "canny-jssdk", "script");
     if (data) {
+      // @ts-expect-error
       Canny("render", {
         boardToken: process.env.NEXT_PUBLIC_CANNY_BOARD_TOKEN,
         basePath: null, // See step 2

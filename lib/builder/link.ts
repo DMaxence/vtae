@@ -56,11 +56,12 @@ export const createLink = withSiteAuth(async (data: Link, site: Site) => {
     const response = await prisma.link.create({
       data: {
         ...data,
-        site: {
-          connect: {
-            id: site.id,
-          },
-        },
+        // site: {
+        //   connect: {
+        //     id: site.id,
+        //   },
+        // },
+        siteId: site.id,
       },
       include: {
         site: {

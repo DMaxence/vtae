@@ -61,6 +61,8 @@ export interface DomainVerificationResponse {
   }[];
 }
 
+export type InitialValuesType = { [key: string]: any };
+
 export type WithChildren<T = {}> = T & PropsWithChildren<{}>;
 
 export type WithShowModal<T = {}> = T & {
@@ -69,6 +71,10 @@ export type WithShowModal<T = {}> = T & {
 };
 
 export type WithSiteId<T = {}> = T & {
+  siteId: string;
+};
+
+export type WithOptionalSiteId<T = {}> = T & {
   siteId?: string;
 };
 

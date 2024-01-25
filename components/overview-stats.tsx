@@ -1,4 +1,5 @@
 "use client";
+import { LoadingCircle } from "@/lib/icons";
 import useSites from "@/lib/swr/use-sites";
 import { cn, fetcher } from "@/lib/utils";
 import { SUB_DOMAIN } from "@/utils";
@@ -16,7 +17,9 @@ export default function OverviewStats() {
     return names;
   });
 
-  const { data } = useSWR<Array<Array<{ start: string; clicks: number }>>>(
+  const { data, isLoading } = useSWR<
+    Array<Array<{ start: string; clicks: number }>>
+  >(
     `/api/edge/stats/timeseries?domains=${domains
       ?.flat()
       .join(",")}&interval=365d`,
@@ -72,40 +75,49 @@ export default function OverviewStats() {
           alignItems="baseline"
         >
           <Metric className="font-cal">{totalVisitorsLastSixMonths}</Metric>
-          <BadgeDelta
-            deltaType={
-              increase
-                ? "moderateIncrease"
-                : decrease
-                  ? "moderateDecrease"
-                  : "unchanged"
-            }
-            className={cn({
-              "dark:bg-green-900 dark:bg-opacity-50 dark:text-green-400":
-                increase,
-              "dark:bg-red-900 dark:bg-opacity-50 dark:text-red-400": decrease,
-              "dark:bg-gray-900 dark:bg-opacity-50 dark:text-gray-400":
-                unchanged,
-            })}
-          >
-            {(totalVisitorsDifferencePercentage / 10).toFixed(0)}%
-          </BadgeDelta>
+          {!isLoading && (
+            <BadgeDelta
+              deltaType={
+                increase
+                  ? "moderateIncrease"
+                  : decrease
+                    ? "moderateDecrease"
+                    : "unchanged"
+              }
+              className={cn({
+                "dark:bg-green-900 dark:bg-opacity-50 dark:text-green-400":
+                  increase,
+                "dark:bg-red-900 dark:bg-opacity-50 dark:text-red-400":
+                  decrease,
+                "dark:bg-gray-900 dark:bg-opacity-50 dark:text-gray-400":
+                  unchanged,
+              })}
+            >
+              {(totalVisitorsDifferencePercentage / 10).toFixed(0)}%
+            </BadgeDelta>
+          )}
         </Flex>
-        <AreaChart
-          className="mt-6 h-28"
-          data={visitors}
-          index="Month"
-          valueFormatter={(number: number) =>
-            `${Intl.NumberFormat("us").format(number).toString()}`
-          }
-          categories={["Total Visitors"]}
-          colors={["blue"]}
-          showXAxis={true}
-          showGridLines={false}
-          startEndOnly={true}
-          showYAxis={false}
-          showLegend={false}
-        />
+        {isLoading ? (
+          <div className="flex p-5 justify-center">
+          <LoadingCircle className="h-7 w-7" />
+            </div>
+        ) : (
+          <AreaChart
+            className="mt-6 h-28"
+            data={visitors}
+            index="Month"
+            valueFormatter={(number: number) =>
+              `${Intl.NumberFormat("us").format(number).toString()}`
+            }
+            categories={["Total Visitors"]}
+            colors={["blue"]}
+            showXAxis={true}
+            showGridLines={false}
+            startEndOnly={true}
+            showYAxis={false}
+            showLegend={false}
+          />
+        )}
       </Card>
     </div>
   );

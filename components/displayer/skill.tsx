@@ -15,10 +15,10 @@ const Skill = ({ skill, theme }: SkillProps) => {
           ? "bg-gray-100 text-gray-800 dark:bg-white dark:text-gray-100"
           : "border border-gray-200 bg-gray-100 text-gray-600 dark:border-none dark:bg-gray-300 dark:text-gray-600",
       )}
-      style={{
-        color: theme?.contrastTextColor,
-        backgroundColor: theme?.contrastColor,
-      }}
+      // style={{
+      //   color: theme?.contrastTextColor,
+      //   backgroundColor: theme?.contrastColor,
+      // }}
     >
       {skill.name}
     </span>

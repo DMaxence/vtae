@@ -12,7 +12,7 @@ import SubmitButton from "@/components/submit-button";
 import TextInput from "@/components/text-input";
 import useSWR, { mutate } from "swr";
 
-import { WithShowModal, WithSiteId } from "@/lib/types";
+import { InitialValuesType, WithShowModal, WithSiteId } from "@/lib/types";
 import { fetcher } from "@/lib/utils";
 import { Form, Formik } from "formik";
 import { useSession } from "next-auth/react";
@@ -31,11 +31,10 @@ const CurrentInfosModal = ({
 }: CurrentInfosModalProps) => {
   const [isPending, startTransition] = React.useTransition();
 
-  const { data: session } = useSession();
-  const sessionId = session?.user?.id;
+  const { status } = useSession();
 
   const { data: personalInfos } = useSWR<PersonalInfos>(
-    sessionId && `/api/builder/${siteId}/personal-infos`,
+    status === "authenticated" && `/api/builder/${siteId}/personal-infos`,
     fetcher,
   );
 
@@ -62,10 +61,14 @@ const CurrentInfosModal = ({
     <Formik
       validateOnBlur={false}
       validateOnChange={false}
-      initialValues={currentInfosFields.reduce((acc, field) => {
-        acc[field.name] = personalInfos?.[field.name] ?? "";
-        return acc;
-      }, {})}
+      initialValues={currentInfosFields.reduce(
+        (acc: InitialValuesType, field) => {
+          acc[field.name] =
+            personalInfos?.[field.name as keyof typeof personalInfos] ?? "";
+          return acc;
+        },
+        {},
+      )}
       onSubmit={(values, actions) => {
         onSubmit(values as PersonalInfos);
         actions.setSubmitting(false);

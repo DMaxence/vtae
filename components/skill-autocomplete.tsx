@@ -55,8 +55,7 @@ const SkillAutocomplete = ({
 }: SkillAutocompleteProps) => {
   const [_, meta] = useField(props);
 
-  const { data: session } = useSession();
-  const sessionId = session?.user?.id;
+  const { status } = useSession();
 
   const [selectedSkills, setSelectedSkills] = React.useState<Array<Skill>>(
     skills || [],
@@ -65,7 +64,7 @@ const SkillAutocomplete = ({
   const [debouncedQuery] = useDebounce(query, 250);
 
   const { data: fetchedSkills, error } = useSWR<Array<Skill>>(
-    sessionId && `/api/builder/skill?q=${debouncedQuery}`,
+    status === "authenticated" && `/api/builder/skill?q=${debouncedQuery}`,
     fetcher,
   );
   const isLoading = !error && !fetchedSkills;

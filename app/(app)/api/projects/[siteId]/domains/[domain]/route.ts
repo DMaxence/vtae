@@ -13,7 +13,7 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 // GET /api/projects/[slug]/domains/[domain] – get a project's domain
-export const GET = withAuth(async ({ siteId }) => {
+export const GET = withAuth(async ({ siteId }: { siteId: string }) => {
   const data = await prisma.site.findUnique({
     where: {
       id: siteId,

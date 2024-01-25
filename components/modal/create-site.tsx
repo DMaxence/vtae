@@ -140,7 +140,7 @@ function CreateSiteFormButton() {
       )}
       disabled={pending}
     >
-      {pending ? <LoadingDots color="#808080" /> : <p>Create Resume</p>}
+      {pending ? <LoadingDots type="gray" /> : <p>Create Resume</p>}
     </button>
   );
 }

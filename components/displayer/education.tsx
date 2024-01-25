@@ -9,9 +9,9 @@ import { CalendarDays, MapPin, PenSquare } from "lucide-react";
 import { getTextDate } from "@/lib/utils";
 
 import EducationModal from "../builder/Modals/education-modal";
-import { WithSiteId } from "@/lib/types";
+import { WithOptionalSiteId } from "@/lib/types";
 
-interface EducationProps extends WithSiteId {
+interface EducationProps extends WithOptionalSiteId {
   education: EducationType;
   readOnly?: boolean;
   theme?: Theme;
@@ -30,7 +30,7 @@ const Education = ({ education, readOnly, theme, siteId }: EducationProps) => {
           </div>
           <div
             className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400"
-            style={{ color: theme?.accentColor }}
+            // style={{ color: theme?.accentColor }}
           >
             <CalendarDays className="h-3.5 w-3.5" />
             {getTextDate(education.startDate)} -{" "}
@@ -38,10 +38,15 @@ const Education = ({ education, readOnly, theme, siteId }: EducationProps) => {
           </div>
           <div
             className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400"
-            style={{ color: theme?.accentColor }}
+            // style={{ color: theme?.accentColor }}
           >
             <MapPin className="h-3.5 w-3.5" />
-            {countryCodeToDisplayNameMap[education.country]}, {education.city}
+            {
+              countryCodeToDisplayNameMap[
+                education.country as keyof typeof countryCodeToDisplayNameMap
+              ]
+            }
+            , {education.city}
           </div>
         </div>
         {!readOnly && (

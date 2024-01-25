@@ -69,7 +69,7 @@ function FormButton() {
       )}
       disabled={pending}
     >
-      {pending ? <LoadingDots color="#808080" /> : <p>Confirm Delete</p>}
+      {pending ? <LoadingDots type="gray" /> : <p>Confirm Delete</p>}
     </button>
   );
 }

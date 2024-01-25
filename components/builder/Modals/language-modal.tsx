@@ -13,7 +13,7 @@ import { useSession } from "next-auth/react";
 
 import DeleteButton from "@/components/delete-button";
 import Select from "@/components/select";
-import { WithShowModal, WithSiteId } from "@/lib/types";
+import { InitialValuesType, WithShowModal, WithSiteId } from "@/lib/types";
 import { Form, Formik, FormikHelpers, FormikProps, FormikValues } from "formik";
 
 import type { Language } from "@prisma/client";
@@ -40,11 +40,10 @@ const LanguageModal = ({
   const [isUpdating, startUpdateTransition] = React.useTransition();
   const [isDeleting, startDeleteTransition] = React.useTransition();
 
-  const { data: session } = useSession();
-  const sessionId = session?.user?.id;
+  const { status } = useSession();
 
   const { data: language } = useSWR<Language>(
-    sessionId &&
+    status === "authenticated" &&
       languageId &&
       `/api/builder/${siteId}/language?languageId=${languageId}`,
     fetcher,
@@ -92,7 +91,7 @@ const LanguageModal = ({
     <Formik
       validateOnBlur={false}
       validateOnChange={false}
-      initialValues={languageFields.reduce((acc, field) => {
+      initialValues={languageFields.reduce((acc: InitialValuesType, field) => {
         acc[field.name] =
           (languageId
             ? language?.[field.name as keyof typeof language]
@@ -106,10 +105,7 @@ const LanguageModal = ({
       validationSchema={validationSchema}
       enableReinitialize={!!languageId}
     >
-      {({
-        setFieldValue,
-        resetForm,
-      }: FormikProps<(typeof languageFields)[keyof typeof languageFields]>) => {
+      {({ setFieldValue, resetForm }: FormikProps<InitialValuesType>) => {
         const onCancel = () => {
           resetForm();
           setShowModal(false);

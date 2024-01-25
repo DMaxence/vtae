@@ -14,13 +14,11 @@ import { personalInfosFields } from "@/constants/fields";
 import useSWR, { mutate } from "swr";
 
 import Modal from "@/components/modal";
-import { useModal } from "@/components/modal/provider";
 import { createOrUpdatePersonalInfos } from "@/lib/builder/personal-infos";
-import { WithShowModal, WithSiteId } from "@/lib/types";
+import { InitialValuesType, WithShowModal, WithSiteId } from "@/lib/types";
 import { fetcher } from "@/lib/utils";
 import { Form, Formik } from "formik";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 interface PersonalInfosModalProps extends WithSiteId, WithShowModal {}
@@ -32,12 +30,10 @@ export default function PersonalInfosModal({
 }: PersonalInfosModalProps) {
   const [isPending, startTransition] = React.useTransition();
 
-  const { data: session } = useSession();
-
-  const sessionId = session?.user?.id;
+  const { status } = useSession();
 
   const { data: personalInfos, isLoading } = useSWR<PersonalInfos>(
-    sessionId && `/api/builder/${siteId}/personal-infos`,
+    status === "authenticated" && `/api/builder/${siteId}/personal-infos`,
     fetcher,
   );
 
@@ -94,10 +90,14 @@ export default function PersonalInfosModal({
     <Formik
       validateOnBlur={false}
       validateOnChange={false}
-      initialValues={personalInfosFields.reduce((acc, field) => {
-        acc[field.name] = personalInfos?.[field.name] ?? "";
-        return acc;
-      }, {})}
+      initialValues={personalInfosFields.reduce(
+        (acc: InitialValuesType, field) => {
+          acc[field.name as string] =
+            personalInfos?.[field.name as keyof typeof personalInfos] ?? "";
+          return acc;
+        },
+        {},
+      )}
       onSubmit={(values, actions) => {
         onSubmit(values as PersonalInfos);
         actions.setSubmitting(false);

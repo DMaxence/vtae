@@ -3,7 +3,7 @@
 
 datasource db {
   provider     = "mysql"
-  url          = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  url          = env("DATABASE_URL") // uses connection pooling
   // directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
   relationMode = "prisma"
 }
@@ -168,9 +168,9 @@ model Skill {
   name        String       @unique
   primary     Boolean      @default(false)
   type        String?
-  siteId      String?
   experiences Experience[]
   site        Site?        @relation(fields: [siteId], references: [id])
+  siteId      String?
 
   @@index([siteId])
   @@fulltext([name])

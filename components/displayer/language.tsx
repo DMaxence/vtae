@@ -6,10 +6,10 @@ import { countryCodeToDisplayLanguageMap } from "@/constants/countryCodeToDispla
 import { PenSquare } from "lucide-react";
 import LanguageModal from "../builder/Modals/language-modal";
 
-import { WithSiteId } from "@/lib/types";
+import { WithOptionalSiteId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-interface LanguageProps extends WithSiteId {
+interface LanguageProps extends WithOptionalSiteId {
   language: LanguageType;
   readOnly?: boolean;
   theme?: Theme;
@@ -31,10 +31,14 @@ export default function Language({
             className={cn("w-[150px]", {
               "text-gray-700 dark:text-gray-200": !readOnly,
             })}
-            style={{ color: theme?.textColor, opacity: 0.8 }}
+            // style={{ color: theme?.textColor, opacity: 0.8 }}
           >
             {readOnly ? "- " : ""}
-            {countryCodeToDisplayLanguageMap[language.name]}
+            {
+              countryCodeToDisplayLanguageMap[
+                language.name as keyof typeof countryCodeToDisplayLanguageMap
+              ]
+            }
           </div>
         </div>
         {!readOnly && (
@@ -45,7 +49,7 @@ export default function Language({
           </div>
         )}
       </div>
-      {!readOnly && (
+      {!readOnly && siteId && (
         <LanguageModal
           siteId={siteId}
           languageId={language.id}

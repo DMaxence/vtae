@@ -108,16 +108,17 @@ export const createEducation = withSiteAuth(
           ...data,
           startDate: new Date(startDate),
           ...(endDate ? { endDate: new Date(endDate) } : {}),
-          site: {
-            connectOrCreate: {
-              where: {
-                id: site.id,
-              },
-              create: {
-                id: site.id,
-              },
-            },
-          },
+          // site: {
+          //   connectOrCreate: {
+          //     where: {
+          //       id: site.id,
+          //     },
+          //     create: {
+          //       id: site.id,
+          //     },
+          //   },
+          // },
+          siteId: site.id,
         },
         include: {
           site: {
