@@ -43,7 +43,9 @@ export default async function middleware(req: NextRequest, ev: NextFetchEvent) {
   // rewrites for app pages
   if (hostname == `app.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) {
     const session = await getToken({ req });
-    if (!session && path !== "/login" && path !== "/register") {
+    console.log("session", session, "path", path);
+    if (!session && path.startsWith("/login") && path !== "/register") {
+      console.log("redirecting to login");
       return NextResponse.redirect(
         new URL(
           `/login${searchParams.length > 0 ? `?${searchParams}` : ""}`,
@@ -51,8 +53,10 @@ export default async function middleware(req: NextRequest, ev: NextFetchEvent) {
         ),
       );
     } else if (session && path === "/login") {
+      console.log("redirecting to home");
       return NextResponse.redirect(new URL("/", req.url));
     }
+    console.log("redirecting to app");
     return NextResponse.rewrite(
       new URL(`/app${path === "/" ? "" : path}`, req.url),
     );
