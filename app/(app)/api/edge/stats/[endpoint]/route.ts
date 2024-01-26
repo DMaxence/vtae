@@ -16,6 +16,8 @@ export const GET = async (
   const { endpoint } = params;
   const searchParams = getSearchParams(req.url);
   const { domain, domains, key, interval } = searchParams;
+  if (domain?.length === 0 || domains?.length === 0)
+    return new Response([] as any);
 
   // demo link (dub.sh/try)
   if (domain === "vtae.xyz" && key === "try") {

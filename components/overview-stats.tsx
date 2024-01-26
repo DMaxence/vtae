@@ -7,7 +7,7 @@ import { AreaChart, BadgeDelta, Card, Flex, Metric, Text } from "@tremor/react";
 import useSWR from "swr";
 
 export default function OverviewStats() {
-  const { sites } = useSites();
+  const { sites = [] } = useSites();
 
   const domains = sites?.map((site) => {
     const names = [
@@ -17,7 +17,7 @@ export default function OverviewStats() {
     return names;
   });
 
-  const { data, isLoading } = useSWR<
+  const { data = [], isLoading } = useSWR<
     Array<Array<{ start: string; clicks: number }>>
   >(
     `/api/edge/stats/timeseries?domains=${domains
@@ -28,7 +28,7 @@ export default function OverviewStats() {
 
   const flatDomains =
     data?.reduce((acc, curr, idx) => {
-      acc = curr.map((d, i) => {
+      acc = curr?.map((d, i) => {
         return {
           start: d.start,
           clicks: d.clicks + (acc[i]?.clicks || 0),
@@ -98,9 +98,9 @@ export default function OverviewStats() {
           )}
         </Flex>
         {isLoading ? (
-          <div className="flex p-5 justify-center">
-          <LoadingCircle className="h-7 w-7" />
-            </div>
+          <div className="flex justify-center p-5">
+            <LoadingCircle className="h-7 w-7" />
+          </div>
         ) : (
           <AreaChart
             className="mt-6 h-28"

@@ -172,8 +172,6 @@ export const getStats = async ({
     }
   });
 
-  console.log("url stats", url.toString());
-
   return await fetch(url.toString(), {
     headers: {
       Authorization: `Bearer ${process.env.TINYBIRD_API_KEY}`,

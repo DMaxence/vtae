@@ -37,10 +37,6 @@ export default function LoginButton({ provider }: LoginButtonProps) {
     <button
       disabled={loading}
       onClick={() => {
-        console.log(
-          "will attempt to sign in",
-          Object.keys(Providers)[Object.values(Providers).indexOf(provider)],
-        );
         setLoading(true);
         signIn(providerName);
       }}
