@@ -46,7 +46,12 @@ export default async function middleware(req: NextRequest, ev: NextFetchEvent) {
     console.log("session", session, path);
     if (!session && path !== "/login" && path !== "/register") {
       console.log("redirecting to login");
-      return NextResponse.redirect(new URL(`/login`, req.url));
+      return NextResponse.redirect(
+        new URL(
+          `/login${searchParams.length > 0 ? `?${searchParams}` : ""}`,
+          req.url,
+        ),
+      );
     } else if (session && (path === "/login" || path === "/register")) {
       console.log("redirecting to home");
       return NextResponse.redirect(new URL("/", req.url));
