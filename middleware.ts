@@ -52,7 +52,7 @@ export default async function middleware(req: NextRequest, ev: NextFetchEvent) {
           req.url,
         ),
       );
-    } else if (session && path === "/login") {
+    } else if (session && path.startsWith("/login")) {
       console.log("redirecting to home");
       return NextResponse.redirect(new URL("/", req.url));
     }
