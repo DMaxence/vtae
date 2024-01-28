@@ -13,7 +13,7 @@ import LoadingSpinner from "../icons/loading-spinner";
 export default function Visitors() {
   const { baseApiPath, queryString, interval } = useContext(StatsContext);
 
-  const { data } = useSWR<{ start: Date; clicks: number }[]>(
+  const { data, isLoading } = useSWR<{ start: Date; clicks: number }[]>(
     `${baseApiPath}/timeseries?${queryString}`,
     fetcher,
   );
@@ -119,7 +119,9 @@ export default function Visitors() {
           );
         })}
       </div>
-      {data && data.length > 0 ? (
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : data && data.length > 0 ? (
         <AreaChart
           className="mt-4 h-72"
           data={visitors || []}
@@ -131,7 +133,9 @@ export default function Visitors() {
           }
         />
       ) : (
-        <LoadingSpinner />
+        <div className="flex h-[300px] items-center justify-center">
+          <p className="text-sm text-gray-600">No data available</p>
+        </div>
       )}
     </Card>
   );

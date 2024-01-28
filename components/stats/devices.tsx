@@ -44,6 +44,7 @@ export default function Devices() {
           },
           getNewPath: true,
         }) as string,
+        target: "_self",
       }))}
       className="mt-2"
     />

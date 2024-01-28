@@ -45,6 +45,7 @@ export default function Referer() {
           },
           getNewPath: true,
         }),
+        target: "_self",
       }))}
       className="mt-2"
     />
