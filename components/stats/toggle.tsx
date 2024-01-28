@@ -169,7 +169,7 @@ export default function Toggle() {
           >
             <button
               onClick={() => setOpenDatePopover(!openDatePopover)}
-              className="flex w-full items-center justify-between space-x-2 rounded-md bg-white px-3 py-2.5 shadow transition-all duration-75 hover:shadow-md active:scale-95 md:w-48"
+              className="flex items-center justify-between space-x-2 rounded-md bg-white px-3 py-2.5 shadow transition-all duration-75 hover:shadow-md active:scale-95"
             >
               <IconMenu
                 text={selectedInterval.display}
@@ -367,7 +367,7 @@ const CustomDomainPopover = () => {
   return (
     <Popover
       content={
-        <div className="grid w-full p-2 md:w-48">
+        <div className="grid w-full p-2">
           {domains?.map((value) => (
             <Link
               key={value}
@@ -394,7 +394,7 @@ const CustomDomainPopover = () => {
     >
       <button
         onClick={() => setOpenDomainPopover(!openDomainPopover)}
-        className="flex w-full items-center justify-between space-x-2 rounded-md bg-white px-3 py-2.5 shadow transition-all duration-75 hover:shadow-md active:scale-95 md:w-48"
+        className="flex items-center justify-between space-x-2 rounded-md bg-white px-3 py-2.5 shadow transition-all duration-75 hover:shadow-md active:scale-95"
       >
         <IconMenu text={domain || ""} icon={<Calendar className="h-4 w-4" />} />
         <ChevronDown
