@@ -24,7 +24,7 @@ const navigation = {
   legal: [
     { name: "Privacy", href: "/privacy" },
     { name: "Terms", href: "/terms" },
-    { name: "Abuse", href: "/abuse" },
+    // { name: "Abuse", href: "/abuse" },
   ],
 };
 
@@ -97,8 +97,8 @@ export function Footer() {
               </a>
             </div>
           </div>
-          {/* <div className="mt-16 grid grid-cols-2 gap-4 xl:col-span-2 xl:mt-0">
-            <div className="md:grid md:grid-cols-2">
+          <div className="mt-16 grid grid-cols-2 gap-4 xl:col-span-2 xl:mt-0">
+            {/* <div className="md:grid md:grid-cols-2">
               <div>
                 <h3 className="text-sm font-semibold text-gray-900">
                   Features
@@ -147,7 +147,7 @@ export function Footer() {
                   ))}
                 </ul>
               </div>
-            </div>
+            </div> */}
             <div className="md:grid md:grid-cols-2">
               <div>
                 <h3 className="text-sm font-semibold text-gray-600">Legal</h3>
@@ -173,7 +173,7 @@ export function Footer() {
                 </ul>
               </div>
             </div>
-          </div> */}
+          </div>
         </div>
         <div className="border-t border-gray-900/10 pt-8">
           <p className="text-sm leading-5 text-gray-500 dark:text-gray-400">
