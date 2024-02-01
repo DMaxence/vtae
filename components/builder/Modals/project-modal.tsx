@@ -12,9 +12,9 @@ import useSWR, { mutate } from "swr";
 import { fetcher, takeWebsiteScreenshot } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 
-import type { Experience, Skill } from "@prisma/client";
+import type { Project, Skill } from "@prisma/client";
 
-import { experienceFields } from "@/constants/fields";
+import { projectFields } from "@/constants/fields";
 
 import TextArea from "@/components/textarea";
 
@@ -24,68 +24,66 @@ import Modal from "@/components/modal";
 import Select from "@/components/select";
 import SkillAutocomplete from "@/components/skill-autocomplete";
 import {
-  createExperience,
-  deleteExperience,
-  updateExperience,
-} from "@/lib/builder/experience";
+  createProject,
+  deleteProject,
+  updateProject,
+} from "@/lib/builder/project";
 import { InitialValuesType, WithShowModal, WithSiteId } from "@/lib/types";
 import { Form, Formik, FormikHelpers, FormikProps, FormikValues } from "formik";
 import { toast } from "sonner";
 
-interface ExperienceModalProps extends WithSiteId, WithShowModal {
-  experienceId?: string;
+interface ProjectModalProps extends WithSiteId, WithShowModal {
+  projectId?: string;
 }
 
-const ExperienceModal = ({
+const ProjectModal = ({
   showModal,
   setShowModal,
   siteId,
-  experienceId,
-}: ExperienceModalProps) => {
+  projectId,
+}: ProjectModalProps) => {
   const [isUpdating, startUpdateTransition] = React.useTransition();
   const [isDeleting, startDeleteTransition] = React.useTransition();
 
   const { status } = useSession();
 
-  const { data: experience } = useSWR<
-    Experience & {
+  const { data: project } = useSWR<
+    Project & {
       skills: Skill[];
     }
   >(
     status === "authenticated" &&
-      experienceId &&
-      `/api/builder/${siteId}/experience?experienceId=${experienceId}`,
+      projectId &&
+      `/api/builder/${siteId}/project?projectId=${projectId}`,
     fetcher,
   );
 
   const validationSchema = yup.object({
     type: yup.string().required("Required"),
-    companyName: yup.string().required("Required"),
-    companyUrl: yup.string(),
-    jobTitle: yup.string().required("Required"),
+    url: yup.string(),
+    title: yup.string().required("Required"),
     startDate: yup.date().required("Required"),
     endDate: yup.date(),
-    location: yup.string(),
     skills: yup.array().of(yup.string()).min(1, "Required"),
     description: yup.string().required("Required"),
   });
 
   const onSubmit = async (
-    values: Experience,
+    values: Project,
     actions: FormikHelpers<FormikValues>,
   ) => {
     startUpdateTransition(async () => {
-      const res = await (experienceId
-        ? updateExperience({ ...values, id: experienceId }, siteId)
-        : createExperience(values, siteId));
+      const res = await (projectId
+        ? updateProject({ ...values, id: projectId }, siteId)
+        : createProject(values, siteId));
       if (res.error) {
         toast.error(res.error);
       } else {
-        mutate(`/api/builder/${siteId}/experience`);
+        mutate(`/api/builder/${siteId}/project`);
         mutate("/api/skill");
         setShowModal(false);
         actions.resetForm();
-        toast.success(`Experience ${experienceId ? "updated" : "created"}`);
+        toast.success(`Project ${projectId ? "updated" : "created"}`);
         takeWebsiteScreenshot(res.site);
       }
     });
@@ -93,14 +91,14 @@ const ExperienceModal = ({
 
   const onDelete = async () => {
     startDeleteTransition(async () => {
-      const res = await deleteExperience({ experienceId }, siteId);
+      const res = await deleteProject({ projectId }, siteId);
       if (res.error) {
         toast.error(res.error);
       } else {
-        mutate(`/api/builder/${siteId}/experience`);
+        mutate(`/api/builder/${siteId}/project`);
         mutate("/api/skill");
         setShowModal(false);
-        toast.success("Experience deleted");
+        toast.success("Project deleted");
       }
     });
   };
@@ -109,22 +107,18 @@ const ExperienceModal = ({
     <Formik
       validateOnBlur={false}
       validateOnChange={false}
-      initialValues={experienceFields.reduce(
-        (acc: InitialValuesType, field) => {
-          acc[field.name] =
-            (experienceId
-              ? experience?.[field.name as keyof typeof experience]
-              : null) ?? "";
-          return acc;
-        },
-        {},
-      )}
+      initialValues={projectFields.reduce((acc: InitialValuesType, field) => {
+        acc[field.name] =
+          (projectId ? project?.[field.name as keyof typeof project] : null) ??
+          "";
+        return acc;
+      }, {})}
       onSubmit={(values, actions) => {
-        onSubmit(values as Experience, actions);
+        onSubmit(values as Project, actions);
         actions.setSubmitting(false);
       }}
       validationSchema={validationSchema}
-      enableReinitialize={!!experienceId}
+      enableReinitialize={!!projectId}
     >
       {({ setFieldValue, resetForm }: FormikProps<InitialValuesType>) => {
         const onCancel = () => {
@@ -139,9 +133,9 @@ const ExperienceModal = ({
             onClose={resetForm}
           >
             <Form className="inline-block w-full max-w-3xl rounded-lg border border-stone-200 bg-white pt-8 text-center align-middle shadow-xl transition-all dark:border-stone-700 dark:bg-stone-900">
-              <ModalTitle title="Edit your experience" />
+              <ModalTitle title="Edit your project" />
               <div className="flex flex-wrap justify-between gap-y-5 px-8">
-                {experienceFields.map(({ ...field }) => {
+                {projectFields.map(({ ...field }) => {
                   if (field.type === "textarea")
                     return <TextArea key={field.name} {...field} />;
                   if (field.type === "select")
@@ -158,10 +152,10 @@ const ExperienceModal = ({
                     return (
                       <SkillAutocomplete
                         key={field.name}
-                        skills={experience?.skills}
+                        skills={project?.skills}
                         setFieldValue={setFieldValue}
-                        exists={!!experienceId}
-                        existingSkills={experience?.skills}
+                        exists={!!projectId}
+                        existingSkills={project?.skills}
                         {...field}
                       />
                     );
@@ -169,7 +163,7 @@ const ExperienceModal = ({
                 })}
               </div>
               <div className="mb-5 mt-3 flex w-full flex-row-reverse items-center justify-between px-8">
-                {experienceId && (
+                {projectId && (
                   <div className="order-1">
                     <DeleteButton onDelete={onDelete} loading={isDeleting} />
                   </div>
@@ -187,4 +181,4 @@ const ExperienceModal = ({
   );
 };
 
-export default ExperienceModal;
+export default ProjectModal;

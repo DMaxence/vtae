@@ -88,8 +88,7 @@ export default async function SiteLayout({
       style={{ colorScheme: theme }}
     >
       <body className={cn(fontMapper[data.font], "text-sm")}>
-        <div>
-          {/* <div className="ease left-0 right-0 top-0 z-30 flex h-16 bg-white transition-all duration-150 dark:bg-black dark:text-white">
+        {/* <div className="ease left-0 right-0 top-0 z-30 flex h-16 bg-white transition-all duration-150 dark:bg-black dark:text-white">
             <div className="mx-auto flex h-full max-w-screen-xl items-center justify-center space-x-5 px-10 sm:px-20">
               <Link href="/" className="flex items-center justify-center">
                 <div className="inline-block h-8 w-8 overflow-hidden rounded-full align-middle">
@@ -110,35 +109,36 @@ export default async function SiteLayout({
             </div>
           </div> */}
 
-          <div className="mt-20 print:mt-0">{children}</div>
+        {/* <div className="mt-20 print:mt-0"> */}
+          {children}
+          {/* </div> */}
 
-          {/* {domain == `demo.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}` ||
+        {/* {domain == `demo.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}` ||
       domain == `platformize.co` ? (
         <CTA />
       ) : (
         <ReportAbuse />
       )} */}
-          <footer className="flex w-full items-center justify-center py-7 print:hidden">
-            <p className="text-center text-xs text-gray-500 dark:text-gray-400">
-              Powered by{" "}
-              <a
-                className="font-semibold text-black underline dark:text-gray-300"
-                href="https://vtae.xyz"
-                rel="noreferrer noopener"
-                target="_blank"
-                // onClick={() => {
-                //   splitbee.track("CTA", {
-                //     from: subdomain,
-                //     cible: "Vtae landing page",
-                //   });
-                // }}
-                // style={{ color: theme?.linkColor }}
-              >
-                vtae.xyz
-              </a>
-            </p>
-          </footer>
-        </div>
+        {/* <footer className="flex w-full items-center justify-center py-7 print:hidden">
+          <p className="text-center text-xs text-gray-500 dark:text-gray-400">
+            Powered by{" "}
+            <a
+              className="font-semibold text-black underline dark:text-gray-300"
+              href="https://vtae.xyz"
+              rel="noreferrer noopener"
+              target="_blank"
+              // onClick={() => {
+              //   splitbee.track("CTA", {
+              //     from: subdomain,
+              //     cible: "Vtae landing page",
+              //   });
+              // }}
+              // style={{ color: theme?.linkColor }}
+            >
+              vtae.xyz
+            </a>
+          </p>
+        </footer> */}
       </body>
     </html>
   );

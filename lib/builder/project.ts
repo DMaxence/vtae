@@ -1,12 +1,12 @@
 "use server";
 import prisma from "@/lib/prisma";
 
-import { Experience, Site } from "@prisma/client";
+import { Project, Site } from "@prisma/client";
 import { withSiteAuth } from "../auth";
 import { revalidateSite } from "../utils";
 
 /**
- * Get Experience
+ * Get Project
  *
  * Fetches & returns either a single or all sites available depending on
  * whether a `siteId` query parameter is provided. If not all sites are
@@ -16,21 +16,21 @@ import { revalidateSite } from "../utils";
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-export const getExperience = async (siteId: string, experienceId?: string) => {
-  if (experienceId) {
-    const experience = await prisma.experience.findFirst({
+export const getProject = async (siteId: string, projectId?: string) => {
+  if (projectId) {
+    const project = await prisma.project.findFirst({
       where: {
-        id: experienceId,
+        id: projectId,
       },
       include: {
         skills: true,
       },
     });
 
-    return experience;
+    return project;
   }
 
-  const experiences = await prisma.experience.findMany({
+  const projects = await prisma.project.findMany({
     where: {
       siteId: siteId,
     },
@@ -42,11 +42,11 @@ export const getExperience = async (siteId: string, experienceId?: string) => {
     },
   });
 
-  return experiences;
+  return projects;
 };
 
 /**
- * Create Experience
+ * Create Project
  *
  * Creates a new site from a set of provided query parameters.
  * These include:
@@ -61,42 +61,36 @@ export const getExperience = async (siteId: string, experienceId?: string) => {
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-export const createExperience = withSiteAuth(
+export const createProject = withSiteAuth(
   async (
     {
       type,
-      companyName,
-      companyUrl,
-      jobTitle,
+      url,
+      title,
       startDate,
       endDate,
-      location,
       skills,
       description,
-    }: Experience & { skills: string[] },
+    }: Project & { skills: string[] },
     site: Site,
   ) => {
-    console.log("createExperience", {
+    console.log("createProject", {
       type,
-      companyName,
-      companyUrl,
-      jobTitle,
+      url,
+      title,
       startDate,
       endDate,
-      location,
       skills,
       description,
       site,
     });
     try {
-      const response = await prisma.experience.create({
+      const response = await prisma.project.create({
         data: {
           type,
-          companyName,
-          companyUrl,
-          jobTitle,
+          url,
+          title,
           description,
-          location,
           startDate: new Date(startDate),
           ...(endDate ? { endDate: new Date(endDate) } : {}),
           skills: {
@@ -118,7 +112,7 @@ export const createExperience = withSiteAuth(
     } catch (error: any) {
       if (error.code === "P2002") {
         return {
-          error: `This experience is already in use`,
+          error: `This project is already in use`,
         };
       } else {
         return {
@@ -130,7 +124,7 @@ export const createExperience = withSiteAuth(
 );
 
 /**
- * Delete Experience
+ * Delete Project
  *
  * Deletes a site from the database using a provided `siteId` query
  * parameter.
@@ -139,12 +133,12 @@ export const createExperience = withSiteAuth(
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-export const deleteExperience = withSiteAuth(
-  async ({ experienceId }: { experienceId: string }, site: Site) => {
+export const deleteProject = withSiteAuth(
+  async ({ projectId }: { projectId: string }, site: Site) => {
     try {
-      const response = await prisma.experience.delete({
+      const response = await prisma.project.delete({
         where: {
-          id: experienceId,
+          id: projectId,
         },
         include: {
           site: {
@@ -164,7 +158,7 @@ export const deleteExperience = withSiteAuth(
 );
 
 /**
- * Update Experience
+ * Update Project
  *
  * Updates a site & all of its data using a collection of provided
  * query parameters. These include the following:
@@ -179,38 +173,34 @@ export const deleteExperience = withSiteAuth(
  * @param res - Next.js API Response
  * @param session - NextAuth.js session
  */
-export const updateExperience = withSiteAuth(
+export const updateProject = withSiteAuth(
   async (
     {
       id,
       type,
-      companyName,
-      companyUrl,
-      jobTitle,
+      url,
+      title,
       startDate,
       endDate,
-      location,
       skills,
       removeSkills,
       description,
-    }: Experience & {
+    }: Project & {
       skills: string[];
       removeSkills: string[];
     },
     site: Site,
   ) => {
     try {
-      const response = await prisma.experience.update({
+      const response = await prisma.project.update({
         where: {
           id: id,
         },
         data: {
           type,
-          companyName,
-          companyUrl,
-          jobTitle,
+          url,
+          title,
           description,
-          location,
           startDate: new Date(startDate),
           ...(endDate ? { endDate: new Date(endDate) } : {}),
           // replace connect with set to remove all skills and replace with new ones
@@ -235,7 +225,7 @@ export const updateExperience = withSiteAuth(
     } catch (error: any) {
       if (error.code === "P2002") {
         return {
-          error: `This experience is already in use`,
+          error: `This project is already in use`,
         };
       } else {
         return {

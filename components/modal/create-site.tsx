@@ -16,6 +16,7 @@ export default function CreateSiteModal() {
   const modal = useModal();
 
   const [data, setData] = useState({
+    type: "resume",
     name: "",
     subdomain: "",
     description: "",
@@ -38,12 +39,12 @@ export default function CreateSiteModal() {
           if (res.error) {
             toast.error(res.error);
           } else {
-            va.track("Created Resume");
+            va.track(`Created ${res.type}`);
             const { id } = res;
             router.refresh();
             router.push(`/site/${id}`);
             modal?.hide();
-            toast.success(`Successfully created hosted resume!`);
+            toast.success(`Successfully created hosted ${res.type}!`);
             takeWebsiteScreenshot(res);
           }
         })
@@ -52,20 +53,58 @@ export default function CreateSiteModal() {
     >
       <div className="relative flex flex-col space-y-4 p-5 md:p-10">
         <h2 className="font-cal text-2xl dark:text-white">
-          Create a new hosted resume
+          Create a new hosted {data.type}
         </h2>
+
+        <div className="flex flex-col space-y-2">
+          <label className="text-sm font-medium text-stone-500 dark:text-stone-400">
+            Type
+          </label>
+          <div className="flex w-full">
+            <button
+              type="button"
+              onClick={() => setData({ ...data, type: "resume" })}
+              className={cn(
+                "flex w-full items-center space-x-2 rounded-l-lg border px-4 py-2 text-sm",
+                data.type === "resume"
+                  ? "border-stone-200 bg-black text-white dark:border-stone-700 dark:bg-black dark:text-white dark:active:bg-stone-800"
+                  : "border-stone-200 bg-stone-50 text-stone-600 hover:border-black hover:bg-black hover:text-white dark:border-stone-600 dark:bg-stone-800 dark:text-stone-400 dark:hover:border-white dark:hover:bg-black dark:hover:text-white dark:active:bg-stone-800",
+              )}
+            >
+              Resume
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                console.log("set portfolio");
+                setData({ ...data, type: "portfolio" });
+              }}
+              className={cn(
+                "flex w-full items-center space-x-2 rounded-r-lg border px-4 py-2 text-sm",
+                data.type === "portfolio"
+                  ? "border-stone-200 bg-black text-white dark:border-stone-700 dark:bg-black dark:text-white dark:active:bg-stone-800"
+                  : "border-stone-200 bg-stone-50 text-stone-600 hover:border-black hover:bg-black hover:text-white dark:border-stone-600 dark:bg-stone-800 dark:text-stone-400 dark:hover:border-white dark:hover:bg-black dark:hover:text-white dark:active:bg-stone-800",
+              )}
+            >
+              Portfolio
+            </button>
+            <input type="hidden" name="type" value={data.type.toUpperCase()} />
+          </div>
+        </div>
 
         <div className="flex flex-col space-y-2">
           <label
             htmlFor="name"
             className="text-sm font-medium text-stone-500 dark:text-stone-400"
           >
-            Resume Name
+            {data.type === "resume" ? "Resume" : "Portfolio"} Name
           </label>
           <input
             name="name"
             type="text"
-            placeholder="My Awesome Resume"
+            placeholder={`My Awesome ${
+              data.type === "resume" ? "Resume" : "Portfolio"
+            }`}
             autoFocus
             value={data.name}
             onChange={(e) => setData({ ...data, name: e.target.value })}
@@ -112,7 +151,7 @@ export default function CreateSiteModal() {
           </label>
           <textarea
             name="description"
-            placeholder="Description about this resume"
+            placeholder={`Description about this ${data.type}`}
             value={data.description}
             onChange={(e) => setData({ ...data, description: e.target.value })}
             maxLength={140}
@@ -123,12 +162,12 @@ export default function CreateSiteModal() {
         </div>
       </div>
       <div className="flex items-center justify-end rounded-b-lg border-t border-stone-200 bg-stone-50 p-3 dark:border-stone-700 dark:bg-stone-800 md:px-10">
-        <CreateSiteFormButton />
+        <CreateSiteFormButton type={data.type} />
       </div>
     </form>
   );
 }
-function CreateSiteFormButton() {
+function CreateSiteFormButton({ type }: { type: string }) {
   const { pending } = useFormStatus();
   return (
     <button
@@ -140,7 +179,11 @@ function CreateSiteFormButton() {
       )}
       disabled={pending}
     >
-      {pending ? <LoadingDots type="gray" /> : <p>Create Resume</p>}
+      {pending ? (
+        <LoadingDots type="gray" />
+      ) : (
+        <p>Create {type === "resume" ? "Resume" : "Portfolio"}</p>
+      )}
     </button>
   );
 }

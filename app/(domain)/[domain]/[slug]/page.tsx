@@ -14,27 +14,21 @@ export async function generateMetadata({
   const domain = decodeURIComponent(params.domain);
   const slug = decodeURIComponent(params.slug);
 
-  const [data, siteData] = await Promise.all([
-    getPostData(domain, slug),
-    getSiteData(domain),
-  ]);
-  if (!data || !siteData) {
+  const siteData = await getSiteData(domain);
+
+  if (!siteData) {
     return null;
   }
-  const { title, description } = data;
 
   return {
-    title,
-    description,
+    title: siteData.name,
     openGraph: {
-      title,
-      description,
+      title: siteData.name,
     },
     twitter: {
       card: "summary_large_image",
-      title,
-      description,
-      creator: "@vercel",
+      title: siteData.name,
+      creator: "@maxencedhx_dev",
     },
     // Optional: Set canonical URL to custom domain if it exists
     // ...(params.domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) &&
@@ -46,40 +40,40 @@ export async function generateMetadata({
   };
 }
 
-export async function generateStaticParams() {
-  const allPosts = await prisma.post.findMany({
-    select: {
-      slug: true,
-      site: {
-        select: {
-          subdomain: true,
-          customDomain: true,
-        },
-      },
-    },
-    // feel free to remove this filter if you want to generate paths for all posts
-    where: {
-      site: {
-        subdomain: "demo",
-      },
-    },
-  });
+// export async function generateStaticParams() {
+//   const allPosts = await prisma.post.findMany({
+//     select: {
+//       slug: true,
+//       site: {
+//         select: {
+//           subdomain: true,
+//           customDomain: true,
+//         },
+//       },
+//     },
+//     // feel free to remove this filter if you want to generate paths for all posts
+//     where: {
+//       site: {
+//         subdomain: "demo",
+//       },
+//     },
+//   });
 
-  const allPaths = allPosts
-    .flatMap(({ site, slug }) => [
-      site?.subdomain && {
-        domain: `${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
-        slug,
-      },
-      site?.customDomain && {
-        domain: site.customDomain,
-        slug,
-      },
-    ])
-    .filter(Boolean);
+//   const allPaths = allPosts
+//     .flatMap(({ site, slug }) => [
+//       site?.subdomain && {
+//         domain: `${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
+//         slug,
+//       },
+//       site?.customDomain && {
+//         domain: site.customDomain,
+//         slug,
+//       },
+//     ])
+//     .filter(Boolean);
 
-  return allPaths;
-}
+//   return allPaths;
+// }
 
 export default async function SitePostPage({
   params,

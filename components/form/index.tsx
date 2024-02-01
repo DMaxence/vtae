@@ -31,6 +31,7 @@ export default function Form({
     maxLength?: number;
     pattern?: string;
     button?: boolean;
+    options?: { value: string; label: string }[];
   };
   handleSubmit: any;
   site?: Site;
@@ -45,6 +46,7 @@ export default function Form({
     router.refresh();
     toast.success(`Successfully updated screenshot!`);
   };
+
   return (
     <form
       action={async (data: FormData) => {
@@ -100,15 +102,18 @@ export default function Form({
             name={inputAttrs.name}
             type={inputAttrs.type as "avatar" | "file"}
           />
-        ) : inputAttrs.name === "themeType" ? (
+        ) : inputAttrs.name === "themeId" ? (
           <div className="flex max-w-sm items-center overflow-hidden rounded-lg border border-stone-600">
             <select
-              name="themeType"
+              name="themeId"
               defaultValue={inputAttrs.defaultValue}
               className="w-full rounded-none border-none bg-white px-4 py-2 text-sm font-medium text-stone-700 focus:outline-none focus:ring-black dark:bg-black dark:text-stone-200 dark:focus:ring-white"
             >
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
+              {inputAttrs.options?.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
         ) : inputAttrs.name === "font" ? (

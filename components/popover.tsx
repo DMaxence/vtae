@@ -44,14 +44,17 @@ export function Popover({
 
   return (
     <PopoverPrimitive.Root open={openPopover} onOpenChange={setOpenPopover}>
-      <PopoverPrimitive.Trigger className="sm:inline-flex" asChild>
+      <PopoverPrimitive.Trigger
+        className="dark:bg-dark-tremor-background dark:ring-1 dark:ring-dark-tremor-ring sm:inline-flex"
+        asChild
+      >
         {children}
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Content
           sideOffset={8}
           align={align}
-          className="animate-slide-up-fade z-50 items-center rounded-md border border-gray-200 bg-white drop-shadow-lg sm:block"
+          className="animate-slide-up-fade z-50 items-center rounded-md border border-gray-200 bg-white drop-shadow-lg dark:bg-dark-tremor-background dark:border-dark-tremor-ring sm:block"
         >
           {content}
         </PopoverPrimitive.Content>

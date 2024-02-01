@@ -13,6 +13,12 @@ export default async function SiteSettingsAppearance({
       id: decodeURIComponent(params.id),
     },
   });
+  const themes = await prisma.theme.findMany({
+    where: {
+      type: data?.type,
+    },
+  });
+  console.log("page", data?.themeId, data?.type, themes);
 
   return (
     <div className="flex flex-col space-y-6">
@@ -21,9 +27,13 @@ export default async function SiteSettingsAppearance({
         description="The theme for your site."
         helpText="Please select a theme."
         inputAttrs={{
-          name: "themeType",
+          name: "themeId",
           type: "select",
-          defaultValue: data?.themeType!,
+          defaultValue: data?.themeId!,
+          options: themes.map((theme) => ({
+            value: theme.id,
+            label: theme.name,
+          })),
         }}
         handleSubmit={updateSite}
       />

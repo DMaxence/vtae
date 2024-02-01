@@ -115,6 +115,58 @@ export const experienceFields: FormFieldsType[] = [
     containerClasses: "w-full",
   },
 ];
+export const projectFields: FormFieldsType[] = [
+  {
+    name: "Title",
+    placeholder: "Project Title",
+    type: "text",
+    required: true,
+    containerClasses: "pr-1.5 w-1/2",
+  },
+  {
+    name: "url",
+    placeholder: "Project URL",
+    type: "text",
+    required: true,
+    containerClasses: "pl-1.5 w-1/2",
+  },
+  {
+    name: "category",
+    placeholder: "Category",
+    type: "select",
+    selectOptions: (
+      Object.keys(EmploymentType) as Array<keyof typeof EmploymentType>
+    ).map((key) => ({ value: key, label: EmploymentType[key] })),
+    required: true,
+    containerClasses: "pl-1.5 w-1/2",
+  },
+  {
+    name: "startDate",
+    placeholder: "Start Date",
+    type: "date",
+    required: true,
+    containerClasses: "pr-1.5 w-1/2",
+  },
+  {
+    name: "endDate",
+    placeholder: "End Date",
+    type: "date",
+    containerClasses: "pl-1.5 w-1/2",
+  },
+  {
+    name: "description",
+    placeholder: "Description",
+    type: "textarea",
+    required: true,
+    containerClasses: "w-full",
+  },
+  {
+    name: "skills",
+    placeholder: "Skills",
+    type: "skills",
+    containerClasses: "w-full",
+  },
+];
 
 export const educationFields: FormFieldsType[] = [
   {

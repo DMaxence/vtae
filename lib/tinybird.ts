@@ -23,6 +23,9 @@ export async function recordVisit({
   domain: string;
   key?: string;
 }) {
+  if (process.env.NODE_ENV === "development") {
+    return null;
+  }
   const isBot = detectBot(req);
   if (isBot) {
     return null;

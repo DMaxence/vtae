@@ -1,5 +1,5 @@
 import localFont from "next/font/local";
-import { Inter, Lora, Work_Sans } from "next/font/google";
+import { Inter, Lora, Work_Sans, Montserrat } from "next/font/google";
 
 export const inter = Inter({
   variable: "--font-inter",
@@ -42,9 +42,17 @@ export const work = Work_Sans({
   display: "swap",
 });
 
+export const montserrat = Montserrat({
+  variable: "--font-title",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+});
+
 export const fontMapper = {
   "font-cal": calTitle.variable,
   "font-lora": lora.variable,
   "font-work": work.variable,
   "font-satoshi": satoshi.variable,
+  "font-montserrat": montserrat.variable,
 } as Record<string, string>;

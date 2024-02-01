@@ -1,17 +1,19 @@
-import CreatePostButton from "@/components/create-post-button";
-import Posts from "@/components/posts";
 import { getSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 
 import Section from "@/components/section";
 
-import { SECTIONS_MAP } from "@/constants/builder";
+import {
+  PORTFOLIO_SECTIONS_MAP,
+  RESUME_SECTIONS_MAP,
+} from "@/constants/builder";
 
 import About from "@/components/builder/about";
 import CurrentInfos from "@/components/builder/current-infos";
 import Educations from "@/components/builder/educations";
 import Experiences from "@/components/builder/experiences";
+import Projects from "@/components/builder/projects";
 import Languages from "@/components/builder/languages";
 import Links from "@/components/builder/links";
 import PersonalInfos from "@/components/builder/personal-infos";
@@ -24,30 +26,31 @@ import ExperienceModal from "@/components/builder/Modals/experience-modal";
 import LanguageModal from "@/components/builder/Modals/language-modal";
 import LinkModal from "@/components/builder/Modals/link-modal";
 import PersonalInfosModal from "@/components/builder/Modals/personal-infos-modal";
-import { getClient } from "@umami/api-client";
+import ProjectModal from "@/components/builder/Modals/project-modal";
 
 const FIELD_SET_MAP = {
-  [SECTIONS_MAP.PERSONAL_INFOS.name]: PersonalInfos,
-  [SECTIONS_MAP.ABOUT.name]: About,
-  [SECTIONS_MAP.CURRENT_INFOS.name]: CurrentInfos,
-  [SECTIONS_MAP.SKILLS.name]: Skills,
-  [SECTIONS_MAP.EXPERIENCES.name]: Experiences,
-  // // [SECTIONS_MAP.PROJECTS.name]: Experience,
-  [SECTIONS_MAP.EDUCATION.name]: Educations,
-  [SECTIONS_MAP.LANGUAGES.name]: Languages,
-  [SECTIONS_MAP.LINKS.name]: Links,
+  "Personal Info": PersonalInfos,
+  About: About,
+  "Current Infos": CurrentInfos,
+  Skills: Skills,
+  Experiences: Experiences,
+  Projects: Projects,
+  Educations: Educations,
+  Languages: Languages,
+  Links: Links,
 };
 
 const FIELD_SET_EDIT_MODAL_MAP = {
-  [SECTIONS_MAP.PERSONAL_INFOS.name]: PersonalInfosModal,
-  [SECTIONS_MAP.ABOUT.name]: AboutModal,
-  [SECTIONS_MAP.CURRENT_INFOS.name]: CurrentInfosModal,
+  "Personal Info": PersonalInfosModal,
+  About: AboutModal,
+  "Current Infos": CurrentInfosModal,
 };
 const FIELD_SET_ADD_MODAL_MAP = {
-  [SECTIONS_MAP.EXPERIENCES.name]: ExperienceModal,
-  [SECTIONS_MAP.EDUCATION.name]: EducationModal,
-  [SECTIONS_MAP.LANGUAGES.name]: LanguageModal,
-  [SECTIONS_MAP.LINKS.name]: LinkModal,
+  Experiences: ExperienceModal,
+  Projects: ProjectModal,
+  Educations: EducationModal,
+  Languages: LanguageModal,
+  Links: LinkModal,
 };
 
 export default async function ResumeBuilder({
@@ -70,15 +73,9 @@ export default async function ResumeBuilder({
     notFound();
   }
 
-  // const client = getClient({
-  //   userId: process.env.UMAMI_API_CLIENT_USER_ID,
-  //   // secret: process.env.UMAMI_API_CLIENT_SECRET,
-  //   // apiEndpoint: process.env.UMAMI_API_CLIENT_ENDPOINT,
-  // });
-  // const website = await client.getWebsites();
-  // console.log("client", client, website);
+  const subUrl = `${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`;
 
-  const url = `${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`;
+  const url = data.customDomain ?? subUrl;
 
   return (
     <>
@@ -101,10 +98,20 @@ export default async function ResumeBuilder({
       </div>
       <div className="min-h-screen rounded-lg border border-stone-200 bg-slate-100 pb-10 shadow-md dark:border-stone-700 dark:bg-stone-900">
         <div className="mx-auto flex flex-col gap-3.5 px-5 py-20 sm:px-20">
-          {Object.values(SECTIONS_MAP).map(({ name }, index) => {
-            const Fieldset = FIELD_SET_MAP[name];
-            const EditModal = FIELD_SET_EDIT_MODAL_MAP[name];
-            const AddModal = FIELD_SET_ADD_MODAL_MAP[name];
+          {Object.values(
+            data.type === "RESUME"
+              ? RESUME_SECTIONS_MAP
+              : PORTFOLIO_SECTIONS_MAP,
+          ).map(({ name }, index) => {
+            const Fieldset = FIELD_SET_MAP[name as keyof typeof FIELD_SET_MAP];
+            const EditModal =
+              FIELD_SET_EDIT_MODAL_MAP[
+                name as keyof typeof FIELD_SET_EDIT_MODAL_MAP
+              ];
+            const AddModal =
+              FIELD_SET_ADD_MODAL_MAP[
+                name as keyof typeof FIELD_SET_ADD_MODAL_MAP
+              ];
             return (
               <Section
                 key={name}

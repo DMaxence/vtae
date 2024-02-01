@@ -22,10 +22,8 @@ import AsyncCreatableSelect from "react-select/async-creatable";
 interface SkillAutocompleteProps extends FormFieldsType {
   skills?: Array<Skill>;
   setFieldValue: any;
-  experienceId?: string;
-  experience?: Experience & {
-    skills: Skill[];
-  };
+  exists?: boolean;
+  existingSkills?: Array<Skill>;
 }
 
 const Skill = ({ skill, removeSkill }: { skill: Skill; removeSkill: any }) => {
@@ -49,8 +47,8 @@ const Skill = ({ skill, removeSkill }: { skill: Skill; removeSkill: any }) => {
 const SkillAutocomplete = ({
   skills,
   setFieldValue,
-  experienceId,
-  experience,
+  exists,
+  existingSkills,
   ...props
 }: SkillAutocompleteProps) => {
   const [_, meta] = useField(props);
@@ -86,14 +84,14 @@ const SkillAutocomplete = ({
 
   React.useEffect(() => {
     const newSkillsValues = selectedSkills.map((skill) => skill.id);
-    if (experienceId) {
-      const removeSkills = experience?.skills
+    if (exists) {
+      const removeSkills = existingSkills
         ?.filter((skill) => !newSkillsValues.includes(skill.id))
         ?.map((skill) => skill.id);
       setFieldValue("removeSkills", removeSkills);
     }
     setFieldValue("skills", newSkillsValues);
-  }, [setFieldValue, experienceId, experience, selectedSkills]);
+  }, [setFieldValue, exists, existingSkills, selectedSkills]);
 
   const getSkills = useDebouncedCallback(async (inputValue: string) => {
     const res = await fetch(`/api/builder/skill?q=${inputValue}`);
