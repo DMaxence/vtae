@@ -269,40 +269,6 @@ export const deleteSite = withSiteAuth(async (_: FormData, site: Site) => {
   }
 });
 
-export const getSiteFromPostId = async (postId: string) => {
-  const post = await prisma.post.findUnique({
-    where: {
-      id: postId,
-    },
-    select: {
-      siteId: true,
-    },
-  });
-  return post?.siteId;
-};
-
-export const createPost = withSiteAuth(async (_: FormData, site: Site) => {
-  const session = await getSession();
-  if (!session?.user.id) {
-    return {
-      error: "Not authenticated",
-    };
-  }
-  const response = await prisma.post.create({
-    data: {
-      siteId: site.id,
-      userId: session.user.id,
-    },
-  });
-
-  await revalidateTag(
-    `${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-posts`,
-  );
-  site.customDomain && (await revalidateTag(`${site.customDomain}-posts`));
-
-  return response;
-});
-
 export const editUser = async (
   formData: FormData,
   _id: unknown,

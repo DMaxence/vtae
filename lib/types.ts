@@ -1,4 +1,3 @@
-import type { Post, Site } from "@prisma/client";
 import type { PropsWithChildren } from "react";
 import React from "react";
 
@@ -81,10 +80,6 @@ export type WithOptionalSiteId<T = {}> = T & {
 export type WithClassName<T = {}> = T & {
   className?: string;
 };
-
-export interface WithSitePost extends Post {
-  site: Site | null;
-}
 
 export interface FormFieldsType {
   name: string;
