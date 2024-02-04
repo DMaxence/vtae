@@ -23,7 +23,7 @@ type ThemeProps = {
     projects: (Project & {
       skills: Skill[];
       category: ProjectCategory;
-      media: Media[];
+      medias: Media[];
     })[];
     personalInfos: PersonalInfos;
   };

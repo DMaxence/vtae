@@ -32,13 +32,12 @@ export async function getSiteData(domain: string) {
             include: {
               skills: true,
               category: true,
-              media: true,
+              medias: true,
             },
             orderBy: {
               startDate: "desc",
             },
           },
-          skills: true,
           links: true,
           languages: true,
           theme: true,

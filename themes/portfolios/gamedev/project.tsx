@@ -1,3 +1,5 @@
+import React from "react";
+
 import { cn, getElapsedTime, getTextDate } from "@/lib/utils";
 import { Media, Project, Skill } from "@prisma/client";
 
@@ -7,18 +9,20 @@ import Carousel from "react-multi-carousel";
 type ProjectProps = {
   project: Project & {
     skills: Skill[];
-    media: Media[];
+    medias: Media[];
   };
 };
 
 export default function Project({ project }: ProjectProps) {
-  const hasImage = project.media.length > 0;
+  const _carouselRef = React.useRef<Carousel>(null);
+  const hasImage = project.medias.length > 0;
   return (
-    <div className="flex flex-col gap-5 text-white sm:flex-row">
+    <div className="flex flex-col gap-5 text-white sm:flex-row py-5">
       {/* image */}
       {hasImage && (
-        <div className="w-full sm:w-1/2">
+        <div className="w-full sm:w-1/2 space-y-2">
           <Carousel
+            ref={_carouselRef}
             responsive={{
               all: {
                 breakpoint: { max: 4000, min: 0 },
@@ -29,11 +33,11 @@ export default function Project({ project }: ProjectProps) {
             // infinite
             className="rounded-lg"
           >
-            {project.media.map((media, i) =>
+            {project.medias.map((media, i) =>
               media.type === "IMAGE" ? (
                 <Image
                   key={i}
-                  src={project.media[0].url}
+                  src={media.url}
                   alt={project.title}
                   className="h-[400px] w-full object-cover"
                   width={550}
@@ -48,6 +52,43 @@ export default function Project({ project }: ProjectProps) {
                 />
               ),
             )}
+          </Carousel>
+          <Carousel
+            responsive={{
+              all: {
+                breakpoint: { max: 4000, min: 0 },
+                items: 6,
+              },
+            }}
+            ssr
+          >
+            {project.medias.map((media, i) => (
+              <div
+                key={i}
+                className="relative h-[50px] w-20 overflow-hidden rounded-lg"
+              >
+                {media.type === "IMAGE" ? (
+                  <Image
+                    src={media.url}
+                    alt={project.title}
+                    className="w-full object-cover"
+                    width={69}
+                    height={75}
+                  />
+                ) : (
+                  <iframe
+                    src={media.url}
+                    className="w-full object-cover"
+                    height={75}
+                  />
+                )}
+                <button
+                  type="button"
+                  onClick={() => _carouselRef.current?.goToSlide(i)}
+                  className="absolute inset-0"
+                />
+              </div>
+            ))}
           </Carousel>
         </div>
       )}

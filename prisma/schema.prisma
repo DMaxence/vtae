@@ -230,7 +230,7 @@ model Project {
   updatedAt   DateTime         @updatedAt
   site        Site?            @relation(fields: [siteId], references: [id], onDelete: Cascade)
   siteId      String?
-  media       Media[]
+  medias       Media[]
   category    ProjectCategory? @relation(fields: [categoryId], references: [id])
   categoryId  String?
 

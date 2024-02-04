@@ -21,7 +21,7 @@ export async function GET(_req: Request) {
 
 export async function POST(req: Request): Promise<Response> {
   const body = await req.json();
-  console.log(body);
+
   try {
     const result = await takeWebsiteScreenshot(body);
     const blurhash = await getBlurDataURL(result.url);

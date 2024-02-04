@@ -1,11 +1,17 @@
 "use client";
 import React from "react";
 
-import type { Project as ProjectType, Skill, Theme } from "@prisma/client";
+import type {
+  Media,
+  Project as ProjectType,
+  Skill,
+  Theme,
+} from "@prisma/client";
 
 import { EmploymentType, WithOptionalSiteId } from "@/lib/types";
 import { cn, getElapsedTime, getTextDate } from "@/lib/utils";
 import { CalendarDays, PenSquare } from "lucide-react";
+import "react-multi-carousel/lib/styles.css";
 import ProjectModal from "../builder/Modals/project-modal";
 
 const Skill = ({ skill, theme }: { skill: Skill; theme?: Theme }) => {
@@ -30,6 +36,7 @@ const Skill = ({ skill, theme }: { skill: Skill; theme?: Theme }) => {
 interface ProjectProps extends WithOptionalSiteId {
   project: ProjectType & {
     skills: Skill[];
+    medias: Media[];
   };
   theme?: Theme;
   readOnly?: boolean;
@@ -48,6 +55,7 @@ const Project = ({ project, readOnly, theme, siteId }: ProjectProps) => {
           >
             {EmploymentType[project.type as keyof typeof EmploymentType]}
           </div>
+          <div className="text-xl font-semibold">{project.title}</div>
           <div
             className="flex items-center gap-1.5 text-sm font-light text-gray-500 dark:text-gray-400"
             // style={{ color: theme?.accentColor }}
@@ -74,6 +82,25 @@ const Project = ({ project, readOnly, theme, siteId }: ProjectProps) => {
         </div>
       )}
       <div className="whitespace-pre-line">{project.description}</div>
+      <div className="flex w-full gap-3.5 overflow-x-scroll">
+        {project.medias?.map((media) =>
+          media.type === "IMAGE" ? (
+            <img
+              key={media.id}
+              src={media.url}
+              className="h-32 w-44 rounded-lg object-cover"
+              alt=""
+              draggable
+            />
+          ) : (
+            <iframe
+              key={media.id}
+              src={media.url}
+              className="h-32 w-44 rounded-lg object-cover"
+            />
+          ),
+        )}
+      </div>
       {!readOnly && siteId && (
         <ProjectModal
           siteId={siteId}

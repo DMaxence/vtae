@@ -13,9 +13,11 @@ type SkillsProps = {
 
 export default function Skills({ site }: SkillsProps) {
   const skills = site.projects.reduce((acc, project) => {
-    acc = acc.concat(
-      project.skills.filter(() => !acc.find((skill) => skill.id === skill.id)),
-    );
+    project.skills.forEach((skill) => {
+      if (!acc.find((s) => s.id === skill.id)) {
+        acc.push(skill);
+      }
+    });
     return acc;
   }, [] as Skill[]);
 

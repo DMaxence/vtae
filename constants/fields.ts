@@ -117,7 +117,7 @@ export const experienceFields: FormFieldsType[] = [
 ];
 export const projectFields: FormFieldsType[] = [
   {
-    name: "Title",
+    name: "title",
     placeholder: "Project Title",
     type: "text",
     required: true,
@@ -129,6 +129,16 @@ export const projectFields: FormFieldsType[] = [
     type: "text",
     required: true,
     containerClasses: "pl-1.5 w-1/2",
+  },
+  {
+    name: "type",
+    placeholder: "Type",
+    type: "select",
+    selectOptions: (
+      Object.keys(EmploymentType) as Array<keyof typeof EmploymentType>
+    ).map((key) => ({ value: key, label: EmploymentType[key] })),
+    required: true,
+    containerClasses: "pr-1.5 w-1/2",
   },
   {
     name: "category",
@@ -164,6 +174,12 @@ export const projectFields: FormFieldsType[] = [
     name: "skills",
     placeholder: "Skills",
     type: "skills",
+    containerClasses: "w-full",
+  },
+  {
+    name: "medias",
+    placeholder: "Medias",
+    type: "medias",
     containerClasses: "w-full",
   },
 ];

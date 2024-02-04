@@ -34,7 +34,7 @@ export default function Section({
     <section
       className={cn(
         "flex flex-col gap-3.5 bg-white p-5 dark:bg-black dark:first:rounded-t-lg dark:last:rounded-b-lg print:px-0 print:py-3.5",
-        site ? "rounded-lg shadow-md" : "",
+        site ? "rounded-lg shadow-md border sm:border-0 dark:border-stone-700" : "",
         { "print:hidden": hidePrint },
       )}
       // style={{ backgroundColor: theme?.bgColor }}

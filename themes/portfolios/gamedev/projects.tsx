@@ -16,14 +16,14 @@ type Projects = {
     projects: (ProjectType & {
       skills: Skill[];
       category: ProjectCategory;
-      media: Media[];
+      medias: Media[];
     })[];
   };
 };
 
 export default function Projects({ site }: Projects) {
   const categories = site.projects.reduce((acc, project) => {
-    if (acc.includes(project.category)) {
+    if (acc.find((c) => c.id === project.category.id)) {
       return acc;
     }
     return [...acc, project.category];
@@ -61,15 +61,15 @@ export default function Projects({ site }: Projects) {
         </div>
 
         <Tab.Panels className="mt-2">
-          {categories.map((category) =>
-            site.projects
-              .filter((project) => project.category.slug === category.slug)
-              .map((project, idx) => (
-                <Tab.Panel key={idx}>
-                  <Project project={project} />
-                </Tab.Panel>
-              )),
-          )}
+          {categories.map((category) => (
+            <Tab.Panel key={category.slug}>
+              {site.projects
+                .filter((project) => project.category.slug === category.slug)
+                .map((project, idx) => (
+                  <Project key={idx} project={project} />
+                ))}
+            </Tab.Panel>
+          ))}
         </Tab.Panels>
       </Tab.Group>
     </MaxWidthWrapper>

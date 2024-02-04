@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { siteId: string } },
 ) {
   const educationId = _req.nextUrl.searchParams.get("educationId") || undefined;
-  const personalInfos = await getEducation(params.siteId, educationId);
+  const education = await getEducation(params.siteId, educationId);
 
-  return Response.json(personalInfos);
+  return Response.json(education);
 }

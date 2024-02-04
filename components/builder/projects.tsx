@@ -23,6 +23,7 @@ export default async function Projects({ siteId }: ProjectsProps) {
     },
     include: {
       skills: true,
+      medias: true,
     },
   });
 

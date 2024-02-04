@@ -22,6 +22,7 @@ module.exports = {
       { hostname: "faisalman.github.io" },
       { hostname: "vtae.xyz" },
       { hostname: "unsplash.com" },
+      { hostname: "www.youtube.com" },
     ],
   },
   // webpack(config) {

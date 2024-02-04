@@ -13,6 +13,9 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@logsnag/next": "^1.0.2",
@@ -67,6 +70,7 @@
     "puppeteer": "^21.6.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-multi-carousel": "^2.8.4",
     "react-scroll": "^1.9.0",
     "react-select": "^5.8.0",
     "react-textarea-autosize": "^8.5.3",

@@ -12,7 +12,7 @@ import useSWR, { mutate } from "swr";
 import { fetcher, takeWebsiteScreenshot } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 
-import type { Project, Skill } from "@prisma/client";
+import type { Media, Project, Skill } from "@prisma/client";
 
 import { projectFields } from "@/constants/fields";
 
@@ -20,6 +20,7 @@ import TextArea from "@/components/textarea";
 
 import DatePicker from "@/components/date-picker";
 import DeleteButton from "@/components/delete-button";
+import AddMedia from "@/components/form/add-media";
 import Modal from "@/components/modal";
 import Select from "@/components/select";
 import SkillAutocomplete from "@/components/skill-autocomplete";
@@ -50,6 +51,7 @@ const ProjectModal = ({
   const { data: project } = useSWR<
     Project & {
       skills: Skill[];
+      medias: Media[];
     }
   >(
     status === "authenticated" &&
@@ -69,16 +71,27 @@ const ProjectModal = ({
   });
 
   const onSubmit = async (
-    values: Project,
+    values: Project & { medias: Media[] },
     actions: FormikHelpers<FormikValues>,
   ) => {
     startUpdateTransition(async () => {
+      const { medias, ...rest } = values;
       const res = await (projectId
-        ? updateProject({ ...values, id: projectId }, siteId)
-        : createProject(values, siteId));
+        ? updateProject({ ...rest, id: projectId }, siteId)
+        : createProject(rest, siteId));
       if (res.error) {
         toast.error(res.error);
       } else {
+        const uploadRes = await fetch(
+          `/api/builder/${siteId}/project/${res.id}/images`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(medias),
+          },
+        );
         mutate(`/api/builder/${siteId}/project`);
         mutate("/api/skill");
         setShowModal(false);
@@ -114,7 +127,7 @@ const ProjectModal = ({
         return acc;
       }, {})}
       onSubmit={(values, actions) => {
-        onSubmit(values as Project, actions);
+        onSubmit(values as Project & { medias: Media[] }, actions);
         actions.setSubmitting(false);
       }}
       validationSchema={validationSchema}
@@ -156,6 +169,16 @@ const ProjectModal = ({
                         setFieldValue={setFieldValue}
                         exists={!!projectId}
                         existingSkills={project?.skills}
+                        {...field}
+                      />
+                    );
+                  if (field.type === "medias")
+                    return (
+                      <AddMedia
+                        key={field.name}
+                        setFieldValue={setFieldValue}
+                        exists={!!projectId}
+                        existingMedias={project?.medias}
                         {...field}
                       />
                     );

@@ -8,7 +8,7 @@ export async function GET(
 ) {
   const experienceId =
     _req.nextUrl.searchParams.get("experienceId") || undefined;
-  const personalInfos = await getExperience(params.siteId, experienceId);
+  const experience = await getExperience(params.siteId, experienceId);
 
-  return Response.json(personalInfos);
+  return Response.json(experience);
 }

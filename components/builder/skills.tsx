@@ -14,14 +14,22 @@ export default async function Skills({ siteId }: SkillsProps) {
   }
   const skills = await prisma.skill.findMany({
     where: {
-      experiences: {
-        some: {
-          siteId,
-          // user: {
-          //   id: session.user.id as string,
-          // },
+      OR: [
+        {
+          experiences: {
+            some: {
+              siteId,
+            },
+          },
         },
-      },
+        {
+          projects: {
+            some: {
+              siteId,
+            },
+          },
+        },
+      ],
     },
     orderBy: {
       name: "asc",

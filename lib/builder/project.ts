@@ -24,6 +24,7 @@ export const getProject = async (siteId: string, projectId?: string) => {
       },
       include: {
         skills: true,
+        medias: true,
       },
     });
 
@@ -39,6 +40,7 @@ export const getProject = async (siteId: string, projectId?: string) => {
     },
     include: {
       skills: true,
+      medias: true,
     },
   });
 
@@ -102,7 +104,7 @@ export const createProject = withSiteAuth(
         },
         include: {
           site: {
-            select: { subdomain: true, customDomain: true },
+            select: { id: true, subdomain: true, customDomain: true },
           },
         },
       });
@@ -184,10 +186,12 @@ export const updateProject = withSiteAuth(
       endDate,
       skills,
       removeSkills,
+      removeMedias,
       description,
     }: Project & {
       skills: string[];
       removeSkills: string[];
+      removeMedias: string[];
     },
     site: Site,
   ) => {
@@ -212,10 +216,15 @@ export const updateProject = withSiteAuth(
               id: skillId,
             })),
           },
+          medias: {
+            disconnect: removeMedias.map((mediaId: string) => ({
+              id: mediaId,
+            })),
+          },
         },
         include: {
           site: {
-            select: { subdomain: true, customDomain: true },
+            select: { id: true, subdomain: true, customDomain: true },
           },
         },
       });

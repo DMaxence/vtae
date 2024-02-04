@@ -25,6 +25,7 @@ export default function TextArea({
           rows={6}
           {...field}
           {...props}
+          maxLength={props?.maxLength || 1000}
           required={false}
         />
         <span className="absolute bottom-0 right-0 mb-2 mr-1 text-xs text-gray-600 dark:text-gray-300">

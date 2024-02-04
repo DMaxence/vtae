@@ -96,8 +96,8 @@ export default async function ResumeBuilder({
           {url} ↗
         </a>
       </div>
-      <div className="min-h-screen rounded-lg border border-stone-200 bg-slate-100 pb-10 shadow-md dark:border-stone-700 dark:bg-stone-900">
-        <div className="mx-auto flex flex-col gap-3.5 px-5 py-20 sm:px-20">
+      <div className="min-h-screen rounded-lg border-stone-200 dark:border-stone-700 sm:border sm:bg-slate-100 sm:pb-10 sm:shadow-md dark:sm:bg-stone-900">
+        <div className="mx-auto flex flex-col gap-3.5 sm:px-5 sm:py-20">
           {Object.values(
             data.type === "RESUME"
               ? RESUME_SECTIONS_MAP
