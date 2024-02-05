@@ -1,7 +1,7 @@
 "use server";
 import prisma from "@/lib/prisma";
 
-import { Project, Site } from "@prisma/client";
+import { Project, ProjectCategory, Site } from "@prisma/client";
 import { withSiteAuth } from "../auth";
 import { revalidateSite } from "../utils";
 
@@ -25,6 +25,7 @@ export const getProject = async (siteId: string, projectId?: string) => {
       include: {
         skills: true,
         medias: true,
+        category: true,
       },
     });
 
@@ -41,6 +42,7 @@ export const getProject = async (siteId: string, projectId?: string) => {
     include: {
       skills: true,
       medias: true,
+      category: true,
     },
   });
 
@@ -73,19 +75,10 @@ export const createProject = withSiteAuth(
       endDate,
       skills,
       description,
-    }: Project & { skills: string[] },
+      category,
+    }: Project & { skills: string[]; category: ProjectCategory },
     site: Site,
   ) => {
-    console.log("createProject", {
-      type,
-      url,
-      title,
-      startDate,
-      endDate,
-      skills,
-      description,
-      site,
-    });
     try {
       const response = await prisma.project.create({
         data: {
@@ -100,7 +93,22 @@ export const createProject = withSiteAuth(
               id: skillId,
             })),
           },
-          siteId: site.id,
+          site: {
+            connect: {
+              id: site.id,
+            },
+          },
+          category: {
+            connectOrCreate: {
+              where: {
+                slug: category.slug,
+              },
+              create: {
+                name: category.name,
+                slug: category.slug,
+              },
+            },
+          },
         },
         include: {
           site: {

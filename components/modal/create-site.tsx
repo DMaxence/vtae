@@ -45,7 +45,7 @@ export default function CreateSiteModal() {
             router.push(`/site/${id}`);
             modal?.hide();
             toast.success(`Successfully created hosted ${res.type}!`);
-            takeWebsiteScreenshot(res);
+            // takeWebsiteScreenshot(res);
           }
         })
       }

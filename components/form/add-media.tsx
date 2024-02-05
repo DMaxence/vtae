@@ -42,7 +42,6 @@ export default function AddMedia({
     setVideoUrl("");
     setShowVideoInput(false);
   };
-  console.log("medias", medias);
 
   React.useEffect(() => {
     if (exists) {

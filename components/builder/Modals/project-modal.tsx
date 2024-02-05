@@ -9,7 +9,7 @@ import SubmitButton from "@/components/submit-button";
 import TextInput from "@/components/text-input";
 import useSWR, { mutate } from "swr";
 
-import { fetcher, takeWebsiteScreenshot } from "@/lib/utils";
+import { fetcher } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 
 import type { Media, Project, Skill } from "@prisma/client";
@@ -22,6 +22,7 @@ import DatePicker from "@/components/date-picker";
 import DeleteButton from "@/components/delete-button";
 import AddMedia from "@/components/form/add-media";
 import Modal from "@/components/modal";
+import ProjectCategories from "@/components/project-categories";
 import Select from "@/components/select";
 import SkillAutocomplete from "@/components/skill-autocomplete";
 import {
@@ -68,6 +69,7 @@ const ProjectModal = ({
     endDate: yup.date(),
     skills: yup.array().of(yup.string()).min(1, "Required"),
     description: yup.string().required("Required"),
+    category: yup.object().required("Required"),
   });
 
   const onSubmit = async (
@@ -82,22 +84,22 @@ const ProjectModal = ({
       if (res.error) {
         toast.error(res.error);
       } else {
-        const uploadRes = await fetch(
-          `/api/builder/${siteId}/project/${res.id}/images`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(medias),
-          },
-        );
+        const uploadRes =
+          medias.length > 0
+            ? await fetch(`/api/builder/${siteId}/project/${res.id}/images`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(medias),
+              })
+            : { json: () => {} };
         mutate(`/api/builder/${siteId}/project`);
         mutate("/api/skill");
         setShowModal(false);
         actions.resetForm();
         toast.success(`Project ${projectId ? "updated" : "created"}`);
-        takeWebsiteScreenshot(res.site);
+        // takeWebsiteScreenshot(res.site);
       }
     });
   };
@@ -145,7 +147,7 @@ const ProjectModal = ({
             setShowModal={setShowModal}
             onClose={resetForm}
           >
-            <Form className="inline-block w-full max-w-3xl rounded-lg border border-stone-200 bg-white pt-8 text-center align-middle shadow-xl transition-all dark:border-stone-700 dark:bg-stone-900">
+            <Form className="inline-block w-full max-w-3xl rounded-lg border border-stone-200 bg-white pt-8 shadow-xl transition-all dark:border-stone-700 dark:bg-stone-900">
               <ModalTitle title="Edit your project" />
               <div className="flex flex-wrap justify-between gap-y-5 px-8">
                 {projectFields.map(({ ...field }) => {
@@ -169,6 +171,16 @@ const ProjectModal = ({
                         setFieldValue={setFieldValue}
                         exists={!!projectId}
                         existingSkills={project?.skills}
+                        {...field}
+                      />
+                    );
+                  if (field.type === "projectCategories")
+                    return (
+                      <ProjectCategories
+                        key={field.name}
+                        setFieldValue={setFieldValue}
+                        siteId={siteId}
+                        projectId={project?.id}
                         {...field}
                       />
                     );

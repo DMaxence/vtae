@@ -1,30 +1,26 @@
 "use client";
 
-import Link from "next/link";
 import {
+  AppWindow,
   ArrowLeft,
   BarChart3,
   Edit3,
-  Globe,
-  Layout,
-  LayoutDashboard,
-  Megaphone,
-  Menu,
-  Newspaper,
-  Settings,
-  FileCode,
-  Github,
   FlaskConical,
+  Globe,
+  LayoutDashboard,
+  Menu,
+  Settings,
 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import {
   useParams,
   usePathname,
   useSelectedLayoutSegments,
 } from "next/navigation";
 import { ReactNode, useEffect, useMemo, useState } from "react";
-import Image from "next/image";
-import { ThemeSwitcher } from "./theme-switcher";
 import { LangSwitcher } from "./lang-switcher";
+import { ThemeSwitcher } from "./theme-switcher";
 
 const externalLinks: Array<{
   name: string;
@@ -93,6 +89,12 @@ export default function Nav({ children }: { children: ReactNode }) {
           href: `/site/${id}/analytics`,
           isActive: segments.includes("analytics"),
           icon: <BarChart3 width={18} />,
+        },
+        {
+          name: "Appearance",
+          href: `/site/${id}/appearance`,
+          isActive: segments.includes("appearance"),
+          icon: <AppWindow width={18} />,
         },
         {
           name: "Settings",

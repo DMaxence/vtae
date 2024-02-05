@@ -11,6 +11,8 @@ import DomainConfiguration from "./domain-configuration";
 import Uploader from "./uploader";
 import va from "@vercel/analytics";
 import { Site } from "@prisma/client";
+import { RadioGroup } from "@headlessui/react";
+import Image from "next/image";
 
 export default function Form({
   title,
@@ -31,7 +33,7 @@ export default function Form({
     maxLength?: number;
     pattern?: string;
     button?: boolean;
-    options?: { value: string; label: string }[];
+    options?: { value: string; label: string; image?: string }[];
   };
   handleSubmit: any;
   site?: Site;
@@ -69,7 +71,7 @@ export default function Form({
               await update();
               router.refresh();
             }
-            takeWebsiteScreenshot(res);
+            // takeWebsiteScreenshot(res);
             toast.success(`Successfully updated ${inputAttrs.name}!`);
           }
         });
@@ -83,7 +85,7 @@ export default function Form({
             {description}
           </p>
         )}
-        {inputAttrs.button && (
+        {/* {inputAttrs.button && (
           <div>
             <button
               type="button"
@@ -93,7 +95,7 @@ export default function Form({
               <p>Retake screenshot</p>
             </button>
           </div>
-        )}
+        )} */}
         {inputAttrs.name === "image" ||
         inputAttrs.name === "logo" ||
         inputAttrs.name === "avatar" ? (
@@ -103,19 +105,41 @@ export default function Form({
             type={inputAttrs.type as "avatar" | "file"}
           />
         ) : inputAttrs.name === "themeId" ? (
-          <div className="flex max-w-sm items-center overflow-hidden rounded-lg border border-stone-600">
-            <select
-              name="themeId"
-              defaultValue={inputAttrs.defaultValue}
-              className="w-full rounded-none border-none bg-white px-4 py-2 text-sm font-medium text-stone-700 focus:outline-none focus:ring-black dark:bg-black dark:text-stone-200 dark:focus:ring-white"
-            >
-              {inputAttrs.options?.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <RadioGroup
+            name="themeId"
+            defaultValue={inputAttrs.defaultValue}
+            className="flex flex-row gap-3.5"
+          >
+            {inputAttrs.options?.map((option) => (
+              <RadioGroup.Option key={option.value} value={option.value}>
+                {({ checked }) => (
+                  <div className="flex flex-col rounded-lg border border-stone-600 p-3.5 gap-2">
+                    <div className="font-bold">
+                      {option.label}
+                    </div>
+                    <Image
+                      src={option.image!}
+                      alt={option.label}
+                      className="w-[200px] h-[300px] rounded-lg object-cover object-top"
+                      width={300}
+                      height={300}
+                    />
+                    <button
+                      type="button"
+                      className={cn(
+                        "flex items-center justify-center space-x-2 rounded-md border text-sm transition-all focus:outline-none sm:h-10",
+                        checked
+                          ? "border-stone-200 bg-stone-100 text-stone-400 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300"
+                          : "border-black bg-black text-white hover:bg-white hover:text-black dark:border-stone-700 dark:hover:border-stone-200 dark:hover:bg-black dark:hover:text-white dark:active:bg-stone-800",
+                      )}
+                    >
+                      {checked ? <p>Selected</p> : <p>Select</p>}
+                    </button>
+                  </div>
+                )}
+              </RadioGroup.Option>
+            ))}
+          </RadioGroup>
         ) : inputAttrs.name === "font" ? (
           <div className="flex max-w-sm items-center overflow-hidden rounded-lg border border-stone-600">
             <select
@@ -127,6 +151,7 @@ export default function Form({
               <option value="font-lora">Lora</option>
               <option value="font-work">Work Sans</option>
               <option value="font-satoshi">Satoshi</option>
+              <option value="font-montserrat">Montserrat</option>
             </select>
           </div>
         ) : inputAttrs.name === "subdomain" ? (

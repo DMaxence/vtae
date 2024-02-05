@@ -143,11 +143,7 @@ export const projectFields: FormFieldsType[] = [
   {
     name: "category",
     placeholder: "Category",
-    type: "select",
-    selectOptions: (
-      Object.keys(EmploymentType) as Array<keyof typeof EmploymentType>
-    ).map((key) => ({ value: key, label: EmploymentType[key] })),
-    required: true,
+    type: "projectCategories",
     containerClasses: "pl-1.5 w-1/2",
   },
   {
