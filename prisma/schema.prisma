@@ -94,6 +94,7 @@ model Site {
   educations    Education[]
   links         Link[]
   languages     Language[]
+  iconsList     Media[]
   theme         Theme?         @relation(fields: [themeId], references: [id])
   type          SiteType?
   themeId       String?
@@ -244,11 +245,13 @@ model Media {
   url       String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId String?
-
-  project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  site      Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId    String?
 
   @@index([projectId], name: "media_project_constraint")
+  @@index([siteId], name: "media_site_constraint")
 }
 
 model ProjectCategory {

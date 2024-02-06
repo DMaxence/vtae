@@ -13,7 +13,6 @@ export const POST = withAuth(async ({ req, params }) => {
   const { projectId } = params;
   
   const images = body.filter((m) => m.type === "IMAGE" && m.image);
-  console.log("images", images);
   const uploadResponse = await Promise.all(
     images.map((media) =>
       handleCloudinaryUpload({

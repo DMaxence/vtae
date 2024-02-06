@@ -3,6 +3,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
 import { takeWebsiteScreenshot } from "@/lib/actions";
+import { withAuth } from "@/lib/auth";
 import { handleGetCloudinaryUploads } from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 import { getBlurDataURL } from "@/lib/utils";
@@ -19,7 +20,7 @@ export async function GET(_req: Request) {
   }
 }
 
-export async function POST(req: Request): Promise<Response> {
+export const POST = withAuth(async ({ req, params }) => {
   const body = await req.json();
 
   try {
@@ -43,7 +44,7 @@ export async function POST(req: Request): Promise<Response> {
     console.error(error);
     return NextResponse.json({ message: "Error", error }, { status: 400 });
   }
-}
+});
 
 const handleGetRequest = async () => {
   const uploads = await handleGetCloudinaryUploads();

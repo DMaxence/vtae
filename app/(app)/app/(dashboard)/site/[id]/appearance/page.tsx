@@ -4,6 +4,7 @@ import { updateSite } from "@/lib/actions";
 import { Site } from "@prisma/client";
 import { notFound, redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
+import AddIcons from "@/components/form/add-icons";
 
 export default async function SiteSettingsAppearance({
   params,
@@ -18,6 +19,9 @@ export default async function SiteSettingsAppearance({
     where: {
       id: decodeURIComponent(params.id),
     },
+    include: {
+      iconsList: true,
+    },
   });
   if (!data || data.userId !== session.user.id) {
     notFound();
@@ -28,7 +32,6 @@ export default async function SiteSettingsAppearance({
       type: data?.type,
     },
   });
-  console.log("page", data?.themeId, data?.type, themes);
 
   const url = `${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`;
 
@@ -92,6 +95,7 @@ export default async function SiteSettingsAppearance({
           }}
           handleSubmit={updateSite}
         />
+        <AddIcons site={data} />
         {/* <Form
           title="Font"
           description="The font for the heading text your site."
