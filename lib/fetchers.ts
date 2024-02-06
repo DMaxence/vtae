@@ -41,6 +41,7 @@ export async function getSiteData(domain: string) {
           links: true,
           languages: true,
           theme: true,
+          iconsList: true,
         },
       });
     },

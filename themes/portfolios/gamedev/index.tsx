@@ -26,6 +26,7 @@ type ThemeProps = {
       medias: Media[];
     })[];
     personalInfos: PersonalInfos;
+    iconsList: Media[];
   };
 };
 

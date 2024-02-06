@@ -29,13 +29,9 @@ export default function AddIcons({ site }: AddIconsProps) {
   );
   const [mediasToRemove, setMediasToRemove] = React.useState<string[]>([]);
 
-  React.useEffect(() => {
-    const removeMedias = medias
-      ?.filter((media) => !medias?.find((m) => m.id === media.id))
-      ?.map((media) => media.id);
-    setMediasToRemove(removeMedias);
-  }, [setMediasToRemove, medias]);
-
+  const removeMedia = (id: string) => {
+    setMediasToRemove([...mediasToRemove, id]);
+  };
   return (
     <form
       action={async (data: FormData) => {
@@ -118,6 +114,7 @@ export default function AddIcons({ site }: AddIconsProps) {
                 type="button"
                 onClick={() => {
                   setMedias(medias.filter((m) => m.id !== media.id));
+                  removeMedia(media.id);
                 }}
                 className="absolute right-1.5 top-1.5 text-sm text-red-500 shadow transition-all hover:text-red-600"
               >
