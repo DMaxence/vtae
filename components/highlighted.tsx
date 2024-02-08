@@ -12,6 +12,7 @@ export default function Highlighted({
   }
   const regex = new RegExp(
     `(${highlight
+      .replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")
       .replaceAll("(", "\\(")
       .replaceAll(")", "\\)")
       .replace(/e/gi, "[eèéêë]")

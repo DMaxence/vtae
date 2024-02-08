@@ -52,7 +52,7 @@ export default async function SiteSettingsAppearance({
             options: themes.map((theme) => ({
               value: theme.id,
               label: theme.name,
-              image: theme.thumbnail!,
+              image: theme?.thumbnail!,
             })),
           }}
           handleSubmit={updateSite}
