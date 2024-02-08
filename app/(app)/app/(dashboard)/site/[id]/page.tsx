@@ -27,6 +27,7 @@ import LanguageModal from "@/components/builder/Modals/language-modal";
 import LinkModal from "@/components/builder/Modals/link-modal";
 import PersonalInfosModal from "@/components/builder/Modals/personal-infos-modal";
 import ProjectModal from "@/components/builder/Modals/project-modal";
+import DashboardContentTitle from "@/components/dashboard-content-title";
 
 const FIELD_SET_MAP = {
   "Personal Info": PersonalInfos,
@@ -73,29 +74,9 @@ export default async function ResumeBuilder({
     notFound();
   }
 
-  const subUrl = `${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`;
-
-  const url = data.customDomain ?? subUrl;
-
   return (
     <>
-      <div className="flex flex-col items-center space-y-2 sm:flex-row sm:space-x-4 sm:space-y-0">
-        <h1 className="w-60 truncate font-cal text-xl font-bold dark:text-white sm:w-auto sm:text-3xl">
-          Content for {data.name}
-        </h1>
-        <a
-          href={
-            process.env.NEXT_PUBLIC_VERCEL_ENV
-              ? `https://${url}`
-              : `http://${data.subdomain}.localhost:3000`
-          }
-          target="_blank"
-          rel="noreferrer"
-          className="truncate rounded-md bg-stone-100 px-2 py-1 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
-        >
-          {url} ↗
-        </a>
-      </div>
+      <DashboardContentTitle site={data} title={`Content for ${data.name}`} />
       <div className="min-h-screen rounded-lg border-stone-200 dark:border-stone-700 sm:border sm:bg-slate-100 sm:pb-10 sm:shadow-md dark:sm:bg-stone-900">
         <div className="mx-auto flex flex-col gap-3.5 sm:px-5 sm:py-20">
           {Object.values(

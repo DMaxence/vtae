@@ -85,7 +85,7 @@ export default function AddMedia({
                 and drop
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                SVG, PNG, JPG or GIF (MAX. 10MB)
+                SVG, PNG, JPG or GIF (MAX. 1MB)
               </p>
             </div>
 
@@ -97,8 +97,8 @@ export default function AddMedia({
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  if (file.size / 1024 / 1024 > 10) {
-                    toast.error("File size too big (max 10MB)");
+                  if (file.size / 1024 / 1024 > 1) {
+                    toast.error("File size too big (max 1MB)");
                   } else {
                     const reader = new FileReader();
                     reader.onload = (e) => {

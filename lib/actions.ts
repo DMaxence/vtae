@@ -13,7 +13,7 @@ import {
   // removeDomainFromVercelTeam,
   validDomainRegex,
 } from "@/lib/domains";
-import { getBlurDataURL } from "@/lib/utils";
+import { getBlurDataURL, revalidateSite } from "@/lib/utils";
 import { put } from "@vercel/blob";
 import { promises as fs } from "fs";
 import { customAlphabet } from "nanoid";
@@ -61,6 +61,9 @@ export const createSite = async (formData: FormData) => {
           connect: {
             slug: type === "RESUME" ? "light" : "gamedev",
           },
+        },
+        themeConfig: {
+          create: {},
         },
         user: {
           connect: {
@@ -219,7 +222,7 @@ export const updateSite = withSiteAuth(
             id: site.id,
           },
           data: {
-            [key]: value,
+            [key]: key === "published" ? value === "true" : value,
           },
         });
       }
@@ -376,4 +379,70 @@ export const takeWebsiteScreenshot = async (options: { url: string }) => {
   await fs.unlink(path);
 
   return uploadResponse;
+};
+
+export const updateThemeConfig = withSiteAuth(
+  async (formData: FormData, site: Site, key: string) => {
+    const value = formData.get(key) as string;
+
+    try {
+      const response = await prisma.themeConfig.update({
+        where: {
+          siteId: site.id,
+        },
+
+        data: {
+          [key]: value.length > 0 ? value : null,
+        },
+      });
+      console.log(
+        "Updated theme config! Revalidating tags: ",
+        `${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
+        `${site.customDomain}-metadata`,
+      );
+      await revalidateSite(site);
+      return response;
+    } catch (error: any) {
+      console.log("Error updating theme config:", error);
+      return {
+        error: error.message,
+      };
+    }
+  },
+);
+
+export const addHeroImage = async (
+  formData: FormData,
+  id: string,
+  name: string,
+) => {
+  const file = formData.get(name) as File;
+
+  if (file.size > 0) {
+    try {
+      const filename = `${nanoid()}.${file.type.split("/")[1]}`;
+      const base64 = await file.arrayBuffer();
+      const base64String = Buffer.from(base64).toString("base64");
+
+      const res = await handleCloudinaryUpload({
+        path: `data:image/png;base64,${base64String}`,
+        name: filename,
+        folder: "themes/custom-images",
+      });
+
+      if (res) {
+        const data = new FormData();
+        data.append(name, res.secure_url);
+        return updateThemeConfig(data, id, name);
+      }
+    } catch (error: any) {
+      return {
+        error: error.message,
+      };
+    }
+  } else {
+    const data = new FormData();
+    data.append(name, "");
+    return updateThemeConfig(data, id, name);
+  }
 };

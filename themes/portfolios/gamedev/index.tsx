@@ -5,6 +5,7 @@ import {
   ProjectCategory,
   Site,
   Skill,
+  ThemeConfig,
   User,
 } from "@prisma/client";
 import { Header } from "./header";
@@ -27,6 +28,7 @@ type ThemeProps = {
     })[];
     personalInfos: PersonalInfos;
     iconsList: Media[];
+    themeConfig: ThemeConfig
   };
 };
 

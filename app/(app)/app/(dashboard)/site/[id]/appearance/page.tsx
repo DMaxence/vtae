@@ -1,10 +1,10 @@
-import prisma from "@/lib/prisma";
+import DashboardContentTitle from "@/components/dashboard-content-title";
 import Form from "@/components/form";
-import { updateSite } from "@/lib/actions";
-import { Site } from "@prisma/client";
-import { notFound, redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
 import AddIcons from "@/components/form/add-icons";
+import { addHeroImage, updateSite, updateThemeConfig } from "@/lib/actions";
+import { getSession } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { notFound, redirect } from "next/navigation";
 
 export default async function SiteSettingsAppearance({
   params,
@@ -21,6 +21,7 @@ export default async function SiteSettingsAppearance({
     },
     include: {
       iconsList: true,
+      themeConfig: true,
     },
   });
   if (!data || data.userId !== session.user.id) {
@@ -33,27 +34,12 @@ export default async function SiteSettingsAppearance({
     },
   });
 
-  const url = `${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`;
-
   return (
     <>
-      <div className="flex flex-col items-center space-x-4 space-y-2 sm:flex-row sm:space-y-0">
-        <h1 className="font-cal text-xl font-bold dark:text-white sm:text-3xl">
-          Appearance for {data.name}
-        </h1>
-        <a
-          href={
-            process.env.NEXT_PUBLIC_VERCEL_ENV
-              ? `https://${url}`
-              : `http://${data.subdomain}.localhost:3000`
-          }
-          target="_blank"
-          rel="noreferrer"
-          className="truncate rounded-md bg-stone-100 px-2 py-1 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
-        >
-          {url} ↗
-        </a>
-      </div>
+      <DashboardContentTitle
+        site={data}
+        title={`Appearance for ${data.name}`}
+      />
       <div className="flex flex-col space-y-6">
         <Form
           title="Theme"
@@ -71,10 +57,26 @@ export default async function SiteSettingsAppearance({
           }}
           handleSubmit={updateSite}
         />
+        <Form
+          title="Theme Customization"
+          description="Customize the theme for your site."
+          helpText="Make your site unique."
+          inputAttrs={{
+            name: "bgColor",
+            type: "select",
+            defaultValue: data?.themeId!,
+            options: themes.map((theme) => ({
+              value: theme.id,
+              label: theme.name,
+              image: theme.thumbnail!,
+            })),
+          }}
+          handleSubmit={updateThemeConfig}
+        />
         {/* <Form
           title="Thumbnail image"
           description="The thumbnail image for your site. Accepted formats: .png, .jpg, .jpeg"
-          helpText="Max file size 10MB. Recommended size 1200x630."
+          helpText="Max file size 1MB. Recommended size 1200x630."
           inputAttrs={{
             name: "image",
             type: "file",
@@ -85,9 +87,20 @@ export default async function SiteSettingsAppearance({
           site={data as Site}
         /> */}
         <Form
+          title="Hero Image"
+          description="The image on the Hero section (top) of your site. Accepted format: .png"
+          helpText="Max file size 1MB. Recommended size 1200x630."
+          inputAttrs={{
+            name: "image",
+            type: "file",
+            defaultValue: data?.themeConfig?.image!,
+          }}
+          handleSubmit={addHeroImage}
+        />
+        <Form
           title="Logo"
           description="The logo for your site. Accepted formats: .png, .jpg, .jpeg"
-          helpText="Max file size 10MB. Recommended size 400x400."
+          helpText="Max file size 1MB. Recommended size 400x400."
           inputAttrs={{
             name: "logo",
             type: "file",

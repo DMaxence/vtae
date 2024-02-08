@@ -18,7 +18,7 @@ export default async function SettingsPage() {
         </h1>
         <Form
           title="Profile Picture"
-          helpText="Max file size 10MB. Recommended size 400x400."
+          helpText="Max file size 1MB. Recommended size 400x400."
           inputAttrs={{
             name: "image",
             type: "avatar",

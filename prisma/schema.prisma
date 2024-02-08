@@ -96,6 +96,7 @@ model Site {
   languages     Language[]
   iconsList     Media[]
   theme         Theme?         @relation(fields: [themeId], references: [id])
+  themeConfig   ThemeConfig?
   type          SiteType?
   themeId       String?
   themeType     String?
@@ -205,6 +206,15 @@ model Theme {
   image             String?
   thumbnail         String?
   thumbnailBlurhash String?   @db.Text
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  sites             Site[]
+  type              SiteType?
+}
+
+model ThemeConfig {
+  id                String   @id @default(cuid())
+  image             String?
   bgColor           String?
   textColor         String?
   titleColor        String?
@@ -212,10 +222,12 @@ model Theme {
   accentColor       String?
   contrastColor     String?
   contrastTextColor String?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  sites             Site[]
-  type              SiteType?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  site              Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId            String?  @unique
+
+  @@index([siteId], name: "theme_config_site_constraint")
 }
 
 model Project {

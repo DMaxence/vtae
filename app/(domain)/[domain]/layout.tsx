@@ -1,3 +1,5 @@
+import CTA from "@/components/cta";
+import { getSession } from "@/lib/auth";
 import { getSiteData } from "@/lib/fetchers";
 import { cn } from "@/lib/utils";
 import { fontMapper } from "@/styles/fonts";
@@ -64,6 +66,7 @@ export default async function SiteLayout({
 }) {
   const domain = decodeURIComponent(params.domain);
   const data = await getSiteData(domain);
+  const session = await getSession();
 
   if (!data) {
     notFound();
@@ -77,6 +80,14 @@ export default async function SiteLayout({
   ) {
     return redirect(`https://${data.customDomain}`);
   }
+  console.log("connected", session, data.userId);
+  // if (!data.published && (!session || session.user.id !== data.userId)) {
+  //   return redirect(
+  //     process.env.NODE_ENV === "production"
+  //       ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+  //       : "http://localhost:3000",
+  //   );
+  // }
 
   const theme = data?.themeType === "dark" ? "dark" : "light";
 
@@ -110,13 +121,13 @@ export default async function SiteLayout({
           </div> */}
 
         {/* <div className="mt-20 print:mt-0"> */}
-          {children}
-          {/* </div> */}
+        {children}
+        {/* </div> */}
 
         {/* {domain == `demo.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}` ||
-      domain == `platformize.co` ? (
-        <CTA />
-      ) : (
+      domain == `platformize.co` ? ( */}
+        {!data.published && <CTA site={data} />}
+        {/* ) : (
         <ReportAbuse />
       )} */}
         {/* <footer className="flex w-full items-center justify-center py-7 print:hidden">

@@ -53,13 +53,6 @@ export default async function SiteHomePage({
   if (!data) {
     notFound();
   }
-  if (!data.published) {
-    return redirect(
-      process.env.NODE_ENV === "production"
-        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-        : "http://localhost:3000",
-    );
-  }
 
   if (data.theme) {
     const themeType = themes[data.type as keyof typeof themes];

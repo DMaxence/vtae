@@ -13,6 +13,7 @@ import va from "@vercel/analytics";
 import { Site } from "@prisma/client";
 import { RadioGroup } from "@headlessui/react";
 import Image from "next/image";
+import ColorPicker from "./color-picker";
 
 export default function Form({
   title,
@@ -108,26 +109,28 @@ export default function Form({
           <RadioGroup
             name="themeId"
             defaultValue={inputAttrs.defaultValue}
-            className="flex flex-row gap-3.5"
+            className="flex flex-row flex-wrap gap-3.5 sm:flex-nowrap sm:overflow-x-scroll"
           >
             {inputAttrs.options?.map((option) => (
-              <RadioGroup.Option key={option.value} value={option.value}>
+              <RadioGroup.Option
+                key={option.value}
+                value={option.value}
+                className="w-full sm:w-auto"
+              >
                 {({ checked }) => (
-                  <div className="flex flex-col rounded-lg border border-stone-600 p-3.5 gap-2">
-                    <div className="font-bold">
-                      {option.label}
-                    </div>
+                  <div className="flex flex-col gap-2 rounded-lg border border-stone-600 p-3.5">
+                    <div className="font-bold">{option.label}</div>
                     <Image
                       src={option.image!}
                       alt={option.label}
-                      className="w-[200px] h-[300px] rounded-lg object-cover object-top"
+                      className="h-[300px] w-full rounded-lg object-cover object-top sm:w-[200px]"
                       width={300}
                       height={300}
                     />
                     <button
                       type="button"
                       className={cn(
-                        "flex items-center justify-center space-x-2 rounded-md border text-sm transition-all focus:outline-none sm:h-10",
+                        "flex items-center justify-center space-x-2 rounded-md border py-1 text-sm transition-all focus:outline-none sm:h-10 sm:py-0",
                         checked
                           ? "border-stone-200 bg-stone-100 text-stone-400 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300"
                           : "border-black bg-black text-white hover:bg-white hover:text-black dark:border-stone-700 dark:hover:border-stone-200 dark:hover:bg-black dark:hover:text-white dark:active:bg-stone-800",
@@ -140,6 +143,8 @@ export default function Form({
               </RadioGroup.Option>
             ))}
           </RadioGroup>
+        ) : inputAttrs.name === "bgColor" ? (
+          <ColorPicker />
         ) : inputAttrs.name === "font" ? (
           <div className="flex max-w-sm items-center overflow-hidden rounded-lg border border-stone-600">
             <select
