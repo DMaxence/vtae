@@ -1,8 +1,7 @@
-import { getSession } from "@/lib/auth";
 import { getSiteData } from "@/lib/fetchers";
 import prisma from "@/lib/prisma";
 import { GameDev, Light } from "@/themes";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 const themes = {
   RESUME: {
@@ -39,8 +38,6 @@ export async function generateStaticParams() {
   return allPaths;
 }
 
-export const dynamic = "force-static";
-
 export default async function SiteHomePage({
   params,
 }: {
@@ -48,7 +45,6 @@ export default async function SiteHomePage({
 }) {
   const domain = decodeURIComponent(params.domain);
   const data = await getSiteData(domain);
-  const session = await getSession();
   // const [data, posts] = await Promise.all([
   //   getSiteData(domain),
   //   getPostsForSite(domain),
@@ -57,7 +53,6 @@ export default async function SiteHomePage({
   if (!data) {
     notFound();
   }
-  console.log("im in page domain", session?.user?.id, data.userId);
 
   if (data.theme) {
     const themeType = themes[data.type as keyof typeof themes];

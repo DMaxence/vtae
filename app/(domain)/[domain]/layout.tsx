@@ -57,6 +57,8 @@ export async function generateMetadata({
   };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function SiteLayout({
   params,
   children,
@@ -66,8 +68,7 @@ export default async function SiteLayout({
 }) {
   const domain = decodeURIComponent(params.domain);
   const data = await getSiteData(domain);
-  // const session = await getSession();
-  console.log("is everything running good in layout?");
+  const session = await getSession();
 
   if (!data) {
     notFound();
@@ -81,17 +82,19 @@ export default async function SiteLayout({
   ) {
     return redirect(`https://${data.customDomain}`);
   }
-  console.log("connected", data.userId);
-  // if (!data.published && (!session || session.user.id !== data.userId)) {
-  //   return redirect(
-  //     process.env.NODE_ENV === "production"
-  //       ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-  //       : "http://localhost:3000",
-  //   );
-  // }
+  if (
+    process.env.NODE_ENV === "production" &&
+    !data.published &&
+    (!session || session?.user?.id !== data.userId)
+  ) {
+    return redirect(
+      process.env.NODE_ENV === "production"
+        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+        : "http://localhost:3000",
+    );
+  }
 
   const theme = data?.themeType === "dark" ? "dark" : "light";
-  console.log("everything running good in layout");
 
   return (
     <html
