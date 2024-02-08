@@ -66,7 +66,8 @@ export default async function SiteLayout({
 }) {
   const domain = decodeURIComponent(params.domain);
   const data = await getSiteData(domain);
-  const session = await getSession();
+  // const session = await getSession();
+  console.log("is everything running good in layout?");
 
   if (!data) {
     notFound();
@@ -80,7 +81,7 @@ export default async function SiteLayout({
   ) {
     return redirect(`https://${data.customDomain}`);
   }
-  console.log("connected", session, data.userId);
+  console.log("connected", data.userId);
   // if (!data.published && (!session || session.user.id !== data.userId)) {
   //   return redirect(
   //     process.env.NODE_ENV === "production"
@@ -90,6 +91,7 @@ export default async function SiteLayout({
   // }
 
   const theme = data?.themeType === "dark" ? "dark" : "light";
+  console.log("everything running good in layout");
 
   return (
     <html

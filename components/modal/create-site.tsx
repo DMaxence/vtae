@@ -75,10 +75,7 @@ export default function CreateSiteModal() {
             </button>
             <button
               type="button"
-              onClick={() => {
-                console.log("set portfolio");
-                setData({ ...data, type: "portfolio" });
-              }}
+              onClick={() => setData({ ...data, type: "portfolio" })}
               className={cn(
                 "flex w-full items-center space-x-2 rounded-r-lg border px-4 py-2 text-sm",
                 data.type === "portfolio"

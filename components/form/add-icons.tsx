@@ -43,7 +43,6 @@ export default function AddIcons({ site }: AddIconsProps) {
           body: JSON.stringify({ mediasToRemove, medias }),
         });
         if (!res.ok) {
-          console.log("error", res.statusText);
           toast.error(res.statusText);
         } else {
           await update();

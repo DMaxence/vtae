@@ -39,16 +39,10 @@ export const createSite = async (formData: FormData) => {
 
   // const client = getClient();
 
-  // console.log("Creating Umami website: ", {
-  //   name,
-  //   domain: `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
-  // });
-
   // const website = await client.createWebsite({
   //   name,
   //   domain: `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
   // });
-  // console.log("Umami API response: ", website);
 
   try {
     const response = await prisma.site.create({

@@ -108,7 +108,6 @@ export default function LoginPage({ searchParams }: any) {
               lastname: "",
             }}
             onSubmit={async (values: any, actions) => {
-              console.log("values", values);
               setLoading(true);
               try {
                 const res = await signIn("app-register", {

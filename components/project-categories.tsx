@@ -29,7 +29,6 @@ const ProjectCategories = ({
     a?.name.toLowerCase() === b?.name.toLowerCase();
 
   const getProjectCategories = async (inputValue: string) => {
-    console.log(inputValue);
     const res = await fetch(
       `/api/builder/${siteId}/project/${projectId}/category`,
     );
@@ -38,7 +37,6 @@ const ProjectCategories = ({
   };
 
   const createCategory = async (inputValue: string) => {
-    console.log(inputValue);
     const slug = slugify(inputValue);
     const name = capitalize(inputValue);
 
