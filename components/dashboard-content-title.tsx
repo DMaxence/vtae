@@ -22,7 +22,6 @@ export default function DashboardContentTitle({
   const subUrl = `${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`;
 
   const url = site.customDomain ?? subUrl;
-  console.log(url);
 
   return (
     <div className="flex flex-col items-center space-y-2 sm:flex-row sm:space-x-4 sm:space-y-0">

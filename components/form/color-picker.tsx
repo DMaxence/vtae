@@ -12,7 +12,6 @@ export default function ColorPicker() {
   //   "linear-gradient(90deg, rgba(96,93,93,1) 0%, rgba(255,255,255,1) 100%)",
   // );
   // const { setSolid, setGradient } = useColorPicker(color, setColor);
-  // console.log("color", color);
 
   return (
     <div className="flex">
@@ -49,17 +48,14 @@ export default function ColorPicker() {
             type="color"
             name="bgColor"
             value={bgColor}
-            onChange={(e) => {
-              console.log(e.target.value);
-              setBgColor(e.target.value);
-            }}
+            onChange={(e) => setBgColor(e.target.value)}
           />
         </div>
         <div className="self-center">
           <button
             type="button"
             onClick={() => setBgColor("")}
-            className="rounded-md border text-xs border-red-500 bg-red-100/75 px-2.5 py-1 text-red-600 hover:bg-red-200/75 hover:text-red-700 dark:border-stone-700 dark:hover:border-stone-200 dark:hover:bg-black dark:hover:text-white dark:active:bg-stone-800"
+            className="rounded-md border border-red-500 bg-red-100/75 px-2.5 py-1 text-xs text-red-600 hover:bg-red-200/75 hover:text-red-700 dark:border-stone-700 dark:hover:border-stone-200 dark:hover:bg-black dark:hover:text-white dark:active:bg-stone-800"
           >
             Reset
           </button>
