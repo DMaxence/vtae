@@ -72,7 +72,7 @@ export default function Nav({ children }: { children: ReactNode }) {
     if (segments[0] === "site" && id) {
       return [
         {
-          name: "Back to All Resumes",
+          name: "Back to All Resumes/Portfolios",
           href: "/sites",
           icon: <ArrowLeft width={18} />,
         },
