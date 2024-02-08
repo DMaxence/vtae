@@ -6,9 +6,9 @@ import { Providers } from "./providers";
 import { Metadata } from "next";
 import { cn } from "@/lib/utils";
 
-const title = "Vtae - Build your resume and host it in minutes.";
+const title = "Vtae - Build your portfolio and host it in minutes.";
 const description =
-  "Vtae is a wonderful SaaS resume builder that allows you to create your resume in minutes and host it for free.";
+  "Vtae is a wonderful SaaS portfolio builder that allows you to create your portfolio in minutes and host it for free.";
 const image = "https://vtae.xyz/thumbnail.png";
 
 export const metadata: Metadata = {

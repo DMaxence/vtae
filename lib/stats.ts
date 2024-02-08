@@ -115,6 +115,7 @@ export const getStats = async ({
   // Note: we're using decodeURIComponent in this function because that's how we store it in MySQL and Tinybird
 
   if (
+    process.env.NODE_ENV === "development" ||
     !process.env.TINYBIRD_API_KEY ||
     !VALID_TINYBIRD_ENDPOINTS.includes(endpoint)
   ) {

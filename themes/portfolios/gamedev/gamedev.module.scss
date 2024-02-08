@@ -1,0 +1,31 @@
+.container {
+  background: radial-gradient(
+    74.24% 74.24% at 50% 13.72%,
+    #cf2cdc 0%,
+    #31096f 100%
+  );
+
+  & .heroContainer {
+    background: url("https://res.cloudinary.com/doskh9xiu/image/upload/v1707345427/vtae/themes/default-images/gamedev_hero_l9me0p.png")
+      no-repeat center center;
+  }
+  & .skillsContainer {
+    background: linear-gradient(125.41deg, #310057 26.31%, #1a002e 85.33%),
+      radial-gradient(75.11% 75.11% at 50% 24.89%, #70179b 0%, #3a2997 100%),
+      linear-gradient(
+        103.28deg,
+        rgba(114, 112, 222, 0.1) 0%,
+        rgba(114, 112, 222, 0.4) 97.94%
+      );
+    box-shadow: 0px 3px 4px 0px rgba(0, 0, 0, 0.25);
+    border: 1px solid;
+    border-image-source: radial-gradient(
+      75.11% 75.11% at 50% 24.89%,
+      #70179b 0%,
+      #3a2997 100%
+    );
+    padding: 100px, 0px, 100px, 0px;
+    border-radius: 8px;
+    gap: 80px;
+  }
+}

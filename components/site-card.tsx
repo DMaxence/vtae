@@ -1,14 +1,19 @@
 import BlurImage from "@/components/blur-image";
-import {
-  placeholderBlurhash,
-  random,
-  websiteScreenshotImage,
-} from "@/lib/utils";
+import { placeholderBlurhash } from "@/lib/utils";
 import { Site } from "@prisma/client";
-import { BarChart, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
-export default function SiteCard({ data }: { data: Site }) {
+type SiteCardProps = {
+  data: Site & {
+    theme: {
+      name: string;
+      slug: string;
+      thumbnail: string | null;
+    } | null;
+  };
+};
+
+export default function SiteCard({ data }: SiteCardProps) {
   const url = `${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`;
   return (
     <div className="relative rounded-lg border border-stone-200 pb-10 shadow-md transition-all hover:shadow-xl dark:border-stone-700 dark:hover:border-white">
@@ -20,10 +25,10 @@ export default function SiteCard({ data }: { data: Site }) {
           alt={data.name ?? "Card thumbnail"}
           width={500}
           height={400}
-          className="h-44 object-cover"
-          src={data.image ?? "/placeholder.png"}
+          className="h-44 object-cover object-top"
+          src={data.theme?.thumbnail ?? "/placeholder.png"}
           placeholder="blur"
-          blurDataURL={data.imageBlurhash ?? placeholderBlurhash}
+          blurDataURL={placeholderBlurhash}
         />
         <div className="border-t border-stone-200 p-4 dark:border-stone-700">
           <h3 className="my-0 truncate font-cal text-xl font-bold tracking-wide dark:text-white">

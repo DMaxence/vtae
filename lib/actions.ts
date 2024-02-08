@@ -1,10 +1,10 @@
 "use server";
 
-import prisma from "@/lib/prisma";
-import { Post, Site } from "@prisma/client";
-import { revalidateTag } from "next/cache";
-import { withPostAuth, withSiteAuth } from "./auth";
 import { getSession } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { Site, SiteType } from "@prisma/client";
+import { revalidateTag } from "next/cache";
+import { withSiteAuth } from "./auth";
 // import { getClient } from "@umami/api-client";
 import {
   addDomainToVercel,
@@ -13,12 +13,12 @@ import {
   // removeDomainFromVercelTeam,
   validDomainRegex,
 } from "@/lib/domains";
+import { getBlurDataURL, revalidateSite } from "@/lib/utils";
 import { put } from "@vercel/blob";
+import { promises as fs } from "fs";
 import { customAlphabet } from "nanoid";
-import { getBlurDataURL } from "@/lib/utils";
 import puppeteer from "puppeteer";
 import { handleCloudinaryUpload } from "./cloudinary";
-import { promises as fs } from "fs";
 
 const nanoid = customAlphabet(
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -35,6 +35,7 @@ export const createSite = async (formData: FormData) => {
   const name = formData.get("name") as string;
   const description = formData.get("description") as string;
   const subdomain = formData.get("subdomain") as string;
+  const type = formData.get("type") as SiteType;
 
   // const client = getClient();
 
@@ -55,6 +56,15 @@ export const createSite = async (formData: FormData) => {
         name,
         description,
         subdomain,
+        type,
+        theme: {
+          connect: {
+            slug: type === "RESUME" ? "light" : "gamedev",
+          },
+        },
+        themeConfig: {
+          create: {},
+        },
         user: {
           connect: {
             id: session.user.id,
@@ -212,7 +222,7 @@ export const updateSite = withSiteAuth(
             id: site.id,
           },
           data: {
-            [key]: value,
+            [key]: key === "published" ? value === "true" : value,
           },
         });
       }
@@ -254,180 +264,6 @@ export const deleteSite = withSiteAuth(async (_: FormData, site: Site) => {
     );
     response.customDomain &&
       (await revalidateTag(`${site.customDomain}-metadata`));
-    return response;
-  } catch (error: any) {
-    return {
-      error: error.message,
-    };
-  }
-});
-
-export const getSiteFromPostId = async (postId: string) => {
-  const post = await prisma.post.findUnique({
-    where: {
-      id: postId,
-    },
-    select: {
-      siteId: true,
-    },
-  });
-  return post?.siteId;
-};
-
-export const createPost = withSiteAuth(async (_: FormData, site: Site) => {
-  const session = await getSession();
-  if (!session?.user.id) {
-    return {
-      error: "Not authenticated",
-    };
-  }
-  const response = await prisma.post.create({
-    data: {
-      siteId: site.id,
-      userId: session.user.id,
-    },
-  });
-
-  await revalidateTag(
-    `${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-posts`,
-  );
-  site.customDomain && (await revalidateTag(`${site.customDomain}-posts`));
-
-  return response;
-});
-
-// creating a separate function for this because we're not using FormData
-export const updatePost = async (data: Post) => {
-  const session = await getSession();
-  if (!session?.user.id) {
-    return {
-      error: "Not authenticated",
-    };
-  }
-  const post = await prisma.post.findUnique({
-    where: {
-      id: data.id,
-    },
-    include: {
-      site: true,
-    },
-  });
-  if (!post || post.userId !== session.user.id) {
-    return {
-      error: "Post not found",
-    };
-  }
-  try {
-    const response = await prisma.post.update({
-      where: {
-        id: data.id,
-      },
-      data: {
-        title: data.title,
-        description: data.description,
-        content: data.content,
-      },
-    });
-
-    await revalidateTag(
-      `${post.site?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-posts`,
-    );
-    await revalidateTag(
-      `${post.site?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-${post.slug}`,
-    );
-
-    // if the site has a custom domain, we need to revalidate those tags too
-    post.site?.customDomain &&
-      (await revalidateTag(`${post.site?.customDomain}-posts`),
-      await revalidateTag(`${post.site?.customDomain}-${post.slug}`));
-
-    return response;
-  } catch (error: any) {
-    return {
-      error: error.message,
-    };
-  }
-};
-
-export const updatePostMetadata = withPostAuth(
-  async (
-    formData: FormData,
-    post: Post & {
-      site: Site;
-    },
-    key: string,
-  ) => {
-    const value = formData.get(key) as string;
-
-    try {
-      let response;
-      if (key === "image") {
-        const file = formData.get("image") as File;
-        const filename = `${nanoid()}.${file.type.split("/")[1]}`;
-
-        const { url } = await put(filename, file, {
-          access: "public",
-        });
-
-        const blurhash = await getBlurDataURL(url);
-
-        response = await prisma.post.update({
-          where: {
-            id: post.id,
-          },
-          data: {
-            image: url,
-            imageBlurhash: blurhash,
-          },
-        });
-      } else {
-        response = await prisma.post.update({
-          where: {
-            id: post.id,
-          },
-          data: {
-            [key]: key === "published" ? value === "true" : value,
-          },
-        });
-      }
-
-      await revalidateTag(
-        `${post.site?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-posts`,
-      );
-      await revalidateTag(
-        `${post.site?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-${post.slug}`,
-      );
-
-      // if the site has a custom domain, we need to revalidate those tags too
-      post.site?.customDomain &&
-        (await revalidateTag(`${post.site?.customDomain}-posts`),
-        await revalidateTag(`${post.site?.customDomain}-${post.slug}`));
-
-      return response;
-    } catch (error: any) {
-      if (error.code === "P2002") {
-        return {
-          error: `This slug is already in use`,
-        };
-      } else {
-        return {
-          error: error.message,
-        };
-      }
-    }
-  },
-);
-
-export const deletePost = withPostAuth(async (_: FormData, post: Post) => {
-  try {
-    const response = await prisma.post.delete({
-      where: {
-        id: post.id,
-      },
-      select: {
-        siteId: true,
-      },
-    });
     return response;
   } catch (error: any) {
     return {
@@ -543,4 +379,70 @@ export const takeWebsiteScreenshot = async (options: { url: string }) => {
   await fs.unlink(path);
 
   return uploadResponse;
+};
+
+export const updateThemeConfig = withSiteAuth(
+  async (formData: FormData, site: Site, key: string) => {
+    const value = formData.get(key) as string;
+
+    try {
+      const response = await prisma.themeConfig.update({
+        where: {
+          siteId: site.id,
+        },
+
+        data: {
+          [key]: value.length > 0 ? value : null,
+        },
+      });
+      console.log(
+        "Updated theme config! Revalidating tags: ",
+        `${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
+        `${site.customDomain}-metadata`,
+      );
+      await revalidateSite(site);
+      return response;
+    } catch (error: any) {
+      console.log("Error updating theme config:", error);
+      return {
+        error: error.message,
+      };
+    }
+  },
+);
+
+export const addHeroImage = async (
+  formData: FormData,
+  id: string,
+  name: string,
+) => {
+  const file = formData.get(name) as File;
+
+  if (file.size > 0) {
+    try {
+      const filename = `${nanoid()}.${file.type.split("/")[1]}`;
+      const base64 = await file.arrayBuffer();
+      const base64String = Buffer.from(base64).toString("base64");
+
+      const res = await handleCloudinaryUpload({
+        path: `data:image/png;base64,${base64String}`,
+        name: filename,
+        folder: "themes/custom-images",
+      });
+
+      if (res) {
+        const data = new FormData();
+        data.append(name, res.secure_url);
+        return updateThemeConfig(data, id, name);
+      }
+    } catch (error: any) {
+      return {
+        error: error.message,
+      };
+    }
+  } else {
+    const data = new FormData();
+    data.append(name, "");
+    return updateThemeConfig(data, id, name);
+  }
 };

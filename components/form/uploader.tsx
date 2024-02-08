@@ -25,8 +25,8 @@ export default function Uploader({
 
   const handleUpload = (file: File | null) => {
     if (file) {
-      if (file.size / 1024 / 1024 > 10) {
-        toast.error("File size too big (max 10MB)");
+      if (file.size / 1024 / 1024 > 1) {
+        toast.error("File size too big (max 1MB)");
       } else if (
         !file.type.includes("png") &&
         !file.type.includes("jpg") &&
@@ -45,6 +45,7 @@ export default function Uploader({
 
   const clearUpload = () => {
     setData((prev) => ({ ...prev, [name]: null }));
+    inputRef.current!.value = "";
   };
 
   return (
@@ -126,7 +127,7 @@ export default function Uploader({
             Drag and drop or click to upload.
           </p>
           <p className="mt-2 text-center text-sm text-gray-500">
-            Max file size: 10MB
+            Max file size: 1MB
           </p>
           <span className="sr-only">Photo upload</span>
         </div>

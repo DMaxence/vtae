@@ -57,13 +57,8 @@ export const createOrUpdatePersonalInfos = withSiteAuth(
         create: {
           ...data,
           site: {
-            connectOrCreate: {
-              where: {
-                id: site.id,
-              },
-              create: {
-                id: site.id,
-              },
+            connect: {
+              id: site.id,
             },
           },
         },

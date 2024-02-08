@@ -12,7 +12,7 @@ const Skill = ({ skill, theme }: SkillProps) => {
       className={cn(
         "inline-flex items-center rounded-full px-3 py-1 text-sm font-normal",
         skill.primary
-          ? "bg-gray-100 text-gray-800 dark:bg-white dark:text-gray-100"
+          ? "bg-gray-100 text-gray-800 dark:bg-white dark:text-gray-900"
           : "border border-gray-200 bg-gray-100 text-gray-600 dark:border-none dark:bg-gray-300 dark:text-gray-600",
       )}
       // style={{

@@ -104,16 +104,7 @@ export const createExperience = withSiteAuth(
               id: skillId,
             })),
           },
-          site: {
-            connectOrCreate: {
-              where: {
-                id: site.id,
-              },
-              create: {
-                id: site.id,
-              },
-            },
-          },
+          siteId: site.id,
         },
         include: {
           site: {

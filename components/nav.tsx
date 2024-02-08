@@ -1,31 +1,26 @@
 "use client";
 
-import Link from "next/link";
 import {
+  AppWindow,
   ArrowLeft,
   BarChart3,
   Edit3,
-  Globe,
-  Layout,
-  LayoutDashboard,
-  Megaphone,
-  Menu,
-  Newspaper,
-  Settings,
-  FileCode,
-  Github,
   FlaskConical,
+  Globe,
+  LayoutDashboard,
+  Menu,
+  Settings,
 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import {
   useParams,
   usePathname,
   useSelectedLayoutSegments,
 } from "next/navigation";
 import { ReactNode, useEffect, useMemo, useState } from "react";
-import { getSiteFromPostId } from "@/lib/actions";
-import Image from "next/image";
-import { ThemeSwitcher } from "./theme-switcher";
 import { LangSwitcher } from "./lang-switcher";
+import { ThemeSwitcher } from "./theme-switcher";
 
 const externalLinks: Array<{
   name: string;
@@ -73,16 +68,6 @@ export default function Nav({ children }: { children: ReactNode }) {
   const segments = useSelectedLayoutSegments();
   const { id } = useParams() as { id?: string };
 
-  const [siteId, setSiteId] = useState<string | null>();
-
-  useEffect(() => {
-    if (segments[0] === "post" && id) {
-      getSiteFromPostId(id).then((id) => {
-        setSiteId(id);
-      });
-    }
-  }, [segments, id]);
-
   const tabs = useMemo(() => {
     if (segments[0] === "site" && id) {
       return [
@@ -106,28 +91,14 @@ export default function Nav({ children }: { children: ReactNode }) {
           icon: <BarChart3 width={18} />,
         },
         {
+          name: "Appearance",
+          href: `/site/${id}/appearance`,
+          isActive: segments.includes("appearance"),
+          icon: <AppWindow width={18} />,
+        },
+        {
           name: "Settings",
           href: `/site/${id}/settings`,
-          isActive: segments.includes("settings"),
-          icon: <Settings width={18} />,
-        },
-      ];
-    } else if (segments[0] === "post" && id) {
-      return [
-        {
-          name: "Back to All Posts",
-          href: siteId ? `/site/${siteId}` : "/sites",
-          icon: <ArrowLeft width={18} />,
-        },
-        {
-          name: "Editor",
-          href: `/post/${id}`,
-          isActive: segments.length === 2,
-          icon: <Edit3 width={18} />,
-        },
-        {
-          name: "Settings",
-          href: `/post/${id}/settings`,
           isActive: segments.includes("settings"),
           icon: <Settings width={18} />,
         },
@@ -154,7 +125,7 @@ export default function Nav({ children }: { children: ReactNode }) {
         icon: <Settings width={18} />,
       },
     ];
-  }, [segments, id, siteId]);
+  }, [segments, id]);
 
   const fixedTabs = useMemo(() => {
     return [

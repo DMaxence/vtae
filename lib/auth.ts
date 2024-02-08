@@ -11,6 +11,7 @@ import prisma from "@/lib/prisma";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 import { LogSnag } from "@logsnag/next/server";
+import { getSearchParams } from "@/utils";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
 
@@ -385,52 +386,43 @@ export function withSiteAuth(action: any) {
   };
 }
 
-export function withPostAuth(action: any) {
-  return async (
-    formData: FormData | null,
-    postId: string,
-    key: string | null,
-  ) => {
-    const session = await getSession();
-    if (!session?.user.id) {
-      return {
-        error: "Not authenticated",
-      };
-    }
-    const post = await prisma.post.findUnique({
-      where: {
-        id: postId,
-      },
-      include: {
-        site: true,
-      },
-    });
-    if (!post || post.userId !== session.user.id) {
-      return {
-        error: "Post not found",
-      };
-    }
-
-    return action(formData, post, key);
-  };
+interface WithAuthHandler {
+  ({
+    req,
+    params,
+    searchParams,
+    headers,
+    session,
+  }: {
+    req: Request;
+    params: Record<string, string>;
+    searchParams: Record<string, string>;
+    headers?: Record<string, string>;
+    session: Session;
+  }): Promise<Response>;
 }
 
-export function withAuth(handler: any) {
+export function withAuth(handler: WithAuthHandler) {
   return async (
     req: Request,
     { params }: { params: Record<string, string> | undefined },
   ) => {
+    const searchParams = getSearchParams(req.url);
     const session = await getSession();
+    let headers = {};
     if (!session) {
-      return {
-        error: "Not authenticated",
-      };
+      return new Response("Unauthorized: Login required.", {
+        status: 401,
+        headers,
+      });
     }
 
     return handler({
       req,
       params: params || {},
+      searchParams,
       session,
+      headers,
     });
   };
 }

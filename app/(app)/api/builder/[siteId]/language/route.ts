@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { siteId: string } },
 ) {
   const languageId = _req.nextUrl.searchParams.get("languageId") || undefined;
-  const personalInfos = await getLanguage(params.siteId, languageId);
+  const language = await getLanguage(params.siteId, languageId);
 
-  return Response.json(personalInfos);
+  return Response.json(language);
 }

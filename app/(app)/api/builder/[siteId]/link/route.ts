@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { siteId: string } },
 ) {
   const linkId = _req.nextUrl.searchParams.get("linkId") || undefined;
-  const personalInfos = await getLink(params.siteId, linkId);
+  const link = await getLink(params.siteId, linkId);
 
-  return Response.json(personalInfos);
+  return Response.json(link);
 }

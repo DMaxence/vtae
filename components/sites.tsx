@@ -18,6 +18,9 @@ export default async function Sites({ limit }: { limit?: number }) {
     orderBy: {
       createdAt: "asc",
     },
+    include: {
+      theme: { select: { name: true, slug: true, thumbnail: true } },
+    },
     ...(limit ? { take: limit } : {}),
   });
 

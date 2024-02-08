@@ -19,11 +19,11 @@ export default function SiteSettingsNav() {
       href: `/site/${id}/settings/domains`,
       segment: "domains",
     },
-    {
-      name: "Appearance",
-      href: `/site/${id}/settings/appearance`,
-      segment: "appearance",
-    },
+    // {
+    //   name: "Appearance",
+    //   href: `/site/${id}/settings/appearance`,
+    //   segment: "appearance",
+    // },
   ];
 
   return (

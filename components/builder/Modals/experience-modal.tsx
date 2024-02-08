@@ -86,7 +86,7 @@ const ExperienceModal = ({
         setShowModal(false);
         actions.resetForm();
         toast.success(`Experience ${experienceId ? "updated" : "created"}`);
-        takeWebsiteScreenshot(res.site);
+        // takeWebsiteScreenshot(res.site);
       }
     });
   };
@@ -160,8 +160,8 @@ const ExperienceModal = ({
                         key={field.name}
                         skills={experience?.skills}
                         setFieldValue={setFieldValue}
-                        experienceId={experienceId}
-                        experience={experience}
+                        exists={!!experienceId}
+                        existingSkills={experience?.skills}
                         {...field}
                       />
                     );

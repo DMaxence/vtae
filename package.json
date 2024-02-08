@@ -13,6 +13,9 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@logsnag/next": "^1.0.2",
@@ -66,7 +69,10 @@
     "punycode": "^2.3.1",
     "puppeteer": "^21.6.1",
     "react": "^18.2.0",
+    "react-best-gradient-color-picker": "^3.0.5",
+    "react-color": "^2.19.3",
     "react-dom": "^18.2.0",
+    "react-multi-carousel": "^2.8.4",
     "react-scroll": "^1.9.0",
     "react-select": "^5.8.0",
     "react-textarea-autosize": "^8.5.3",
@@ -94,6 +100,7 @@
     "@types/node": "^20.9.0",
     "@types/punycode": "^2.1.3",
     "@types/react": "^18.2.37",
+    "@types/react-color": "^3.0.11",
     "@types/react-dom": "^18.2.15",
     "@types/react-scroll": "^1.8.10",
     "@types/uuid": "^9.0.7",
