@@ -39,7 +39,7 @@ export async function generateStaticParams() {
   return allPaths;
 }
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
 
 export default async function SiteHomePage({
   params,
@@ -57,7 +57,7 @@ export default async function SiteHomePage({
   if (!data) {
     notFound();
   }
-  console.log("im in page domain", session, data.userId);
+  console.log("im in page domain", session?.user?.id, data.userId);
 
   if (data.theme) {
     const themeType = themes[data.type as keyof typeof themes];
