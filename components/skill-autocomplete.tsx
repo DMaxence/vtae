@@ -1,23 +1,22 @@
 "use client";
 import React from "react";
 
-import { Combobox } from "@headlessui/react";
 import useSWR from "swr";
 
 import { useSession } from "next-auth/react";
 
-import { Experience, Skill } from "@prisma/client";
+import { Skill } from "@prisma/client";
 
-import { cn, fetcher } from "@/lib/utils";
+import { capitalize, fetcher } from "@/lib/utils";
 
-import Highlighted from "@/components/highlighted";
 import { FormFieldsType } from "@/lib/types";
 import { useField } from "formik";
-import { Search, XCircle } from "lucide-react";
-import LoadingSpinner from "./icons/loading-spinner";
-import { useDebounce, useDebouncedCallback } from "use-debounce";
+import { XCircle } from "lucide-react";
+import { useDebounce } from "use-debounce";
 
-import AsyncCreatableSelect from "react-select/async-creatable";
+import { nanoid } from "@/utils";
+import { SingleValue } from "react-select";
+import AsyncCreatableSelect from "react-select/creatable";
 
 interface SkillAutocompleteProps extends FormFieldsType {
   skills?: Array<Skill>;
@@ -61,23 +60,20 @@ const SkillAutocomplete = ({
   const [query, setQuery] = React.useState("");
   const [debouncedQuery] = useDebounce(query, 250);
 
-  const { data: fetchedSkills, error } = useSWR<Array<Skill>>(
-    status === "authenticated" && `/api/builder/skill?q=${debouncedQuery}`,
+  const {
+    data: fetchedSkills,
+    error,
+    isLoading,
+  } = useSWR<Array<Skill>>(
+    status === "authenticated" &&
+      `/api/builder/skill?q=${encodeURIComponent(debouncedQuery)}`,
     fetcher,
   );
-  const isLoading = !error && !fetchedSkills;
 
-  const ascFilter = (a?: Skill, b?: Skill): boolean =>
-    a?.name.toLowerCase() === b?.name.toLowerCase();
-
-  const handleSelect = (skill: Skill) => {
-    setSelectedSkills([...selectedSkills, skill]);
-    setQuery("");
+  const handleSelect = (skill: SingleValue<Skill>) => {
+    if (!skill || selectedSkills.find((s) => s.name === skill.name)) return;
+    setSelectedSkills([...selectedSkills, skill as Skill]);
   };
-
-  const filteredSkills = fetchedSkills
-    ?.filter((skill) => !selectedSkills.some((s) => s.id === skill.id))
-    .map((skill) => ({ ...skill, value: skill.id, label: skill.name }));
 
   const removeSkill = (skill: Skill) =>
     setSelectedSkills(selectedSkills.filter((s) => s.id !== skill.id));
@@ -90,71 +86,43 @@ const SkillAutocomplete = ({
         ?.map((skill) => skill.id);
       setFieldValue("removeSkills", removeSkills);
     }
-    setFieldValue("skills", newSkillsValues);
+    setFieldValue("skills", selectedSkills);
   }, [setFieldValue, exists, existingSkills, selectedSkills]);
 
-  const getSkills = useDebouncedCallback(async (inputValue: string) => {
-    const res = await fetch(`/api/builder/skill?q=${inputValue}`);
-    const data = await res.json();
-    return data.map((skill: Skill) => ({
-      ...skill,
-      value: skill.id,
-      label: skill.name,
-    }));
-  }, 200);
+  const createSkill = async (inputValue: string) => {
+    const name = capitalize(inputValue);
+    if (selectedSkills.find((s) => s.name === name)) return;
+    setSelectedSkills([
+      ...selectedSkills,
+      {
+        id: nanoid(),
+        name,
+      } as Skill,
+    ]);
+  };
 
   return (
     <div className="flex w-full flex-col">
-      {/* <AsyncCreatableSelect
-        cacheOptions
-        defaultOptions
+      <AsyncCreatableSelect
+        isSearchable
+        allowCreateWhileLoading
         classNamePrefix="select-content"
-        className="select-component w-full"
-        loadOptions={getSkills}
-        components={{
-          Option: ({ data, ...props }) => (
-            <div className="flex items-center px-5 py-3" {...props}>
-              <span className="block truncate font-normal">
-                <Highlighted text={data.label} highlight={query} />
-              </span>
-            </div>
-          ),
-        }}
-      /> */}
-      <Combobox
-        by={ascFilter}
+        onCreateOption={createSkill}
+        className="select-component"
+        options={fetchedSkills}
+        {...props}
+        getOptionLabel={(option) => option.name}
+        getOptionValue={(option) => option.id}
+        value={null as unknown as Skill}
         onChange={handleSelect}
-        as="div"
-        className="max-w-x1 shadow-2x1 relative w-full rounded-lg bg-white ring-1 ring-black/5 dark:bg-stone-700 "
-      >
-        <div className="flex w-full items-center rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus-within:border-blue-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
-          <Search className="mr-2 h-5 w-5 text-gray-400" />
-          <Combobox.Input
-            onChange={(event) => setQuery(event.target.value)}
-            autoComplete="off"
-            className="w-full border-none p-0 text-sm placeholder-gray-300 focus:ring-0 dark:bg-stone-700"
-            placeholder="Search for a skill"
-          />
-          {isLoading && <LoadingSpinner />}
-        </div>
-
-        <Combobox.Options
-          className={cn(
-            "absolute z-[1001] max-h-56 w-full divide-y divide-gray-200 overflow-y-auto rounded-b-lg border border-t-0 border-gray-300 bg-white dark:bg-stone-700",
-            !filteredSkills?.length ? "border-0" : "",
-          )}
-        >
-          {filteredSkills?.map((skill) => (
-            <Combobox.Option key={skill.id} value={skill}>
-              <div className="flex items-center px-5 py-3">
-                <span className="block truncate font-normal">
-                  <Highlighted text={skill.name} highlight={query} />
-                </span>
-              </div>
-            </Combobox.Option>
-          ))}
-        </Combobox.Options>
-      </Combobox>
+        onInputChange={(inputValue) => setQuery(inputValue)}
+        getNewOptionData={(inputValue, optionLabel) =>
+          ({
+            name: optionLabel,
+            id: inputValue,
+          }) as Skill
+        }
+      />
       <div className="mt-1">
         {props.helperText && (
           <p className="text-xs text-gray-500 dark:text-gray-200">

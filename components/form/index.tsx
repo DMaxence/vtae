@@ -109,7 +109,7 @@ export default function Form({
           <RadioGroup
             name="themeId"
             defaultValue={inputAttrs.defaultValue}
-            className="flex flex-row flex-wrap gap-3.5 sm:flex-nowrap sm:overflow-x-scroll"
+            className="flex flex-row flex-wrap gap-3.5 sm:flex-nowrap sm:overflow-x-auto"
           >
             {inputAttrs.options?.map((option) => (
               <RadioGroup.Option

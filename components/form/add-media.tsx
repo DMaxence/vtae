@@ -138,7 +138,7 @@ export default function AddMedia({
           </button>
         </div>
       )}
-      <div className="flex w-full gap-3.5 overflow-x-scroll">
+      <div className="flex w-full gap-3.5 overflow-x-auto">
         {medias?.map((media) => (
           <div key={media.id} className="relative shrink-0">
             {media.type === "IMAGE" ? (

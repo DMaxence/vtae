@@ -82,7 +82,7 @@ const Project = ({ project, readOnly, theme, siteId }: ProjectProps) => {
         </div>
       )}
       <div className="whitespace-pre-line">{project.description}</div>
-      <div className="flex w-full gap-3.5 overflow-x-scroll">
+      <div className="flex w-full gap-3.5 overflow-x-auto">
         {project.medias?.map((media) =>
           media.type === "IMAGE" ? (
             <img

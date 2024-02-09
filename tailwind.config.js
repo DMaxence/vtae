@@ -114,6 +114,7 @@ module.exports = {
         default: ["var(--font-inter)", ...fontFamily.sans],
         display: ["var(--font-satoshi)", "system-ui", "sans-serif"],
         cal: ["var(--font-cal)", ...fontFamily.sans],
+        montserrat: ["var(--font-montserrat)", ...fontFamily.sans],
         title: ["var(--font-title)", ...fontFamily.sans],
         mono: ["Consolas", ...fontFamily.mono],
       },

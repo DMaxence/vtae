@@ -1,7 +1,7 @@
 "use server";
 import prisma from "@/lib/prisma";
 
-import { Project, ProjectCategory, Site } from "@prisma/client";
+import { Project, ProjectCategory, Site, Skill } from "@prisma/client";
 import { withSiteAuth } from "../auth";
 import { revalidateSite } from "../utils";
 
@@ -76,7 +76,7 @@ export const createProject = withSiteAuth(
       skills,
       description,
       category,
-    }: Project & { skills: string[]; category: ProjectCategory },
+    }: Project & { skills: Skill[]; category: ProjectCategory },
     site: Site,
   ) => {
     try {
@@ -89,8 +89,9 @@ export const createProject = withSiteAuth(
           startDate: new Date(startDate),
           ...(endDate ? { endDate: new Date(endDate) } : {}),
           skills: {
-            connect: skills.map((skillId: string) => ({
-              id: skillId,
+            connectOrCreate: skills.map((skill) => ({
+              where: { id: skill.id },
+              create: { name: skill.name },
             })),
           },
           site: {
@@ -197,7 +198,7 @@ export const updateProject = withSiteAuth(
       removeMedias,
       description,
     }: Project & {
-      skills: string[];
+      skills: Skill[];
       removeSkills: string[];
       removeMedias: string[];
     },
@@ -217,8 +218,9 @@ export const updateProject = withSiteAuth(
           ...(endDate ? { endDate: new Date(endDate) } : {}),
           // replace connect with set to remove all skills and replace with new ones
           skills: {
-            connect: skills.map((skillId: string) => ({
-              id: skillId,
+            connectOrCreate: skills.map((skill) => ({
+              where: { id: skill.id },
+              create: { name: skill.name },
             })),
             disconnect: removeSkills.map((skillId: string) => ({
               id: skillId,

@@ -67,7 +67,7 @@ const ProjectModal = ({
     title: yup.string().required("Required"),
     startDate: yup.date().required("Required"),
     endDate: yup.date(),
-    skills: yup.array().of(yup.string()).min(1, "Required"),
+    skills: yup.array().of(yup.object()).min(1, "Required"),
     description: yup.string().required("Required"),
     category: yup.object().required("Required"),
   });

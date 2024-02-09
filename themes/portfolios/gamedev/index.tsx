@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import Skills from "./skills";
 import About from "./about";
 import Footer from "./footer";
+import { montserrat } from "@/styles/fonts";
 
 type ThemeProps = {
   site: Site & {
@@ -34,7 +35,7 @@ type ThemeProps = {
 
 export default function Theme({ site }: ThemeProps) {
   return (
-    <div className={cn(styles.container, "font-title")}>
+    <div className={cn(styles.container, montserrat.variable, 'font-montserrat')}>
       <Header site={site} />
       <Hero site={site} />
       <BrandList site={site} />

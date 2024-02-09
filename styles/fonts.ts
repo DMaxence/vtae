@@ -43,9 +43,15 @@ export const work = Work_Sans({
 });
 
 export const montserrat = Montserrat({
-  variable: "--font-title",
+  variable: "--font-montserrat",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+});
+export const montserratTitle = Montserrat({
+  variable: "--font-title",
+  subsets: ["latin"],
+  weight: "600",
   display: "swap",
 });
 

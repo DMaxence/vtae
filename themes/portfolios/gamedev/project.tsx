@@ -49,6 +49,7 @@ export default function Project({ project }: ProjectProps) {
                   src={media.url}
                   className="h-[400px] w-full object-cover"
                   height={400}
+                  allowFullScreen
                 />
               ),
             )}

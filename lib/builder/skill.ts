@@ -20,6 +20,10 @@ export const getSkill = async (query?: string) => {
           contains: query,
         },
       },
+      include: {
+        experiences: { select: { id: true } },
+        projects: { select: { id: true } },
+      },
     });
 
     return skills;
