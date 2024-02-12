@@ -6,8 +6,10 @@
   );
 
   & .heroContainer {
-    background: url("https://res.cloudinary.com/doskh9xiu/image/upload/v1707345427/vtae/themes/default-images/gamedev_hero_l9me0p.png")
-      no-repeat center center;
+    background: url("https://res.cloudinary.com/doskh9xiu/image/upload/v1707345427/vtae/themes/default-images/gamedev_hero_l9me0p.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
   }
   & .skillsContainer {
     background: linear-gradient(125.41deg, #310057 26.31%, #1a002e 85.33%),

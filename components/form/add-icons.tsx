@@ -32,6 +32,16 @@ export default function AddIcons({ site }: AddIconsProps) {
   const removeMedia = (id: string) => {
     setMediasToRemove([...mediasToRemove, id]);
   };
+
+  React.useEffect(() => {
+    setMedias(
+      site.iconsList as (Media & {
+        image: string;
+      })[],
+    );
+    setMediasToRemove([]);
+  }, [site.iconsList]);
+
   return (
     <form
       action={async (data: FormData) => {
