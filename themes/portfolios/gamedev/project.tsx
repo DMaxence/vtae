@@ -124,7 +124,7 @@ export default function Project({ project }: ProjectProps) {
           </div>
         </div>
         {/* description */}
-        <div className="whitespace-pre-line">{project.description}</div>
+        <div className="whitespace-pre-line text-justify">{project.description}</div>
       </div>
     </div>
   );
