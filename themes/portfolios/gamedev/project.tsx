@@ -105,7 +105,7 @@ export default function Project({ project }: ProjectProps) {
             render={{
               // slide: NextJsImage,
               slide: ({ slide, offset, rect }) =>
-                slide.type === "video" ? (
+                slide.type === ("video" as "image") ? (
                   <div className="h-full w-full overflow-hidden rounded-lg">
                     <iframe
                       src={slide.src}
@@ -148,7 +148,7 @@ export default function Project({ project }: ProjectProps) {
             controller={{ closeOnPullDown: true, closeOnBackdropClick: true }}
             render={{
               slide: ({ slide, offset, rect }) =>
-                slide.type === "video" ? (
+                slide.type === ("video" as "image") ? (
                   <iframe
                     src={slide.src}
                     className="h-full w-full object-contain"
