@@ -8,6 +8,7 @@ import { FileInput, Label } from "flowbite-react";
 import { useField } from "formik";
 import { FileVideo2, ImagePlus, XCircleIcon } from "lucide-react";
 import { toast } from "sonner";
+import { getVideoEmbedUrl } from "@/lib/utils";
 
 interface AddMediaProps extends FormFieldsType {
   setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
@@ -127,7 +128,7 @@ export default function AddMedia({
             placeholder="Video embed URL eg. https://www.youtube.com/embed/..."
             className="w-full rounded-l-lg border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-300 focus:outline-none focus:ring-0 dark:bg-stone-700"
             value={videoUrl}
-            onChange={(e) => setVideoUrl(e.target.value)}
+            onChange={(e) => setVideoUrl(getVideoEmbedUrl(e.target.value))}
           />
           <button
             type="button"

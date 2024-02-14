@@ -23,6 +23,8 @@ module.exports = {
       { hostname: "vtae.xyz" },
       { hostname: "unsplash.com" },
       { hostname: "www.youtube.com" },
+      { hostname: "img.youtube.com" },
+      { hostname: "i.vimeocdn.com" },
     ],
   },
   // webpack(config) {

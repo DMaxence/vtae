@@ -179,3 +179,55 @@ export const getLang = () =>
       navigator.languages.find((lang) => lang.includes("_")) ||
       navigator.languages[0]
     : navigator.language;
+
+export const getYoutubeThumbnail = (videoId: string) => {
+  return `https://img.youtube.com/vi/${videoId}/default.jpg`;
+};
+
+export const getVimeoThumbnail = (videoId: string) => {
+  return `https://i.vimeocdn.com/video/${videoId}_640.jpg`;
+  // return `https://vumbnail.com/${videoId}.jpg`;
+};
+// export const getVimeoThumbnail = async (videoId: string) => {
+//   const response = await fetch(
+//     `https://vimeo.com/api/v2/video/${videoId}.json`,
+//   );
+//   const data = await response.json();
+//   return data[0].thumbnail_large;
+// };
+
+export const getVimeoVideoId = (url: string) => {
+  const match = url.match(/vimeo.com\/(\d+)/);
+  return match ? match[1] : "";
+};
+
+export const getYoutubeVideoId = (url: string) => {
+  const match = url.match(
+    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([^&\n?#]+)/,
+  );
+  return match ? match[1] : "";
+};
+
+export const getVideoId = (url: string) => {
+  return url.includes("youtube")
+    ? getYoutubeVideoId(url)
+    : getVimeoVideoId(url);
+};
+
+export const getVideoThumbnail = (url: string) => {
+  return url.includes("youtube")
+    ? getYoutubeThumbnail(getYoutubeVideoId(url))
+    : getVimeoThumbnail(getVimeoVideoId(url));
+};
+
+export const getVideoEmbedUrl = (url: string) => {
+  return url.includes("youtube")
+    ? `https://www.youtube.com/embed/${getYoutubeVideoId(url)}`
+    : `https://player.vimeo.com/video/${getVimeoVideoId(url)}`;
+};
+
+export const getVideoUrl = (url: string) => {
+  return url.includes("youtube")
+    ? `https://www.youtube.com/watch?v=${getYoutubeVideoId(url)}`
+    : `https://vimeo.com/${getVimeoVideoId(url)}`;
+};

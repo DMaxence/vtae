@@ -31,3 +31,17 @@
     gap: 80px;
   }
 }
+
+.yarlThumbnails :global(.yarl__container) {
+  background-color: transparent;
+}
+
+.yarlLightbox {
+  & :global(.yarl__container) {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+  }
+  & :global(.yarl__slide) {
+    padding: 0;
+  }
+}
