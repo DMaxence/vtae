@@ -23,20 +23,31 @@ interface SkillAutocompleteProps extends FormFieldsType {
   setFieldValue: any;
   exists?: boolean;
   existingSkills?: Array<Skill>;
+  canDeleteExisting?: boolean;
 }
 
-const Skill = ({ skill, removeSkill }: { skill: Skill; removeSkill: any }) => {
+const Skill = ({
+  skill,
+  removeSkill,
+  canDelete,
+}: {
+  skill: Skill;
+  removeSkill: any;
+  canDelete: boolean;
+}) => {
   return (
     <>
       <span className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2.5 py-1 text-xs font-normal text-gray-500 dark:border-none dark:bg-gray-300 dark:text-gray-600">
         {skill.name}
-        <button
-          type="button"
-          className="ml-1.5"
-          onClick={() => removeSkill(skill)}
-        >
-          <XCircle className="h-5 w-5 text-gray-500" />
-        </button>
+        {canDelete && (
+          <button
+            type="button"
+            className="ml-1.5"
+            onClick={() => removeSkill(skill)}
+          >
+            <XCircle className="h-5 w-5 text-gray-500" />
+          </button>
+        )}
       </span>
       <input type="hidden" name="skills" value={skill.id} />
     </>
@@ -48,6 +59,7 @@ const SkillAutocomplete = ({
   setFieldValue,
   exists,
   existingSkills,
+  canDeleteExisting = true,
   ...props
 }: SkillAutocompleteProps) => {
   const [_, meta] = useField(props);
@@ -136,7 +148,16 @@ const SkillAutocomplete = ({
 
       <div className="mt-2 flex flex-wrap gap-2">
         {selectedSkills.map((skill) => (
-          <Skill key={skill.id} skill={skill} removeSkill={removeSkill} />
+          <Skill
+            key={skill.id}
+            skill={skill}
+            removeSkill={removeSkill}
+            canDelete={
+              canDeleteExisting ||
+              !!existingSkills?.find((s) => s.id === skill.id) ||
+              !skills?.find((s) => s.id === skill.id)
+            }
+          />
         ))}
       </div>
     </div>

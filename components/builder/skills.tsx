@@ -29,6 +29,13 @@ export default async function Skills({ siteId }: SkillsProps) {
             },
           },
         },
+        {
+          sites: {
+            some: {
+              id: siteId,
+            },
+          },
+        },
       ],
     },
     orderBy: {

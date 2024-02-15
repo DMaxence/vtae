@@ -5,6 +5,7 @@ import styles from "./gamedev.module.scss";
 
 type SkillsProps = {
   site: Site & {
+    skills: Skill[];
     projects: (Project & {
       skills: Skill[];
     })[];
@@ -19,7 +20,7 @@ export default function Skills({ site }: SkillsProps) {
       }
     });
     return acc;
-  }, [] as Skill[]);
+  }, site.skills as Skill[]);
 
   return (
     <MaxWidthWrapper

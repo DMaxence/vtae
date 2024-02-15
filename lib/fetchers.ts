@@ -38,6 +38,7 @@ export async function getSiteData(domain: string) {
               startDate: "desc",
             },
           },
+          skills: true,
           links: true,
           languages: true,
           theme: true,

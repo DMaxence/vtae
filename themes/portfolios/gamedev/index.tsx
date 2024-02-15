@@ -22,6 +22,7 @@ import { montserrat } from "@/styles/fonts";
 type ThemeProps = {
   site: Site & {
     user: User;
+    skills: Skill[];
     projects: (Project & {
       skills: Skill[];
       category: ProjectCategory;

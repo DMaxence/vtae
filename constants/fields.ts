@@ -115,6 +115,7 @@ export const experienceFields: FormFieldsType[] = [
     containerClasses: "w-full",
   },
 ];
+
 export const projectFields: FormFieldsType[] = [
   {
     name: "title",
@@ -330,5 +331,14 @@ export const themeFields: FormFieldsType[] = [
     name: "contrastTextColor",
     placeholder: "Contrast text color",
     type: "color",
+  },
+];
+
+export const skillsFields: FormFieldsType[] = [
+  {
+    name: "skills",
+    placeholder: "Skills",
+    type: "skills",
+    containerClasses: "w-full",
   },
 ];

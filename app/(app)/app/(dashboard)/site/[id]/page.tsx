@@ -28,6 +28,7 @@ import LinkModal from "@/components/builder/Modals/link-modal";
 import PersonalInfosModal from "@/components/builder/Modals/personal-infos-modal";
 import ProjectModal from "@/components/builder/Modals/project-modal";
 import DashboardContentTitle from "@/components/dashboard-content-title";
+import SkillsModal from "@/components/builder/Modals/skills-modal";
 
 const FIELD_SET_MAP = {
   "Personal Info": PersonalInfos,
@@ -44,6 +45,7 @@ const FIELD_SET_MAP = {
 const FIELD_SET_EDIT_MODAL_MAP = {
   "Personal Info": PersonalInfosModal,
   About: AboutModal,
+  Skills: SkillsModal,
   "Current Infos": CurrentInfosModal,
 };
 const FIELD_SET_ADD_MODAL_MAP = {

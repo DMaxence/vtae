@@ -95,6 +95,7 @@ model Site {
   links         Link[]
   languages     Language[]
   iconsList     Media[]
+  skills        Skill[]
   theme         Theme?         @relation(fields: [themeId], references: [id])
   themeConfig   ThemeConfig?
   type          SiteType?
@@ -149,6 +150,7 @@ model Skill {
   type        String?
   experiences Experience[]
   projects    Project[]
+  sites       Site[]
 
   @@fulltext([name])
 }

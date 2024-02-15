@@ -1,4 +1,8 @@
+"use server";
+
 import prisma from "@/lib/prisma";
+import { Site, Skill } from "@prisma/client";
+import { withSiteAuth } from "../auth";
 
 /**
  * Get Skill
@@ -37,3 +41,80 @@ export const getSkill = async (query?: string) => {
 
   return skills;
 };
+
+export const getSkillsFromSite = async (siteId: string) => {
+  const skills = await prisma.skill.findMany({
+    where: {
+      sites: {
+        some: {
+          id: siteId,
+        },
+      },
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
+
+  return skills;
+};
+
+export const getSkillsFromProjects = async (siteId: string) => {
+  const skills = await prisma.skill.findMany({
+    where: {
+      OR: [
+        {
+          experiences: {
+            some: {
+              siteId,
+            },
+          },
+        },
+        {
+          projects: {
+            some: {
+              siteId,
+            },
+          },
+        },
+      ],
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
+
+  return skills;
+};
+
+export const updateSiteSkills = withSiteAuth(
+  async (
+    {
+      skills,
+      removeSkills,
+    }: {
+      skills: Skill[];
+      removeSkills: string[];
+    },
+    site: Site,
+  ) => {
+    const response = await prisma.site.update({
+      where: {
+        id: site.id,
+      },
+      data: {
+        skills: {
+          connectOrCreate: skills.map((skill) => ({
+            where: { id: skill.id },
+            create: { name: skill.name },
+          })),
+          disconnect: removeSkills.map((skillId: string) => ({
+            id: skillId,
+          })),
+        },
+      },
+    });
+
+    return response;
+  },
+);
