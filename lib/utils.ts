@@ -105,7 +105,14 @@ export const getElapsedTime = (
 
   let monthText = "";
   if (months <= 1) {
-    monthText = " 1 month";
+    const days = Math.floor((end.getTime() - start.getTime()) / 86400000);
+    if (days > 30) {
+      monthText = " 1 month";
+    } else if (days > 1) {
+      monthText = ` ${days} days`;
+    } else {
+      monthText = " 1 day";
+    }
   } else if (months > 1 && months % 12 !== 0) {
     monthText = ` ${months % 12} months`;
   } else if (months % 12 === 0) {
