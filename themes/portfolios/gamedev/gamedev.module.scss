@@ -32,8 +32,13 @@
   }
 }
 
-.yarlThumbnails :global(.yarl__container) {
-  background-color: transparent;
+.yarlThumbnails {
+  & :global(.yarl__container) {
+    background-color: transparent;
+  }
+  & :global(.yarl__thumbnails_track) {
+    justify-content: flex-start;
+  }
 }
 
 .yarlLightbox {
