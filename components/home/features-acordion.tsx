@@ -18,29 +18,29 @@ export default function FeaturesAcordion() {
   const [transitionLeave, setTransitionLeave] = React.useState(false);
 
   const changeItem = (item: string) => {
-    if (_changingContentRef.current) {
-      setTransitionLeave(true);
-      // @ts-ignore
-      _changingContentRef.current.style.transform = "translateY(-10px)";
-      // @ts-ignore
-      _changingContentRef.current.style.opacity = "0.5";
-      setTimeout(() => {
-        // @ts-ignore
-        _changingContentRef.current.style.opacity = "0";
-        // @ts-ignore
-        _changingContentRef.current.style.transform = "translateY(10px)";
-        setTransitionLeave(false);
-        setTransitionEnter(true);
-      }, 150);
-      setTimeout(() => {
-        // @ts-ignore
-        _changingContentRef.current.style.transform = "translateY(0px)";
-        // @ts-ignore
-        _changingContentRef.current.style.opacity = "1";
-        setActiveItem(FEATURES_LIST[parseInt(item.split("-")[1]) - 1]);
-        setTransitionEnter(false);
-      }, 300);
-    }
+    // if (_changingContentRef.current) {
+    //   setTransitionLeave(true);
+    //   // @ts-ignore
+    //   _changingContentRef.current.style.transform = "translateY(-10px)";
+    //   // @ts-ignore
+    //   _changingContentRef.current.style.opacity = "0.5";
+    //   setTimeout(() => {
+    //     // @ts-ignore
+    //     _changingContentRef.current.style.opacity = "0";
+    //     // @ts-ignore
+    //     _changingContentRef.current.style.transform = "translateY(10px)";
+    //     setTransitionLeave(false);
+    //     setTransitionEnter(true);
+    //   }, 150);
+    //   setTimeout(() => {
+    //     // @ts-ignore
+    //     _changingContentRef.current.style.transform = "translateY(0px)";
+    //     // @ts-ignore
+    //     _changingContentRef.current.style.opacity = "1";
+    setActiveItem(FEATURES_LIST[parseInt(item.split("-")[1]) - 1]);
+    //   setTransitionEnter(false);
+    // }, 300);
+    // }
   };
 
   // React.useEffect(() => {
@@ -111,10 +111,10 @@ export default function FeaturesAcordion() {
               data-nimg="1"
               className={cn(
                 "block aspect-[800/600] object-cover object-left-top dark:hidden",
-                {
-                  "blur-0": !transitionEnter && !transitionLeave,
-                  blur: transitionEnter,
-                },
+                // {
+                //   "blur-0": !transitionEnter && !transitionLeave,
+                //   blur: transitionEnter,
+                // },
               )}
             />
             <Image
@@ -127,10 +127,10 @@ export default function FeaturesAcordion() {
               data-nimg="1"
               className={cn(
                 "hidden aspect-[800/600] object-cover object-left-top dark:block",
-                {
-                  "blur-0": !transitionEnter && !transitionLeave,
-                  blur: transitionEnter,
-                },
+                // {
+                //   "blur-0": !transitionEnter && !transitionLeave,
+                //   blur: transitionEnter,
+                // },
               )}
             />
           </div>

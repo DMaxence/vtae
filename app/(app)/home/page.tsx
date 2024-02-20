@@ -1,4 +1,5 @@
 import FeaturesAcordion from "@/components/home/features-acordion";
+import Roadmap from "@/components/home/roadmap";
 import { APP_DOMAIN } from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -66,7 +67,9 @@ export default function HomePage() {
           <FeaturesAcordion />
         </div>
       </div>
-      <div className="mt-20  border-t border-gray-200 bg-white/10 py-20 shadow-[inset_10px_-50px_94px_0_rgb(199,199,199,0.2)] backdrop-blur dark:border-slate-700 dark:bg-black/10 dark:shadow-[inset_10px_-50px_94px_0_rgb(50,50,50,0.2)]">
+      {/* <Pricing /> */}
+      <Roadmap />
+      <div className="mt-20 border-t border-gray-200 bg-white/10 py-20 shadow-[inset_10px_-50px_94px_0_rgb(199,199,199,0.2)] backdrop-blur dark:border-slate-700 dark:bg-black/10 dark:shadow-[inset_10px_-50px_94px_0_rgb(50,50,50,0.2)]">
         <div className="mx-auto w-full max-w-screen-xl px-2.5 lg:px-20">
           <div className="mx-auto max-w-md text-center sm:max-w-xl">
             <h2 className="bg-gradient-to-r from-blue-400 via-blue-700 to-blue-400 bg-clip-text font-display text-4xl font-extrabold leading-tight text-transparent sm:text-5xl sm:leading-tight">

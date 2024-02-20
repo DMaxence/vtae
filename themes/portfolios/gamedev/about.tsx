@@ -28,7 +28,7 @@ export default function About({ site }: AboutProps) {
           <div className="text-3xl font-bold text-white">
             {site.personalInfos.firstname} {site.personalInfos.lastname}
           </div>
-          <div className="whitespace-pre-line text-white">
+          <div className="whitespace-pre-line text-white text-justify">
             {site.personalInfos.about}
           </div>
         </div>
