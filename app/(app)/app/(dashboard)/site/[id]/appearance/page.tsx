@@ -57,7 +57,7 @@ export default async function SiteSettingsAppearance({
           }}
           handleSubmit={updateSite}
         />
-        <Form
+        {/* <Form
           title="Theme Customization"
           description="Customize the theme for your site."
           helpText="Make your site unique."
@@ -72,7 +72,7 @@ export default async function SiteSettingsAppearance({
             })),
           }}
           handleSubmit={updateThemeConfig}
-        />
+        /> */}
         {/* <Form
           title="Thumbnail image"
           description="The thumbnail image for your site. Accepted formats: .png, .jpg, .jpeg"
