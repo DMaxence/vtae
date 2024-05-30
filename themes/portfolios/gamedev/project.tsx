@@ -72,7 +72,9 @@ export default function Project({ project }: ProjectProps) {
     <div className="flex flex-col gap-5 py-5 text-white sm:flex-row">
       {/* image */}
       {hasImage && (
-        <div className={cn("w-full space-y-2 sm:w-1/2", styles.yarlThumbnails)}>
+        <div className={cn("w-full space-y-2 sm:w-1/2", styles.yarlThumbnails, {
+          [styles.yarlSlideStart]: slides.length <= 5,
+        })}>
           <Lightbox
             index={index}
             slides={slides}
@@ -292,13 +294,13 @@ export default function Project({ project }: ProjectProps) {
         <div className="flex flex-col gap-3.5">
           <div className="flex gap-2 text-xl font-semibold">
             <div>{getTextDate(project.startDate)}</div>
-            <span>|</span>
+            {/* <span>|</span>
             <div>
               {getElapsedTime(
                 project.startDate,
                 project?.endDate || new Date(),
               )}
-            </div>
+            </div> */}
           </div>
           {/* skills list */}
           <div className="flex flex-wrap gap-3">

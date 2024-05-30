@@ -2,15 +2,14 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL") // uses connection pooling
-  // directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
-  relationMode = "prisma"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // uses connection pooling
+  directUrl = env("DIRECT_URL") // uses a direct connectionØ
 }
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+  previewFeatures = ["fullTextSearch"]
 }
 
 model User {
@@ -117,7 +116,7 @@ model PersonalInfos {
   location      String?
   currentWork   String?
   image         String?  @db.Text
-  imageBlurhash String?  @db.LongText
+  imageBlurhash String?  @db.Text
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   site          Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
@@ -139,8 +138,6 @@ model Experience {
   updatedAt   DateTime  @updatedAt
   site        Site?     @relation(fields: [siteId], references: [id], onDelete: Cascade)
   siteId      String?
-
-  @@index([siteId], name: "experience_site_constraint")
 }
 
 model Skill {
@@ -151,8 +148,6 @@ model Skill {
   experiences Experience[]
   projects    Project[]
   sites       Site[]
-
-  @@fulltext([name])
 }
 
 model Education {
@@ -273,8 +268,6 @@ model ProjectCategory {
   slug     String    @unique
   name     String
   projects Project[]
-
-  @@fulltext([name])
 }
 
 enum SiteType {

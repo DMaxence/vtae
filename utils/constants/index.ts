@@ -50,7 +50,7 @@ export const APP_DOMAIN =
     ? `https://app.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
     : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
       ? `https://preview.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-      : "http://localhost:3000";
+      : "http://app.localhost:3000";
 
 export const SUB_DOMAIN = (subdomain: string) =>
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
