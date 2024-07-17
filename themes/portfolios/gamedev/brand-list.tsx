@@ -54,7 +54,7 @@ export default function BrandList({ site }: BrandListProps) {
   };
 
   return (
-    <div className=" bg-[#1D072E] py-10">
+    <div className=" bg-[#001f3f] py-10">
       <div className="relative mx-auto h-full max-w-4xl">
         {logos.length > 0 && (
           <Carousel

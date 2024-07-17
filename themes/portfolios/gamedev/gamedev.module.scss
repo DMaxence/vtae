@@ -1,9 +1,10 @@
 .container {
-  background: radial-gradient(
+  background: linear-gradient(90deg, #001f3f, #0074d9, #7fdbff);
+  /* background: radial-gradient(
     74.24% 74.24% at 50% 13.72%,
     #cf2cdc 0%,
     #31096f 100%
-  );
+  ); */
 
   & .heroContainer {
     background: url("https://res.cloudinary.com/doskh9xiu/image/upload/v1707345427/vtae/themes/default-images/gamedev_hero_l9me0p.png");
@@ -12,8 +13,12 @@
     background-size: cover;
   }
   & .skillsContainer {
-    background: linear-gradient(125.41deg, #310057 26.31%, #1a002e 85.33%),
-      radial-gradient(75.11% 75.11% at 50% 24.89%, #70179b 0%, #3a2997 100%),
+    background: linear-gradient(
+        125.41deg,
+        #40a2c8 16.31%,
+        #0074d9 65.33%,
+        #2c7fd5 94%
+      ),
       linear-gradient(
         103.28deg,
         rgba(114, 112, 222, 0.1) 0%,
@@ -23,8 +28,8 @@
     border: 1px solid;
     border-image-source: radial-gradient(
       75.11% 75.11% at 50% 24.89%,
-      #70179b 0%,
-      #3a2997 100%
+      #17659b 0%,
+      #293597 100%
     );
     padding: 100px, 0px, 100px, 0px;
     border-radius: 8px;
