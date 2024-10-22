@@ -39,7 +39,7 @@ export default function Roadmap() {
               }}
             />
             <TimelineContent>
-              <TimelineTime>January 2024</TimelineTime>
+              <TimelineTime>October 2024</TimelineTime>
               <TimelineTitle>Portfolios</TimelineTitle>
               <TimelineBody>
                 Gives the ability to choose between a hosted resume or a
@@ -54,7 +54,7 @@ export default function Roadmap() {
           <TimelineItem>
             <TimelinePoint />
             <TimelineContent>
-              <TimelineTime>March 2024</TimelineTime>
+              <TimelineTime>January 2025</TimelineTime>
               <TimelineTitle>Custom themes</TimelineTitle>
               <TimelineBody>
                 Adding a lot more themes and the ability to customize them.
@@ -64,7 +64,7 @@ export default function Roadmap() {
           <TimelineItem>
             <TimelinePoint />
             <TimelineContent>
-              <TimelineTime>March-April 2024</TimelineTime>
+              <TimelineTime>March 2025</TimelineTime>
               <TimelineTitle>Enterprise-scale</TimelineTitle>
               <TimelineBody>
                 Give enterprises custom theme and platform so they can manage
